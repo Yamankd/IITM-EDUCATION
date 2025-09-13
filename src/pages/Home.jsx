@@ -1,33 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-
+// import Doodle from '../assets/doodlebg.png'
 const Home = () => {
     return (
         <div className='bg-white text-[#0B2A4A]'>
             {/* Hero Section */}
-            <section className='w-full min-h-[80vh] flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-10 bg-[#0B2A4A] text-white'>
-                <div className='flex-1'>
-                    <h1 className='text-4xl md:text-5xl font-bold leading-tight'>
-                        Welcome to IITM Computer Education
-                    </h1>
-                    <p className='mt-4 text-lg'>
-                        Empowering students with digital skills since 2010.
-                        Learn programming, web development, and computer basics with us.
-                    </p>
-                    <NavLink to='/course'>
-                        <button className='mt-6 px-6 py-3 bg-[#D6A419] text-[#0B2A4A] font-bold rounded-md hover:bg-yellow-500 transition'>
-                            Explore Courses
-                        </button>
-                    </NavLink>
-                </div>
+            <section className='w-full min-h-[100vh] flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-10 bg-[#0B2A4A] text-white'>
 
-                <div className='flex-1 mt-10 md:mt-0 flex justify-center'>
-                    <img
-                        src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'
-                        alt='Education'
-                        className='w-72 md:w-96'
-                    />
-                </div>
+
             </section>
 
             {/* Course Highlights */}
