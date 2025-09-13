@@ -8,13 +8,10 @@ const Navbar = () => {
     const toggleMenu = () => setIsOpen(!isOpen);
 
     return (
-        <nav className='flex items-center justify-between px-4 md:px-20 py-2 border-b relative bg-[#0B2A4A] shadow-sm'>
+        <nav className='flex items-center justify-between px-4 md:px-20 py-2  relative bg-[#0B2A4A] '>
             {/* Logo */}
             <div className='flex items-center gap-2'>
                 <img src={logo} alt="Logo" className='w-20 h-20 object-contain' />
-                {/* <span className='text-white text-xl font-bold hidden md:block'>
-                    IITM COMPUTER EDUCATION
-                </span> */}
             </div>
 
             {/* Desktop Menu */}
@@ -33,7 +30,7 @@ const Navbar = () => {
             {/* Hamburger Icon */}
             <div className='md:hidden'>
                 <button onClick={toggleMenu}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         {isOpen ? (
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         ) : (
