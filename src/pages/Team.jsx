@@ -351,7 +351,7 @@ const Team = () => {
                   onClick={() => setSelectedMember(allTeamMembers[currentIndex])}
                 >
                   <motion.div 
-                    className="w-80 h-80 rounded-full overflow-hidden border-4 border-white shadow-2xl mb-6 relative"
+                    className="w-80 h-80 rounded-full mt-2 overflow-hidden border-4 border-white shadow-2xl mb-6 relative"
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
@@ -414,10 +414,9 @@ const Team = () => {
             {filteredTeamMembers.map((member, index) => (
               <motion.div
                 key={member.id}
-                layout
-                initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                initial={{ opacity: 0, y: 100, scale: 0.5 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
+                transition={{ delay: index * 0.2, type: "tween" }}
                 whileHover={{ 
                   scale: 1.05, 
                   y: -10,
