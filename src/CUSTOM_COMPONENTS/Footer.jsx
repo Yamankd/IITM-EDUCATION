@@ -115,6 +115,14 @@ const Footer = () => {
                                     Careers
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink
+                                    to="/gallery"
+                                    className="text-gray-300 hover:text-[#D6A419] transition-colors"
+                                >
+                                    Gallery
+                                </NavLink>
+                            </li>
                         </ul>
                     </div>
 

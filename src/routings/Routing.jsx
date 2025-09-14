@@ -6,16 +6,18 @@ import Team from '../pages/Team'
 import Store from '../pages/Store'
 import CourseDetail from '../pages/CourseDetail'
 import About from '../pages/About'
+import Gallery from '../pages/Gallery'
 
 const Routing = () => {
     return (
         <Routes> {/* Use Routes instead of Router */}
             <Route path='/' element={<Home />} />
             <Route path='/course' element={<Courses />} />
+            <Route path='/course/:id' element={<CourseDetail />} />
             <Route path='/team' element={<Team />} />
             <Route path='/store' element={<Store />} />
             <Route path='/about' element={<About />} />
-            <Route path='/course/:id' element={<CourseDetail />} />
+            <Route path='/gallery' element={<Gallery />} />
         </Routes>
     )
 }
