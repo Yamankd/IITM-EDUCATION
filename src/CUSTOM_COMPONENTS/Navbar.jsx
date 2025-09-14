@@ -158,12 +158,12 @@ const Navbar = () => {
                             )}
                         </div>
 
-                        {/* <NavLink to='/team' className={({ isActive }) => isActive ? 'text-[#D6A419] font-semibold' : 'hover:text-[#D6A419]'}>
+                        <NavLink to='/team' className={({ isActive }) => isActive ? 'text-[#D6A419] font-semibold' : 'hover:text-[#D6A419]'}>
                             Team
                         </NavLink>
                         <NavLink to='/store' className={({ isActive }) => isActive ? 'text-[#D6A419] font-semibold' : 'hover:text-[#D6A419]'}>
                             Store
-                        </NavLink> */}
+                        </NavLink>
                     </div>
 
                     {/* Sign In Button (Desktop) */}
