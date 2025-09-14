@@ -34,35 +34,35 @@ const About = () => {
           animate={{ scaleX: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
         ></motion.div>
-
-        {/* Second Line */}
-        <motion.p
-          className="text-lg md:text-2xl font-medium text-gray-200 max-w-3xl leading-relaxed relative z-10"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut", delay: 1 }}
-        >
-          We don’t just teach computers —{" "}
-          <span className="text-[#D6A419] font-semibold">
-            we inspire confidence to create your digital future.
-          </span>
-        </motion.p>
       </div>
 
       {/* --------------------------------------------------------------------------------- */}
 
-      <div className="bg-[#0B2A4A] text-white min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-12 space-y-10 md:space-y-0">
-        {/* Text Section */}
-        <div className="md:w-1/2 space-y-6">
-          <motion.h1
-            className="text-4xl md:text-5xl font-bold text-[#D6A419] leading-tight"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            About Us
-          </motion.h1>
+      <motion.h1
+        className="text-4xl md:text-5xl bg-[#0B2A4A] font-bold text-center text-[#D6A419] leading-tight"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+        About Us
+      </motion.h1>
+      {/* ------------------------------------------------ */}
+      <div className="bg-[#0B2A4A] text-white min-h-screen flex flex-col md:flex-row items-stretch justify-between px-6 md:px-16 py-12 gap-10">
+        {/* Image Section */}
+        {/* <div className="md:w-1/2 flex items-center"> */}
+        {/* <motion.img
+            src="#"
+            alt="Computer Coaching"
+            className="rounded-xl shadow-2xl w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+          /> */}
+        {/* </div> */}
 
+        {/* Text Section */}
+
+        <div className="md:w-full text-center flex flex-col justify-center space-y-6">
           <motion.h2
             className="text-2xl md:text-3xl font-semibold"
             initial={{ opacity: 0, y: 30 }}
@@ -118,7 +118,7 @@ const About = () => {
           </motion.p>
 
           <motion.blockquote
-            className="text-xl italic font-medium border-l-4 border-[#d6a419] pl-4 text-amber-300/90 mt-6"
+            className="text-xl italic font-medium border-l-4 border-[#D6A419] pl-4 text-amber-300/90 mt-6"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 1.2 }}
@@ -127,18 +127,20 @@ const About = () => {
             unlocking your potential today.”
           </motion.blockquote>
         </div>
-
-        {/* Image Section */}
-        <div className="md:w-1/2 mt-10 md:mt-0">
-          <motion.img
-            src="https://i.pinimg.com/736x/ca/d7/8e/cad78eb43c7cb7a4e6f1c4fa392d8fa4.jpg"
-            alt="Computer Coaching"
-            className="rounded-xl shadow-2xl w-full object-cover"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-          />
-        </div>
+      </div>
+      {/* ---------------------------------------------- */}
+      <div className="flex flex-col items-center justify-center bg-[#0B2A4A] px-6 py-16 text-center space-y-8 relative overflow-hidden">
+        <motion.p
+          className="text-xl md:text-3xl font-semibold leading-relaxed max-w-3xl text-white"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.8 }}
+        >
+          We don’t just teach computers —{" "}
+          <span className="text-[#D6A419]">
+            we inspire confidence to create your digital future.
+          </span>
+        </motion.p>
       </div>
     </>
   );
