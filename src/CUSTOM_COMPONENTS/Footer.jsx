@@ -85,26 +85,18 @@ const Footer = () => {
                         <ul className="space-y-2">
                             <li>
                                 <NavLink
-                                    to="#"
-                                    className="text-gray-300 hover:text-[#D6A419] transition-colors"
-                                >
-
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    to="#"
-                                    className="text-gray-300 hover:text-[#D6A419] transition-colors"
-                                >
-
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
                                     to="/team"
                                     className="text-gray-300 hover:text-[#D6A419] transition-colors"
                                 >
                                     Team
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/about"
+                                    className="text-gray-300 hover:text-[#D6A419] transition-colors"
+                                >
+                                    About
                                 </NavLink>
                             </li>
                             <li>
@@ -114,14 +106,6 @@ const Footer = () => {
                                 >
                                     Store
                                 </NavLink>
-                            </li>
-                            <li>
-                                <a
-                                    href="/about"
-                                    className="text-gray-300 hover:text-[#D6A419] transition-colors"
-                                >
-                                    About
-                                </a>
                             </li>
                             <li>
                                 <NavLink
