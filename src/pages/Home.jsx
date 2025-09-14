@@ -226,47 +226,9 @@ const Home = () => {
                     </NavLink>
                 </div>
 
-                {/* Interaction Instructions */}
-                {/* <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 max-w-md mx-auto">
-                    <h2 className="text-xl font-semibold mb-4 text-[#D6A419]">Interactive Background</h2>
-                    <p className="mb-4">Try interacting with the background using:</p>
-
-                    <div className="flex justify-center mb-4">
-                        <button
-                            onClick={toggleInteractionMode}
-                            className={`px-4 py-2 rounded-l-lg ${interactionMode === 'mouse'
-                                ? 'bg-[#D6A419] text-[#0B2A4A]'
-                                : 'bg-gray-700 text-white'
-                                }`}
-                        >
-                            Mouse Mode
-                        </button>
-                        <button
-                            onClick={toggleInteractionMode}
-                            className={`px-4 py-2 rounded-r-lg ${interactionMode === 'keyboard'
-                                ? 'bg-[#D6A419] text-[#0B2A4A]'
-                                : 'bg-gray-700 text-white'
-                                }`}
-                        >
-                            Keyboard Mode
-                        </button>
-                    </div>
-
-                    {interactionMode === 'mouse' ? (
-                        <div className="text-sm">
-                            <p>✨ Move your mouse to influence the particles</p>
-                            <p>✨ Watch them react to your cursor movement</p>
-                        </div>
-                    ) : (
-                        <div className="text-sm">
-                            <p>🎮 Use arrow keys to create currents</p>
-                            <p>🎮 Press spacebar for an explosion effect</p>
-                        </div>
-                    )}
-                </div> */}
 
                 {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
                     <div className="animate-bounce">
                         <svg className="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
