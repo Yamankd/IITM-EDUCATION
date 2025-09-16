@@ -4,22 +4,20 @@ import Routing from './routings/Routing'
 import Footer from './CUSTOM_COMPONENTS/Footer'
 import Faq from './CUSTOM_COMPONENTS/Faq'
 import { useLocation } from 'react-router-dom'
+import ImageCarousel from './CUSTOM_COMPONENTS/ImageCarousel' // Import the carousel
+
 const App = () => {
 
-  const {pathname} = useLocation();
-  useEffect(()=>{
-    window.scrollTo(0,0);
-    console.log(pathname)
-  },[pathname])
+  const location = useLocation();
+  console.log(location)
   return (
-
     <>
       <Navbar />
       <Routing />
-      {pathname === '/' && <Faq />}
+      {location.pathname === '/' && <Faq />}
       <Footer />
     </>
   )
 }
 
-export default App
+export default App;

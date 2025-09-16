@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Mail, Linkedin, Twitter, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -9,6 +9,7 @@ const Team = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+  // NOTE: This data is hardcoded for demonstration. In a real app, it would likely come from an API.
   const teamData = {
     management: [
       {
@@ -179,13 +180,12 @@ const Team = () => {
     { id: "operations", name: "Operations", icon: "⚙️" },
   ];
 
-  
   const filteredTeamMembers = allTeamMembers.filter(member => {
     const matchesDepartment = activeDepartment === "all" || member.department === activeDepartment;
-    const matchesSearch = searchTerm === "" || 
-                         member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.skills?.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = searchTerm === "" ||
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.skills?.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesDepartment && matchesSearch;
   });
 
@@ -200,34 +200,30 @@ const Team = () => {
   }, [activeDepartment, allTeamMembers.length, isAutoPlaying, searchTerm]);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => prev === allTeamMembers.length - 1 ? 0 : prev + 1);
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev === allTeamMembers.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => prev === 0 ? allTeamMembers.length - 1 : prev - 1);
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev === 0 ? allTeamMembers.length - 1 : prev - 1));
   };
-
 
   const handleDepartmentChange = (deptId) => {
     setActiveDepartment(deptId);
     setCurrentIndex(0);
-    if (deptId !== "all") {
-      setSearchTerm(""); 
-    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 font-sans">
-      
-      <motion.div 
+      <motion.div
         className="bg-[#0B2A4A] text-white py-16 relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-transparent"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <motion.h1 
+          <motion.h1
             className="text-4xl md:text-5xl font-extrabold mb-4 tracking-wide"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -235,7 +231,7 @@ const Team = () => {
           >
             Meet the team that makes the magic happen
           </motion.h1>
-          <motion.p 
+          <motion.p
             className="text-xl max-w-3xl mx-auto mb-8 opacity-90"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -247,8 +243,7 @@ const Team = () => {
       </motion.div>
 
       <div className="container mx-auto px-4 py-8">
-        
-        <motion.div 
+        <motion.div
           className="max-w-md mx-auto mb-8"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -261,19 +256,20 @@ const Team = () => {
               placeholder="Search team members by name, role, or skills..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#D6A419] focus:border-transparent transition-all"
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#D6A419] focus:border-transparent transition-all"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                aria-label="Clear search"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
           </div>
           {searchTerm && (
-            <motion.p 
+            <motion.p
               className="text-sm text-gray-600 mt-2 text-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -283,27 +279,32 @@ const Team = () => {
           )}
         </motion.div>
 
-        
-        <motion.div 
+        <motion.div
           className="flex flex-wrap justify-center gap-4 mb-12"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.05,
+              },
+            },
+          }}
         >
-          {departments.map((dept, index) => (
+          {departments.map((dept) => (
             <motion.button
               key={dept.id}
               onClick={() => handleDepartmentChange(dept.id)}
-              className={`px-5 py-3 rounded-full transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg ${
-                activeDepartment === dept.id
-                  ? "bg-[#D6A419] text-[#0B2A4A] font-bold scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-100 hover:scale-105"
-              }`}
-              whileHover={{ y: -2 }}
+              className={`px-5 py-3 rounded-full transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg ${activeDepartment === dept.id
+                ? "bg-[#D6A419] text-[#0B2A4A] font-bold scale-105"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              whileHover={{ y: -2, scale: activeDepartment === dept.id ? 1.05 : 1.02 }}
               whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index }}
             >
               <span>{dept.icon}</span>
               {dept.name}
@@ -311,173 +312,166 @@ const Team = () => {
           ))}
         </motion.div>
 
-      
         {activeDepartment === "all" && !searchTerm ? (
-          
           <div className="relative w-full max-w-4xl mx-auto h-[600px] overflow-hidden">
-            
             <div className="absolute top-4 right-4 z-20 flex gap-2">
               <button
                 onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                className={`p-2 rounded-full ${isAutoPlaying ? 'bg-[#D6A419]' : 'bg-gray-300'} text-white`}
+                className={`p-2 rounded-full ${isAutoPlaying ? 'bg-[#D6A419]' : 'bg-gray-300'} text-white transition-colors`}
+                aria-label={isAutoPlaying ? 'Pause autoplay' : 'Start autoplay'}
               >
                 {isAutoPlaying ? '⏸️' : '▶️'}
               </button>
             </div>
-            
+
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+              className="absolute left-0 md:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+              aria-label="Previous member"
             >
               <ChevronLeft className="w-6 h-6 text-[#0B2A4A]" />
             </button>
-            
+
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+              className="absolute right-0 md:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+              aria-label="Next member"
             >
               <ChevronRight className="w-6 h-6 text-[#0B2A4A]" />
             </button>
 
             <AnimatePresence initial={false} mode="wait">
-              {allTeamMembers.length > 0 && allTeamMembers[currentIndex] && (
+              {allTeamMembers.length > 0 && (
                 <motion.div
                   key={allTeamMembers[currentIndex].id}
                   initial={{ x: 300, opacity: 0, rotateY: 45 }}
                   animate={{ x: 0, opacity: 1, rotateY: 0 }}
                   exit={{ x: -300, opacity: 0, rotateY: -45 }}
-                  transition={{ duration: 0.8, type: "spring" }}
+                  transition={{ duration: 0.6, type: "spring", stiffness: 150, damping: 25 }}
                   className="absolute w-full flex flex-col items-center text-center cursor-pointer"
                   onClick={() => setSelectedMember(allTeamMembers[currentIndex])}
                 >
-                  <motion.div 
-                    className="w-80 h-80 rounded-full mt-2 overflow-hidden border-4 border-white shadow-2xl mb-6 relative"
+                  <motion.div
+                    className="w-80 h-80 rounded-full overflow-hidden border-4 border-white shadow-2xl mb-6 relative"
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <img
                       src={allTeamMembers[currentIndex].image}
-                      alt={allTeamMembers[currentIndex].name || "Team member"}
+                      alt={allTeamMembers[currentIndex].name}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
                       <span className="text-white font-semibold">Click for details</span>
                     </div>
                   </motion.div>
-                  <motion.h3 
+                  <motion.h3
                     className="text-4xl font-bold text-[#0B2A4A] mb-2"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
                   >
-                    {allTeamMembers[currentIndex].name || "Unnamed"}
+                    {allTeamMembers[currentIndex].name}
                   </motion.h3>
-                  <motion.p 
+                  <motion.p
                     className="text-[#D6A419] font-medium text-2xl mb-4"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
                   >
-                    {allTeamMembers[currentIndex].role || "No role"}
+                    {allTeamMembers[currentIndex].role}
                   </motion.p>
-                  <motion.p 
+                  <motion.p
                     className="text-gray-700 max-w-2xl text-lg leading-relaxed"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
                   >
-                    {allTeamMembers[currentIndex].bio || "No bio available"}
+                    {allTeamMembers[currentIndex].bio}
                   </motion.p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
               {allTeamMembers.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentIndex ? 'bg-[#D6A419] scale-125' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
+                  onClick={() => {
+                    setIsAutoPlaying(false);
+                    setCurrentIndex(index);
+                  }}
+                  className={`w-3 h-3 rounded-full transition-all ${index === currentIndex ? 'bg-[#D6A419] scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
             </div>
           </div>
         ) : (
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center"
+          // FIX: Wrapped grid items in <AnimatePresence> for smooth filtering animations.
+          // The `layout` prop on the container will animate the grid resizing.
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center"
             layout
           >
-            {filteredTeamMembers.map((member, index) => (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, y: 100, scale: 0.5 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: index * 0.2, type: "tween" }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  y: -10,
-                  boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
-                }}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer w-full max-w-xs relative overflow-hidden group"
-                onClick={() => setSelectedMember(member)}
-              >
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B2A4A]/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-6 z-10">
-                  <span className="text-white font-semibold">View Profile</span>
-                </div>
-
-                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-100 mb-4 relative">
-                  <img
-                    src={member.image}
-                    alt={member.name || "Team member"}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-[#0B2A4A] mb-2 text-center">
-                  {member.name || "Unnamed"}
-                </h3>
-                <p className="text-[#D6A419] font-medium text-center mb-3">
-                  {member.role || "No role"}
-                </p>
-                <p className="text-gray-600 text-sm text-center mb-4 line-clamp-3">
-                  {member.bio || "No bio available"}
-                </p>
-                
-                
-                <div className="flex flex-wrap justify-center gap-1">
-                  {member.skills?.slice(0, 3).map((skill, skillIndex) => (
-                    <span
-                      key={skillIndex}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  {member.skills?.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-200 text-gray-500 text-xs rounded-full">
-                      +{member.skills.length - 3}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+            <AnimatePresence>
+              {filteredTeamMembers.map((member) => (
+                <motion.div
+                  key={member.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                  whileHover={{
+                    scale: 1.05,
+                    y: -10,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+                  }}
+                  className="bg-white rounded-2xl p-6 shadow-lg transition-shadow duration-300 cursor-pointer w-full max-w-xs relative overflow-hidden group"
+                  onClick={() => setSelectedMember(member)}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B2A4A]/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-6 z-10">
+                    <span className="text-white font-semibold">View Profile</span>
+                  </div>
+                  <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-100 mb-4 relative">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0B2A4A] mb-2 text-center">
+                    {member.name}
+                  </h3>
+                  <p className="text-[#D6A419] font-medium text-center mb-3">
+                    {member.role}
+                  </p>
+                  {/* NOTE: The `line-clamp-3` class requires the @tailwindcss/line-clamp plugin. */}
+                  <p className="text-gray-600 text-sm text-center mb-4 h-16 line-clamp-3">
+                    {member.bio}
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-1">
+                    {member.skills?.slice(0, 3).map((skill, skillIndex) => (
+                      <span
+                        key={skillIndex}
+                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {member.skills?.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-200 text-gray-500 text-xs rounded-full">
+                        +{member.skills.length - 3}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </motion.div>
         )}
 
-      
         {filteredTeamMembers.length === 0 && searchTerm && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             className="text-center py-12"
           >
             <div className="text-6xl mb-4">🔍</div>
             <p className="text-gray-500 text-xl mb-2">No team members found</p>
-            <p className="text-gray-400">Try searching for a different name, role, or skill</p>
+            <p className="text-gray-400">Try searching for a different name, role, or skill.</p>
             <button
               onClick={() => setSearchTerm("")}
               className="mt-4 px-4 py-2 bg-[#D6A419] text-[#0B2A4A] rounded-lg font-medium hover:bg-yellow-500 transition-colors"
@@ -488,14 +482,13 @@ const Team = () => {
         )}
       </div>
 
-      
       <AnimatePresence>
         {selectedMember && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedMember(null)}
           >
             <motion.div
@@ -503,89 +496,91 @@ const Team = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative">
-                
-                <button
-                  onClick={() => setSelectedMember(null)}
-                  className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
-                >
-                  <X className="w-6 h-6 text-gray-600" />
-                </button>
+              <button
+                onClick={() => setSelectedMember(null)}
+                className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                aria-label="Close profile"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
 
-                
-                <div className="bg-gradient-to-br from-[#0B2A4A] to-blue-900 text-white p-8 rounded-t-3xl">
-                  <div className="flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                      <img
-                        src={selectedMember.image}
-                        alt={selectedMember.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="text-center md:text-left">
-                      <h2 className="text-3xl font-bold mb-2">{selectedMember.name}</h2>
-                      <p className="text-[#D6A419] text-xl font-medium mb-2">{selectedMember.role}</p>
-                      <p className="opacity-90">{selectedMember.yearsOfExperience} years of experience</p>
-                    </div>
+              <div className="bg-gradient-to-br from-[#0B2A4A] to-blue-900 text-white p-8 rounded-t-3xl">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0">
+                    <img
+                      src={selectedMember.image}
+                      alt={selectedMember.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center md:text-left">
+                    <h2 className="text-3xl font-bold mb-2">{selectedMember.name}</h2>
+                    <p className="text-[#D6A419] text-xl font-medium mb-2">{selectedMember.role}</p>
+                    <p className="opacity-90">{selectedMember.yearsOfExperience} years of experience</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">About</h3>
+                  <p className="text-gray-700 leading-relaxed">{selectedMember.bio}</p>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">Education</h3>
+                  <p className="text-gray-700">{selectedMember.education}</p>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">Skills & Expertise</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMember.skills?.map((skill, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="px-3 py-2 bg-[#D6A419] text-[#0B2A4A] rounded-full font-medium text-sm"
+                      >
+                        {skill}
+                      </motion.span>
+                    ))}
                   </div>
                 </div>
 
-                <div className="p-8">
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">About</h3>
-                    <p className="text-gray-700 leading-relaxed">{selectedMember.bio}</p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">Education</h3>
-                    <p className="text-gray-700">{selectedMember.education}</p>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-3">Skills & Expertise</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember.skills?.map((skill, index) => (
-                        <motion.span
-                          key={index}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="px-3 py-2 bg-[#D6A419] text-[#0B2A4A] rounded-full font-medium text-sm"
-                        >
-                          {skill}
-                        </motion.span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-6">
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">Connect</h3>
-                    <div className="flex gap-4">
-                      <a
-                        href={`mailto:${selectedMember.email}`}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                      >
-                        <Mail className="w-5 h-5 text-gray-600" />
-                        Email
-                      </a>
-                      <a
-                        href={selectedMember.linkedin}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
-                      >
-                        <Linkedin className="w-5 h-5 text-blue-600" />
-                        LinkedIn
-                      </a>
-                      <a
-                        href={selectedMember.twitter}
-                        className="flex items-center gap-2 px-4 py-2 bg-sky-100 hover:bg-sky-200 rounded-lg transition-colors"
-                      >
-                        <Twitter className="w-5 h-5 text-sky-600" />
-                        Twitter
-                      </a>
-                    </div>
+                <div className="border-t pt-6">
+                  <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">Connect</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {/* FIX: Added target="_blank" and rel attributes for security and UX. */}
+                    <a
+                      href={`mailto:${selectedMember.email}`}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                      <Mail className="w-5 h-5 text-gray-600" />
+                      Email
+                    </a>
+                    <a
+                      href={selectedMember.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                    >
+                      <Linkedin className="w-5 h-5 text-blue-600" />
+                      LinkedIn
+                    </a>
+                    <a
+                      href={selectedMember.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-sky-100 hover:bg-sky-200 rounded-lg transition-colors"
+                    >
+                      <Twitter className="w-5 h-5 text-sky-600" />
+                      Twitter
+                    </a>
                   </div>
                 </div>
               </div>
@@ -594,7 +589,7 @@ const Team = () => {
         )}
       </AnimatePresence>
 
-      <motion.div 
+      <motion.div
         className="bg-[#0B2A4A] py-12 mt-8"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -602,30 +597,12 @@ const Team = () => {
         viewport={{ once: true }}
       >
         <div className="container mx-auto px-4 text-center">
-          <motion.h2 
-            className="text-3xl font-bold text-white mb-4"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Join Our Team
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-white mb-8 max-w-3xl mx-auto opacity-90"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            viewport={{ once: true }}
-          >
+          <h2 className="text-3xl font-bold text-white mb-4">Join Our Team</h2>
+          <p className="text-xl text-white mb-8 max-w-3xl mx-auto opacity-90">
             We're always looking for talented instructors and staff passionate about technology education.
-          </motion.p>
-          <motion.button 
-            className="px-8 py-4 bg-[#D6A419] text-[#0B2A4A] rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            viewport={{ once: true }}
+          </p>
+          <motion.button
+            className="px-8 py-4 bg-[#D6A419] text-[#0B2A4A] rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -638,3 +615,4 @@ const Team = () => {
 };
 
 export default Team;
+
