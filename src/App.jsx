@@ -9,7 +9,10 @@ import ImageCarousel from './CUSTOM_COMPONENTS/ImageCarousel' // Import the caro
 const App = () => {
 
   const location = useLocation();
-  console.log(location)
+  console.log(location);
+  useEffect(()=>{
+    window.scrollTo(0,0);
+  },[location.pathname])
   return (
     <>
       <Navbar />
