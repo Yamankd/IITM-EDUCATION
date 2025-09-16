@@ -13,7 +13,7 @@ const Courses = () => {
     // Sample course data - replace with your actual data
     const sampleCourses = [
         {
-            id: 1,
+            id: "cs",
             title: "Introduction to Computer Science",
             category: "Computer Science",
             level: "Beginner",
@@ -25,7 +25,7 @@ const Courses = () => {
             price: 49.99
         },
         {
-            id: 2,
+            id: "ds",
             title: "Data Science Fundamentals",
             category: "Data Science",
             level: "Intermediate",
@@ -37,7 +37,7 @@ const Courses = () => {
             price: 59.99
         },
         {
-            id: 3,
+            id: "aml",
             title: "Advanced Machine Learning",
             category: "Artificial Intelligence",
             level: "Advanced",
@@ -49,7 +49,7 @@ const Courses = () => {
             price: 79.99
         },
         {
-            id: 4,
+            id: "webdev",
             title: "Web Development Bootcamp",
             category: "Web Development",
             level: "Beginner",
@@ -61,7 +61,7 @@ const Courses = () => {
             price: 69.99
         },
         {
-            id: 5,
+            id: "mobile",
             title: "Mobile App Development",
             category: "Mobile Development",
             level: "Intermediate",
@@ -73,7 +73,7 @@ const Courses = () => {
             price: 74.99
         },
         {
-            id: 6,
+            id: "cloud",
             title: "Cloud Computing Essentials",
             category: "Cloud Computing",
             level: "Intermediate",
@@ -335,7 +335,7 @@ const Courses = () => {
                                                 </span>
                                             </div>
                                             <NavLink
-                                                to={`/course/${course.id}`}
+                                            to={`/course/${course.id}`}
                                                 className="block w-full text-center px-4 py-2 bg-[#D6A419] text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors"
                                             >
                                                 View Course

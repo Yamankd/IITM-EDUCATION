@@ -1,0 +1,383 @@
+[
+     {
+    "id": "cs",
+    "title": "Introduction to Computer Science",
+    "category": "Computer Science",
+    "level": "Beginner",
+    "duration": "12 weeks",
+    "description": "Learn the fundamentals of computer science and programming.",
+    "longDescription": "This comprehensive course introduces you to the world of computer science and programming. You'll learn fundamental concepts including algorithms, data structures, and computational thinking. Through hands-on projects, you'll gain practical experience in problem-solving and software development.",
+    "image": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1000&q=80",
+    "instructor": {
+      "name": "Dr. Sarah Johnson",
+      "bio": "Professor of Computer Science with 10+ years of teaching experience",
+      "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.7,
+    "reviews": 1250,
+    "students": 4500,
+    "price": 49.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Programming", "topics": ["What is programming?", "Basic syntax", "Variables and data types"] },
+      { "week": 2, "title": "Control Structures", "topics": ["Conditional statements", "Loops", "Boolean logic"] },
+      { "week": 3, "title": "Functions and Modules", "topics": ["Defining functions", "Parameters and return values", "Code organization"] },
+      { "week": 4, "title": "Data Structures", "topics": ["Arrays", "Lists", "Dictionaries", "Basic algorithms"] },
+      { "week": 5, "title": "Object-Oriented Programming", "topics": ["Classes and objects", "Inheritance", "Polymorphism"] },
+      { "week": 6, "title": "Introduction to Algorithms", "topics": ["Searching algorithms", "Sorting algorithms", "Algorithm efficiency"] }
+    ],
+    "requirements": [
+      "Basic computer literacy",
+      "No prior programming experience required",
+      "Access to a computer with internet connection"
+    ],
+    "learningOutcomes": [
+      "Understand fundamental programming concepts",
+      "Write basic programs in a programming language",
+      "Solve problems using computational thinking",
+      "Design and implement simple algorithms"
+    ]
+  },
+  {
+    "id": "ds",
+    "title": "Data Science Fundamentals",
+    "category": "Data Science",
+    "level": "Intermediate",
+    "duration": "16 weeks",
+    "description": "Master data analysis, visualization, and machine learning basics.",
+    "longDescription": "Dive into the exciting field of data science with this comprehensive course. You'll learn how to collect, process, analyze, and visualize data to extract meaningful insights. The course covers statistical analysis, data visualization techniques, and an introduction to machine learning algorithms.",
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
+    "instructor": {
+      "name": "Prof. Michael Chen",
+      "bio": "Data Scientist with industry experience at leading tech companies",
+      "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.8,
+    "reviews": 980,
+    "students": 3200,
+    "price": 59.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Data Science", "topics": ["What is data science?", "Data science process", "Tools and technologies"] },
+      { "week": 2, "title": "Data Collection and Cleaning", "topics": ["Data sources", "Data cleaning techniques", "Handling missing data"] },
+      { "week": 3, "title": "Exploratory Data Analysis", "topics": ["Descriptive statistics", "Data visualization", "Identifying patterns"] },
+      { "week": 4, "title": "Statistical Analysis", "topics": ["Probability distributions", "Hypothesis testing", "Correlation and regression"] },
+      { "week": 5, "title": "Data Visualization", "topics": ["Principles of effective visualization", "Creating charts and graphs", "Interactive dashboards"] },
+      { "week": 6, "title": "Introduction to Machine Learning", "topics": ["Supervised vs unsupervised learning", "Model evaluation", "Basic algorithms"] }
+    ],
+    "requirements": [
+      "Basic knowledge of statistics",
+      "Familiarity with programming concepts",
+      "Access to a computer with internet connection"
+    ],
+    "learningOutcomes": [
+      "Collect and clean data from various sources",
+      "Perform exploratory data analysis",
+      "Apply statistical methods to data problems",
+      "Create effective data visualizations",
+      "Build basic machine learning models"
+    ]
+  },
+  {
+    "id": "aml",
+    "title": "Advanced Machine Learning",
+    "category": "Artificial Intelligence",
+    "level": "Advanced",
+    "duration": "14 weeks",
+    "description": "Master advanced concepts in machine learning and deep learning.",
+    "longDescription": "This course dives deep into advanced machine learning techniques including neural networks, reinforcement learning, and unsupervised methods. You'll gain hands-on experience building state-of-the-art models and applying them to real-world problems.",
+    "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1000&q=80",
+    "instructor": {
+      "name": "Dr. Michael Lee",
+      "bio": "AI researcher specializing in deep learning with over 12 years of industry experience.",
+      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.8,
+    "reviews": 980,
+    "students": 3200,
+    "price": 89.99,
+    "syllabus": [
+      { "week": 1, "title": "Neural Network Architectures", "topics": ["Deep feedforward networks", "Activation functions", "Backpropagation"] },
+      { "week": 2, "title": "Convolutional Neural Networks", "topics": ["Image recognition", "CNN architectures", "Transfer learning"] },
+      { "week": 3, "title": "Recurrent Neural Networks", "topics": ["Sequence modeling", "LSTMs", "GRUs"] },
+      { "week": 4, "title": "Unsupervised Learning", "topics": ["Autoencoders", "GANs", "Clustering methods"] },
+      { "week": 5, "title": "Reinforcement Learning", "topics": ["Markov decision processes", "Q-learning", "Policy gradients"] },
+      { "week": 6, "title": "Advanced Applications", "topics": ["Natural language processing", "Computer vision", "Recommendation systems"] }
+    ],
+    "requirements": [
+      "Strong programming skills in Python",
+      "Understanding of basic machine learning concepts",
+      "Familiarity with linear algebra and statistics"
+    ],
+    "learningOutcomes": [
+      "Design and train advanced machine learning models",
+      "Apply deep learning to complex datasets",
+      "Implement reinforcement learning algorithms",
+      "Develop AI solutions for real-world challenges"
+    ]
+  },
+  {
+    "id": "webdev",
+    "title": "Web Development Bootcamp",
+    "category": "Web Development",
+    "level": "Beginner to Intermediate",
+    "duration": "16 weeks",
+    "description": "Become a full-stack web developer with hands-on projects.",
+    "longDescription": "This bootcamp takes you from zero to full-stack developer. You'll learn front-end technologies like HTML, CSS, JavaScript, and React, as well as back-end tools including Node.js, Express, and MongoDB.",
+    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80",
+    "instructor": {
+      "name": "Emily Carter",
+      "bio": "Full-stack developer and coding mentor with 8+ years of teaching experience.",
+      "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.9,
+    "reviews": 2100,
+    "students": 7800,
+    "price": 59.99,
+    "syllabus": [
+      { "week": 1, "title": "HTML & CSS Fundamentals", "topics": ["HTML structure", "CSS styling", "Responsive design"] },
+      { "week": 2, "title": "JavaScript Basics", "topics": ["Variables", "Functions", "DOM manipulation"] },
+      { "week": 3, "title": "Modern JavaScript", "topics": ["ES6 features", "Async programming", "APIs"] },
+      { "week": 4, "title": "React Development", "topics": ["Components", "Props & State", "Hooks"] },
+      { "week": 5, "title": "Backend Development", "topics": ["Node.js", "Express.js", "REST APIs"] },
+      { "week": 6, "title": "Databases & Deployment", "topics": ["MongoDB", "Authentication", "Hosting apps"] }
+    ],
+    "requirements": [
+      "Basic computer knowledge",
+      "Willingness to learn coding",
+      "Access to a computer with internet"
+    ],
+    "learningOutcomes": [
+      "Build responsive front-end websites",
+      "Develop dynamic full-stack applications",
+      "Work with modern web frameworks",
+      "Deploy applications to the web"
+    ]
+  },
+  {
+    "id": "mobile",
+    "title": "Mobile App Development",
+    "category": "App Development",
+    "level": "Intermediate",
+    "duration": "12 weeks",
+    "description": "Create mobile applications for Android and iOS.",
+    "longDescription": "This course teaches you mobile app development using React Native and Flutter. You'll build cross-platform apps with real-world features like authentication, navigation, and API integration.",
+    "image": "https://kms-solutions.asia/wp-content/uploads/mobile-application-development-lifecycle-5-key-phases.jpg",
+    "instructor": {
+      "name": "David Kim",
+      "bio": "Mobile app engineer with 7+ years of experience building cross-platform apps.",
+      "image": "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.7,
+    "reviews": 1500,
+    "students": 6000,
+    "price": 69.99,
+    "syllabus": [
+      { "week": 1, "title": "Intro to Mobile Development", "topics": ["Native vs hybrid", "Setup environment", "Hello World app"] },
+      { "week": 2, "title": "React Native Basics", "topics": ["Components", "Navigation", "Styling"] },
+      { "week": 3, "title": "Flutter Basics", "topics": ["Widgets", "State management", "Layouts"] },
+      { "week": 4, "title": "APIs & Data Handling", "topics": ["REST APIs", "JSON", "Local storage"] },
+      { "week": 5, "title": "Authentication & Security", "topics": ["Login systems", "Firebase Auth", "Secure storage"] },
+      { "week": 6, "title": "Publishing Apps", "topics": ["Play Store", "App Store", "App optimization"] }
+    ],
+    "requirements": [
+      "Knowledge of JavaScript or Dart",
+      "Basic programming experience",
+      "Android/iOS device or emulator"
+    ],
+    "learningOutcomes": [
+      "Build cross-platform apps with React Native & Flutter",
+      "Integrate APIs into mobile apps",
+      "Implement secure authentication",
+      "Publish apps to app stores"
+    ]
+  },
+  {
+    "id": "cloud",
+    "title": "Cloud Computing Essentials",
+    "category": "Cloud Computing",
+    "level": "Beginner to Intermediate",
+    "duration": "10 weeks",
+    "description": "Learn the basics of cloud platforms and services.",
+    "longDescription": "This course introduces you to cloud computing with AWS, Azure, and Google Cloud. You'll understand cloud concepts, architecture, and how to deploy applications in the cloud.",
+    "image": "https://t3.ftcdn.net/jpg/04/22/27/60/240_F_422276092_xyZKPrwnfJzuPzSunrGi3oZnF84iM5i9.jpg",
+    "instructor": {
+      "name": "Sophia Martinez",
+      "bio": "Cloud solutions architect with certifications in AWS and Azure.",
+      "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.6,
+    "reviews": 1200,
+    "students": 5000,
+    "price": 54.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Cloud", "topics": ["What is cloud computing?", "Cloud models", "Benefits"] },
+      { "week": 2, "title": "AWS Basics", "topics": ["EC2", "S3", "IAM"] },
+      { "week": 3, "title": "Azure Basics", "topics": ["Azure Compute", "Storage", "Networking"] },
+      { "week": 4, "title": "Google Cloud Basics", "topics": ["Compute Engine", "Cloud Storage", "BigQuery"] },
+      { "week": 5, "title": "Deploying Applications", "topics": ["Containers", "Kubernetes", "Serverless functions"] },
+      { "week": 6, "title": "Cloud Security", "topics": ["Identity management", "Encryption", "Best practices"] }
+    ],
+    "requirements": [
+      "Basic IT knowledge",
+      "Familiarity with networking",
+      "Access to cloud free-tier accounts"
+    ],
+    "learningOutcomes": [
+      "Understand cloud computing models",
+      "Work with AWS, Azure, and Google Cloud",
+      "Deploy applications in the cloud",
+      "Apply security practices in cloud environments"
+    ]
+  },
+  {
+    "id": "ee",
+    "title": "Electrical Engineering Fundamentals",
+    "category": "Engineering",
+    "level": "Beginner",
+    "duration": "12 weeks",
+    "description": "Explore the foundations of electrical engineering.",
+    "longDescription": "This course covers the principles of electrical circuits, signals, and systems. You'll learn how electricity powers devices and gain experience in circuit design and analysis.",
+    "image": "https://t4.ftcdn.net/jpg/16/23/13/61/240_F_1623136195_p7prCsM8ov9i4Xrpw6bBVZS8E6N9y5zY.jpg",
+    "instructor": {
+      "name": "Prof. Andrew Smith",
+      "bio": "Electrical engineer and university lecturer with 15+ years of experience.",
+      "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.5,
+    "reviews": 800,
+    "students": 4200,
+    "price": 39.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Electricity", "topics": ["Charge & current", "Voltage", "Power"] },
+      { "week": 2, "title": "Basic Circuits", "topics": ["Resistors", "Ohm’s law", "Kirchhoff’s laws"] },
+      { "week": 3, "title": "Capacitors & Inductors", "topics": ["Capacitors", "Inductors", "Energy storage"] },
+      { "week": 4, "title": "AC & DC Analysis", "topics": ["DC circuits", "AC circuits", "Phasors"] },
+      { "week": 5, "title": "Electronics Basics", "topics": ["Diodes", "Transistors", "Amplifiers"] },
+      { "week": 6, "title": "Systems & Applications", "topics": ["Power systems", "Communication systems", "Control systems"] }
+    ],
+    "requirements": [
+      "High school mathematics",
+      "Interest in electronics",
+      "Calculator and circuit simulation tools"
+    ],
+    "learningOutcomes": [
+      "Understand fundamental electrical concepts",
+      "Analyze and design basic circuits",
+      "Apply electronics in real-world systems",
+      "Build a foundation for advanced engineering studies"
+    ]
+  },
+  {
+    "id": "me",
+    "title": "Mechanical Engineering Basics",
+    "category": "Engineering",
+    "level": "Beginner",
+    "duration": "12 weeks",
+    "description": "Learn the core principles of mechanical engineering.",
+    "longDescription": "This course covers mechanics, thermodynamics, materials, and design principles. You’ll gain practical knowledge about how machines work and how to design mechanical systems.",
+    "image": "https://t4.ftcdn.net/jpg/03/21/03/19/240_F_321031954_RX4bH9saYe4nZvhrzjc0Jxci1bxxPkzh.jpg",
+    "instructor": {
+      "name": "Dr. Laura Wilson",
+      "bio": "Mechanical engineer with expertise in automotive and industrial design.",
+      "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.6,
+    "reviews": 900,
+    "students": 3800,
+    "price": 44.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Mechanics", "topics": ["Forces", "Moments", "Equilibrium"] },
+      { "week": 2, "title": "Materials Science", "topics": ["Properties of materials", "Stress & strain", "Failure analysis"] },
+      { "week": 3, "title": "Thermodynamics", "topics": ["Energy", "Heat transfer", "Engines"] },
+      { "week": 4, "title": "Fluid Mechanics", "topics": ["Fluid properties", "Flow dynamics", "Applications"] },
+      { "week": 5, "title": "Machine Design", "topics": ["Gears", "Bearings", "Structural design"] },
+      { "week": 6, "title": "Manufacturing Processes", "topics": ["Casting", "Machining", "3D Printing"] }
+    ],
+    "requirements": [
+      "Basic physics knowledge",
+      "Interest in mechanics",
+      "Calculator and drawing tools"
+    ],
+    "learningOutcomes": [
+      "Understand mechanical engineering principles",
+      "Analyze mechanics and thermodynamics problems",
+      "Design simple machines and systems",
+      "Prepare for advanced mechanical studies"
+    ]
+  },
+  {
+    "id": "mba",
+    "title": "Business Administration",
+    "category": "Management",
+    "level": "Beginner to Intermediate",
+    "duration": "14 weeks",
+    "description": "Learn the essentials of managing businesses effectively.",
+    "longDescription": "This course introduces the fundamentals of business administration including management, marketing, finance, and operations. Gain practical knowledge to excel in business environments.",
+    "image": "https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1000&q=80",
+    "instructor": {
+      "name": "James Anderson",
+      "bio": "MBA professional with 10+ years of experience in corporate management.",
+      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.7,
+    "reviews": 1400,
+    "students": 5000,
+    "price": 49.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to Business", "topics": ["Business environments", "Types of businesses", "Organizational structures"] },
+      { "week": 2, "title": "Management Principles", "topics": ["Planning", "Organizing", "Leading"] },
+      { "week": 3, "title": "Marketing Fundamentals", "topics": ["Market research", "Branding", "Promotion"] },
+      { "week": 4, "title": "Finance & Accounting", "topics": ["Financial statements", "Budgeting", "Cost analysis"] },
+      { "week": 5, "title": "Operations Management", "topics": ["Supply chain", "Quality control", "Efficiency"] },
+      { "week": 6, "title": "Business Strategy", "topics": ["SWOT analysis", "Competitive strategy", "Growth strategies"] }
+    ],
+    "requirements": [
+      "Basic mathematics",
+      "Interest in management",
+      "Access to spreadsheets"
+    ],
+    "learningOutcomes": [
+      "Understand business operations",
+      "Develop management skills",
+      "Analyze financial performance",
+      "Apply marketing and strategy concepts"
+    ]
+  },
+  {
+    "id": "ai",
+    "title": "Artificial Intelligence",
+    "category": "Artificial Intelligence",
+    "level": "Intermediate",
+    "duration": "12 weeks",
+    "description": "Explore the world of AI and intelligent systems.",
+    "longDescription": "This course covers AI fundamentals including search algorithms, knowledge representation, and reasoning. You'll also gain practical experience with AI tools and libraries in Python.",
+    "image": "https://incubator.ucf.edu/wp-content/uploads/2023/07/artificial-intelligence-new-technology-science-futuristic-abstract-human-brain-ai-technology-cpu-central-processor-unit-chipset-big-data-machine-learning-cyber-mind-domination-generative-ai-scaled-1-1500x1000.jpg",
+    "instructor": {
+      "name": "Dr. Aisha Patel",
+      "bio": "AI researcher with publications in natural language processing and robotics.",
+      "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500&q=80"
+    },
+    "rating": 4.8,
+    "reviews": 1750,
+    "students": 6200,
+    "price": 79.99,
+    "syllabus": [
+      { "week": 1, "title": "Introduction to AI", "topics": ["What is AI?", "History of AI", "Applications"] },
+      { "week": 2, "title": "Search Algorithms", "topics": ["Uninformed search", "Informed search", "Heuristics"] },
+      { "week": 3, "title": "Knowledge Representation", "topics": ["Logic", "Semantic networks", "Ontologies"] },
+      { "week": 4, "title": "Reasoning", "topics": ["Inference", "Expert systems", "Probabilistic reasoning"] },
+      { "week": 5, "title": "AI in Practice", "topics": ["Python AI libraries", "NLP basics", "Robotics intro"] },
+      { "week": 6, "title": "Future of AI", "topics": ["Ethics", "AI and society", "Trends"] }
+    ],
+    "requirements": [
+      "Basic Python programming",
+      "Understanding of algorithms",
+      "Logical thinking skills"
+    ],
+    "learningOutcomes": [
+      "Understand AI principles and history",
+      "Implement search and reasoning algorithms",
+      "Apply AI libraries to real problems",
+      "Discuss ethical implications of AI"
+    ]
+  }
+]

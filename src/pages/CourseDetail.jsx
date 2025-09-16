@@ -1,108 +1,28 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
 const CourseDetail = () => {
-    const { courseId } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
 
-    // Sample course data - in a real app, you would fetch this based on courseId
-    const sampleCourses = [
-        {
-            id: 1,
-            title: "Introduction to Computer Science",
-            category: "Computer Science",
-            level: "Beginner",
-            duration: "12 weeks",
-            description: "Learn the fundamentals of computer science and programming.",
-            longDescription: "This comprehensive course introduces you to the world of computer science and programming. You'll learn fundamental concepts including algorithms, data structures, and computational thinking. Through hands-on projects, you'll gain practical experience in problem-solving and software development.",
-            image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            instructor: {
-                name: "Dr. Sarah Johnson",
-                bio: "Professor of Computer Science with 10+ years of teaching experience",
-                image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
-            },
-            rating: 4.7,
-            reviews: 1250,
-            students: 4500,
-            price: 49.99,
-            syllabus: [
-                { week: 1, title: "Introduction to Programming", topics: ["What is programming?", "Basic syntax", "Variables and data types"] },
-                { week: 2, title: "Control Structures", topics: ["Conditional statements", "Loops", "Boolean logic"] },
-                { week: 3, title: "Functions and Modules", topics: ["Defining functions", "Parameters and return values", "Code organization"] },
-                { week: 4, title: "Data Structures", topics: ["Arrays", "Lists", "Dictionaries", "Basic algorithms"] },
-                { week: 5, title: "Object-Oriented Programming", topics: ["Classes and objects", "Inheritance", "Polymorphism"] },
-                { week: 6, title: "Introduction to Algorithms", topics: ["Searching algorithms", "Sorting algorithms", "Algorithm efficiency"] }
-            ],
-            requirements: [
-                "Basic computer literacy",
-                "No prior programming experience required",
-                "Access to a computer with internet connection"
-            ],
-            learningOutcomes: [
-                "Understand fundamental programming concepts",
-                "Write basic programs in a programming language",
-                "Solve problems using computational thinking",
-                "Design and implement simple algorithms"
-            ]
-        },
-        {
-            id: 2,
-            title: "Data Science Fundamentals",
-            category: "Data Science",
-            level: "Intermediate",
-            duration: "16 weeks",
-            description: "Master data analysis, visualization, and machine learning basics.",
-            longDescription: "Dive into the exciting field of data science with this comprehensive course. You'll learn how to collect, process, analyze, and visualize data to extract meaningful insights. The course covers statistical analysis, data visualization techniques, and an introduction to machine learning algorithms.",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            instructor: {
-                name: "Prof. Michael Chen",
-                bio: "Data Scientist with industry experience at leading tech companies",
-                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
-            },
-            rating: 4.8,
-            reviews: 980,
-            students: 3200,
-            price: 59.99,
-            syllabus: [
-                { week: 1, title: "Introduction to Data Science", topics: ["What is data science?", "Data science process", "Tools and technologies"] },
-                { week: 2, title: "Data Collection and Cleaning", topics: ["Data sources", "Data cleaning techniques", "Handling missing data"] },
-                { week: 3, title: "Exploratory Data Analysis", topics: ["Descriptive statistics", "Data visualization", "Identifying patterns"] },
-                { week: 4, title: "Statistical Analysis", topics: ["Probability distributions", "Hypothesis testing", "Correlation and regression"] },
-                { week: 5, title: "Data Visualization", topics: ["Principles of effective visualization", "Creating charts and graphs", "Interactive dashboards"] },
-                { week: 6, title: "Introduction to Machine Learning", topics: ["Supervised vs unsupervised learning", "Model evaluation", "Basic algorithms"] }
-            ],
-            requirements: [
-                "Basic knowledge of statistics",
-                "Familiarity with programming concepts",
-                "Access to a computer with internet connection"
-            ],
-            learningOutcomes: [
-                "Collect and clean data from various sources",
-                "Perform exploratory data analysis",
-                "Apply statistical methods to data problems",
-                "Create effective data visualizations",
-                "Build basic machine learning models"
-            ]
-        }
-    ];
-
     useEffect(() => {
-        // Simulate API call to fetch course details
-        const fetchCourse = () => {
+        
+        const fetchCourse = async () => {
             setLoading(true);
-            setTimeout(() => {
-                const foundCourse = sampleCourses.find(course => course.id === parseInt(courseId));
-                setCourse(foundCourse);
-                setLoading(false);
-            }, 800);
+            const courses = await axios.get("/courses.json");
+            const data = courses.data;
+            const coursedata  = await data.find( (c) => (c.id == id));
+            setCourse(coursedata);
+            setLoading(false);
         };
 
         fetchCourse();
-    }, [courseId]);
+    }, [id]);
 
     const copyCourseLink = () => {
         const courseUrl = window.location.href;
