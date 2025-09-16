@@ -4,7 +4,6 @@ import Routing from './routings/Routing'
 import Footer from './CUSTOM_COMPONENTS/Footer'
 import Faq from './CUSTOM_COMPONENTS/Faq'
 import { useLocation } from 'react-router-dom'
-import ImageCarousel from './CUSTOM_COMPONENTS/ImageCarousel' // Import the carousel
 
 const App = () => {
 

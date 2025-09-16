@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const Navbar = () => {
+    const {pathname} = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);
@@ -77,11 +78,14 @@ const Navbar = () => {
                 </div>
 
                 <div className='flex gap-20'>
+                    {/* go back button */}
+                    {pathname !== "/" &&
                     <button
-      className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium shadow-md hover:scale-105 hover:shadow-lg transition-all duration-300" onClick={()=>{navigate(-1)}}
-    >
-      Go back
-    </button>
+                        className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium shadow-md hover:scale-105 hover:shadow-lg transition-all duration-300" onClick={() => { navigate(-1) }}
+                    >
+                        Go back
+                    </button>
+                    }
                     {/* Desktop Menu */}
                     <div className='hidden md:flex items-center gap-10 text-lg text-white'>
                         <NavLink to='/' className={({ isActive }) => isActive ? 'text-[#D6A419] font-semibold' : 'hover:text-[#D6A419]'}>
