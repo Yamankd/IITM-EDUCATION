@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
-
 const Navbar = () => {
     const {pathname} = useLocation();
     const [isOpen, setIsOpen] = useState(false);
@@ -11,18 +10,15 @@ const Navbar = () => {
     const [hasShadow, setHasShadow] = useState(false);
     const [isCoursesHovered, setIsCoursesHovered] = useState(false);
     const [coursesMenuTimeout, setCoursesMenuTimeout] = useState(null);
-
+    const [courses, setCourses] = useState([]);
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    // Sample course data - replace with your actual courses
-    const courses = [
-        { id: 1, title: "Computer Science", path: "/course/cs", description: "Learn programming and algorithms" },
-        { id: 2, title: "Data Science", path: "/course/ds", description: "Master data analysis and visualization" },
-        { id: 3, title: "Electrical Engineering", path: "/course/ee", description: "Explore circuits and systems" },
-        { id: 4, title: "Mechanical Engineering", path: "/course/me", description: "Study mechanics and thermodynamics" },
-        { id: 5, title: "Business Administration", path: "/course/mba", description: "Develop management skills" },
-        { id: 6, title: "Artificial Intelligence", path: "/course/ai", description: "Dive into machine learning and AI" },
-    ];
+    useEffect(() => {
+        fetch("/courses.json")   // ✅ Path relative to public/
+          .then((res) => res.json())
+          .then((data) => setCourses(data))
+          .catch((err) => console.error(err));
+      }, []);
 
     const handleCoursesHover = () => {
         if (coursesMenuTimeout) {
@@ -105,25 +101,25 @@ const Navbar = () => {
                                 }
                             >
                                 Courses
-                                <svg
+                                {/* <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className={`ml-1 h-4 w-4 transition-transform ${isCoursesHovered ? 'rotate-180' : ''}`}
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
                                 >
                                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
+                                </svg> */}
                             </NavLink>
 
                             {/* Full-width Dropdown */}
                             {isCoursesHovered && (
                                 <div
-                                    className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-screen max-w-6xl px-4"
+                                    className="absolute left-1/2 transform -translate-x-[70%] mt-8 w-screen max-w-8xl px-6"
                                     onMouseEnter={handleCoursesHover}
                                     onMouseLeave={handleCoursesLeave}
                                 >
                                     <div className="rounded-lg shadow-lg overflow-hidden">
-                                        <div className="relative bg-white grid grid-cols-2 md:grid-cols-3 gap-6 p-8">
+                                        <div className="relative bg-white grid grid-cols-2 md:grid-cols-4 gap-4 p-8">
                                             {/* Decorative element */}
                                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0B2A4A] to-[#D6A419]"></div>
 
@@ -131,15 +127,15 @@ const Navbar = () => {
                                                 <NavLink
                                                     key={course.id}
                                                     to={course.path}
-                                                    className="group block p-4 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-200"
+                                                    className=" group block p-2 rounded-lg hover:bg-gray-50 transition-all duration-200  hover:border-gray-200 border border-transparent"
                                                     onClick={() => setIsCoursesHovered(false)}
                                                 >
                                                     <h3 className="font-semibold text-[#0B2A4A] group-hover:text-[#D6A419] transition-colors">
                                                         {course.title}
                                                     </h3>
-                                                    <p className="mt-2 text-sm text-gray-600">
+                                                    {/* <p className="mt-2 text-sm text-gray-600">
                                                         {course.description}
-                                                    </p>
+                                                    </p> */}
                                                     <div className="mt-3 flex items-center text-sm text-[#0B2A4A] font-medium group-hover:text-[#D6A419] transition-colors">
                                                         Explore course
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

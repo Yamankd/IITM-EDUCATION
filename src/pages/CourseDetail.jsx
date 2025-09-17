@@ -10,12 +10,14 @@ const CourseDetail = () => {
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
 
+    
     useEffect(() => {
         
         const fetchCourse = async () => {
             setLoading(true);
             const courses = await axios.get("/courses.json");
             const data = courses.data;
+            console.log(data)
             const coursedata  = await data.find( (c) => (c.id == id));
             setCourse(coursedata);
             setLoading(false);
@@ -77,7 +79,7 @@ const CourseDetail = () => {
                         </li>
                         <li className="flex items-center">
                             <span className="text-gray-400 mx-2">/</span>
-                            <Link to="/courses" className="text-gray-500 hover:text-[#0B2A4A]">Courses</Link>
+                            <Link to="/course" className="text-gray-500 hover:text-[#0B2A4A]">Courses</Link>
                         </li>
                         <li className="flex items-center">
                             <span className="text-gray-400 mx-2">/</span>
@@ -221,7 +223,7 @@ const CourseDetail = () => {
                                             ))}
                                         </div>
 
-                                        <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">Requirements</h3>
+                                        <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">Pre Requisite</h3>
                                         <ul className="list-disc list-inside space-y-2 mb-6">
                                             {course.requirements.map((requirement, index) => (
                                                 <li key={index} className="text-gray-700">{requirement}</li>
