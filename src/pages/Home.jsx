@@ -6,6 +6,7 @@ import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
 const Home = () => {
     const [particles, setParticles] = useState([]);
     const [interactionMode, setInteractionMode] = useState('mouse');
+    const [showScrollIndicator, setShowScrollIndicator] = useState(true);
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const requestRef = useRef();
@@ -20,31 +21,85 @@ const Home = () => {
             image: "https://avatars.githubusercontent.com/u/148179853?v=4",
         },
         {
-            name: "Walter White",
+            name: "Deepak Kumar",
             role: "Frontend Developer",
             image: "https://randomuser.me/api/portraits/men/33.jpg",
         },
         {
-            name: "Skyler White",
+            name: "Amarjeet Singh",
             role: "Backend Engineer",
             image: "https://randomuser.me/api/portraits/women/44.jpg",
         },
         {
-            name: "Jane Margolis",
+            name: "Deepak Yadav",
             role: "Data Scientist",
             image: "https://randomuser.me/api/portraits/women/45.jpg",
         },
         {
-            name: "Hank Schrader",
+            name: "Aashish Gupta",
             role: "DevOps Specialist",
             image: "https://randomuser.me/api/portraits/men/46.jpg",
         },
         {
-            name: "Marie Schrader",
+            name: "Sachin Kumar",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Prem Kumar",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Ritu Singh",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Mahima Sharma",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Khusboo Kumari",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Khushi",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Tejaswi Sharma",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Rohit Mahour",
+            role: "Product Manager",
+            image: "https://randomuser.me/api/portraits/women/47.jpg",
+        },
+        {
+            name: "Vijay Verma",
             role: "Product Manager",
             image: "https://randomuser.me/api/portraits/women/47.jpg",
         },
     ];
+
+    // Hide scroll indicator when user scrolls
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 100) {
+                setShowScrollIndicator(false);
+            } else {
+                setShowScrollIndicator(true);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Auto-scroll functionality
     useEffect(() => {
@@ -254,64 +309,92 @@ const Home = () => {
                         </NavLink>
                     </div>
 
+                    {/* Scroll indicator */}
+                    {showScrollIndicator && (
+                        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
+                            <div className="flex flex-col items-center">
+                                {/* <span className="text-sm text-white mb-2">Scroll Down</span> */}
+                                <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+                                    <div className="w-1 h-3 bg-amber-500 rounded-full mt-2 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+            {/* infinite scroller strip showing discounts  */}
+            <div className="bg-[#0B2A4A] py-4 overflow-hidden">
+                <div
+                    className="flex whitespace-nowrap"
+                    style={{
+                        animation: 'infinite-scroll 30s linear infinite',
+                        width: 'max-content'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.animationPlayState = 'paused';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.animationPlayState = 'running';
+                    }}
+                >
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="inline-flex items-center mx-8 text-white">
+                            <span className="text-2xl font-bold text-[#D6A419] mr-2">🎓</span>
+                            <span className="font-semibold">Enroll Now & Get </span>
+                            <span className="font-bold text-[#D6A419] mx-1">30% OFF</span>
+                            <span className="font-semibold">on All Courses!</span>
+                            <span className="text-2xl font-bold text-[#D6A419] ml-2">⭐</span>
+                        </div>
+                    ))}
                 </div>
             </div>
 
+            {/* Add CSS for the infinite scroll animation */}
+            <style>
+                {`
+    @keyframes infinite-scroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+    `}
+            </style>
             {/* Stats Section */}
             <div className='bg-[#0B2A4A] w-full h-55 flex items-center justify-center'>
-                <div className='w-[90%] bg-white h-40 rounded-xl flex items-center justify-around p-4'>
+                <div className='w-[90%] bg-white  h-40 rounded-xl flex items-center justify-around p-4'>
                     {/* Stat Item 1: Years of Excellence */}
                     <div className="flex items-center gap-x-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#0B2A4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-9.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-9.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20M1 12v7a2 2 0 002 2h18a2 2 0 002-2v-7" />
-                        </svg>
-                        <div>
-                            <h3 className="text-3xl font-bold text-slate-800">14+</h3>
-                            <p className="text-sm text-slate-500">Years of Educational Excellence</p>
+                        <div className='flex items-center justify-center flex-col'>
+                            <h3 className="text-6xl font-bold text-[#0B2A4A]">14+</h3>
+                            <p className="text-md text-zinc-800">Years of Educational Excellence</p>
                         </div>
                     </div>
 
                     {/* Stat Item 2: Successful Alumni */}
                     <div className="flex items-center gap-x-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#0B2A4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 极市4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        <div>
-                            <h3 className="text-3xl font-bold text-slate-800">5,000+</h3>
-                            <p className="text-sm text-slate-500">Successful Alumni</p>
+                        <div className='flex items-center justify-center flex-col'>
+                            <h3 className="text-6xl font-bold text-[#0B2A4A]">25K+</h3>
+                            <p className="text-md text-zinc-800">Successful Alumni</p>
                         </div>
                     </div>
 
                     {/* Stat Item 3: Placement Rate */}
                     <div className="flex items-center gap-x-4">
-                        <svg xmlns="极市www.w3.org/2000/svg" className="h-12 w-12 text-[#0B2A4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8极市v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12l-3-3-3 3" />
-                        </svg>
-                        <div>
-                            <h3 className="text-3极市xl font-bold text-slate-800">95%</h3>
-                            <p className="text-sm text-slate-500">Placement Rate</p>
+                        <div className='flex items-center justify-center flex-col'>
+                            <h3 className="text-6xl font-bold text-[#0B2A4A]">85%</h3>
+                            <p className="text-md text-zinc-800">Placement Rate</p>
                         </div>
                     </div>
 
                     {/* Stat Item 4: Industry Partners */}
                     <div className="flex items-center gap-x-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#0B2A4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2极市h2a2 2 极市0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        <div>
-                            <h3 className="text-3xl font-bold text-slate-800">50+</h3>
-                            <p className="text-sm text-slate-500">Industry Partners</p>
+                        <div className='flex items-center justify-center flex-col'>
+                            <h3 className="text-6xl font-bold text-[#0B2A4A]">50+</h3>
+                            <p className="text-md text-zinc-800">Industry Partners</p>
                         </div>
-                    </div>
-
-                    {/* Stat Item 5: Placeholder */}
-                    <div className="flex items-center gap-x-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#0B2A4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0极市l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
                     </div>
                 </div>
             </div>
@@ -332,7 +415,7 @@ const Home = () => {
                                 }}
                                 className="p-3 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 极市0 24 24" fill="none" stroke="currentColor">
                                     <path d="M15 18l-6-6 6-6" />
                                 </svg>
                             </button>
@@ -355,7 +438,7 @@ const Home = () => {
 
                     <div
                         className="flex overflow-hidden w-full"
-                        onMouseEnter={handleMouseEnter}
+                        onMouseEnter极市={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         ref={carouselRef}
                     >
@@ -366,17 +449,17 @@ const Home = () => {
                             {/* Create an infinite loop by duplicating the items */}
                             {[...instructors, ...instructors, ...instructors].map((instructor, index) => (
                                 <div key={index} className="bg-[#0B2A4A] rounded-lg shadow-md p-6 w-60 mx-2 text-center flex items-center justify-center flex-col hover:shadow-lg transition-shadow duration-300">
-                                    <div className=' border-3 h-[150px] w-[150px] border-white rounded-full flex items-center justify-center overflow-hidden'>
+                                    <div className='border-3 h-[150px] w-[150px] border-white rounded-full flex items-center justify-center overflow-hidden'>
                                         <img
                                             src={instructor.image}
                                             alt={instructor.name}
-                                            className="w-full h-full  object-cover"
+                                            className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="flex justify-center mt-4 gap-4 text-gray-600">
-                                        <FaFacebookF className="hover:text-[#0B2A4A] cursor-pointer transition-colors" />
-                                        <FaTwitter className="hover:text-[#0B2A4A] cursor-pointer transition-colors" />
-                                        <FaLinkedinIn className="hover:text-[#0B2A4A] cursor-pointer transition-colors" />
+                                        <FaFacebookF className="hover:text-[#D6A419] cursor-pointer transition-colors text-white" />
+                                        <FaTwitter className="hover:text-[#D6A419] cursor-pointer transition-colors text-white" />
+                                        <FaLinkedinIn className="hover:text-[#D6A419] cursor-pointer transition-colors text-white" />
                                     </div>
                                     <h3 className="text-lg font-semibold mt-4 text-white">{instructor.name}</h3>
                                     <p className="text-sm text-amber-400">{instructor.role}</p>
