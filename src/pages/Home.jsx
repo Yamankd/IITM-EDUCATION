@@ -13,6 +13,14 @@ const Home = () => {
     const [instructorStartIndex, setInstructorStartIndex] = useState(0);
     const autoScrollRef = useRef(null);
     const carouselRef = useRef(null);
+    const [stats, setStats] = useState({
+        years: 0,
+        alumni: 0,
+        placement: 0,
+        partners: 0
+    });
+    const statsRef = useRef(null);
+    const hasAnimatedRef = useRef(false);
 
     const instructors = [
         {
@@ -100,6 +108,65 @@ const Home = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Stats animation on scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !hasAnimatedRef.current) {
+                        hasAnimatedRef.current = true;
+
+                        // Animate the stats counting
+                        const duration = 2000; // ms
+                        const frameRate = 30;
+                        const totalFrames = Math.round(duration / (1000 / frameRate));
+
+                        // Years of Excellence
+                        animateValue(14, 0, totalFrames, 'years');
+
+                        // Successful Alumni
+                        animateValue(25, 0, totalFrames, 'alumni');
+
+                        // Placement Rate
+                        animateValue(85, 0, totalFrames, 'placement');
+
+                        // Industry Partners
+                        animateValue(50, 0, totalFrames, 'partners');
+                    }
+                });
+            },
+            { threshold: 0.5 }
+        );
+
+        if (statsRef.current) {
+            observer.observe(statsRef.current);
+        }
+
+        return () => {
+            if (statsRef.current) {
+                observer.unobserve(statsRef.current);
+            }
+        };
+    }, []);
+
+    const animateValue = (target, start, totalFrames, statKey) => {
+        let frame = 0;
+        const timer = setInterval(() => {
+            frame++;
+            const progress = frame / totalFrames;
+            const current = Math.round(target * progress);
+
+            setStats(prev => ({
+                ...prev,
+                [statKey]: current
+            }));
+
+            if (frame === totalFrames) {
+                clearInterval(timer);
+            }
+        }, 1000 / 30); // 30fps
+    };
 
     // Auto-scroll functionality
     useEffect(() => {
@@ -313,7 +380,6 @@ const Home = () => {
                     {showScrollIndicator && (
                         <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
                             <div className="flex flex-col items-center">
-                                {/* <span className="text-sm text-white mb-2">Scroll Down</span> */}
                                 <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
                                     <div className="w-1 h-3 bg-amber-500 rounded-full mt-2 animate-pulse"></div>
                                 </div>
@@ -322,6 +388,7 @@ const Home = () => {
                     )}
                 </div>
             </div>
+
             {/* infinite scroller strip showing discounts  */}
             <div className="bg-[#0B2A4A] py-4 overflow-hidden">
                 <div
@@ -340,9 +407,9 @@ const Home = () => {
                     {[...Array(6)].map((_, i) => (
                         <div key={i} className="inline-flex items-center mx-8 text-white">
                             <span className="text-2xl font-bold text-[#D6A419] mr-2">🎓</span>
-                            <span className="font-semibold">Enroll Now & Get </span>
-                            <span className="font-bold text-[#D6A419] mx-1">30% OFF</span>
-                            <span className="font-semibold">on All Courses!</span>
+                            <span className="font-semibold text-sm md:text-base">Enroll Now & Get </span>
+                            <span className="font-bold text-[#D6A419] mx-1 text-sm md:text-base">30% OFF</span>
+                            <span className="font-semibold text-sm md:text-base">on All Courses!</span>
                             <span className="text-2xl font-bold text-[#D6A419] ml-2">⭐</span>
                         </div>
                     ))}
@@ -362,39 +429,32 @@ const Home = () => {
     }
     `}
             </style>
+
             {/* Stats Section */}
-            <div className='bg-[#0B2A4A] w-full h-55 flex items-center justify-center'>
-                <div className='w-[90%] bg-white  h-40 rounded-xl flex items-center justify-around p-4'>
+            <div ref={statsRef} className='bg-[#0B2A4A] w-full py-10 flex items-center justify-center'>
+                <div className='w-[90%] bg-white h-auto rounded-xl flex flex-col md:flex-row items-center justify-around p-6 gap-6 md:gap-0'>
                     {/* Stat Item 1: Years of Excellence */}
-                    <div className="flex items-center gap-x-4">
-                        <div className='flex items-center justify-center flex-col'>
-                            <h3 className="text-6xl font-bold text-[#0B2A4A]">14+</h3>
-                            <p className="text-md text-zinc-800">Years of Educational Excellence</p>
-                        </div>
+                    <div className="flex items-center justify-center flex-col">
+                        <h3 className="text-5xl md:text-6xl font-bold text-[#0B2A4A]">{stats.years}+</h3>
+                        <p className="text-sm md:text-md text-zinc-800 text-center mt-2">Years of Educational Excellence</p>
                     </div>
 
                     {/* Stat Item 2: Successful Alumni */}
-                    <div className="flex items-center gap-x-4">
-                        <div className='flex items-center justify-center flex-col'>
-                            <h3 className="text-6xl font-bold text-[#0B2A4A]">25K+</h3>
-                            <p className="text-md text-zinc-800">Successful Alumni</p>
-                        </div>
+                    <div className="flex items-center justify-center flex-col">
+                        <h3 className="text-5xl md:text-6xl font-bold text-[#0B2A4A]">{stats.alumni}K+</h3>
+                        <p className="text-sm md:text-md text-zinc-800 text-center mt-2">Successful Alumni</p>
                     </div>
 
                     {/* Stat Item 3: Placement Rate */}
-                    <div className="flex items-center gap-x-4">
-                        <div className='flex items-center justify-center flex-col'>
-                            <h3 className="text-6xl font-bold text-[#0B2A4A]">85%</h3>
-                            <p className="text-md text-zinc-800">Placement Rate</p>
-                        </div>
+                    <div className="flex items-center justify-center flex-col">
+                        <h3 className="text-5xl md:text-6xl font-bold text-[#0B2A4A]">{stats.placement}%</h3>
+                        <p className="text-sm md:text-md text-zinc-800 text-center mt-2">Placement Rate</p>
                     </div>
 
                     {/* Stat Item 4: Industry Partners */}
-                    <div className="flex items-center gap-x-4">
-                        <div className='flex items-center justify-center flex-col'>
-                            <h3 className="text-6xl font-bold text-[#0B2A4A]">50+</h3>
-                            <p className="text-md text-zinc-800">Industry Partners</p>
-                        </div>
+                    <div className="flex items-center justify-center flex-col">
+                        <h3 className="text-5xl md:text-6xl font-bold text-[#0B2A4A]">{stats.partners}+</h3>
+                        <p className="text-sm md:text-md text-zinc-800 text-center mt-2">Industry Partners</p>
                     </div>
                 </div>
             </div>
@@ -404,7 +464,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <h2 className="text-3xl font-bold text-[#0B2A4A]">Our Instructors</h2>
-                        <div className="flex space-x-2">
+                        <div className="hidden md:flex space-x-2">
                             <button
                                 onClick={() => {
                                     setInstructorStartIndex(prev => {
@@ -415,7 +475,7 @@ const Home = () => {
                                 }}
                                 className="p-3 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 极市0 24 24" fill="none" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M15 18l-6-6 6-6" />
                                 </svg>
                             </button>
@@ -437,19 +497,19 @@ const Home = () => {
                     </div>
 
                     <div
-                        className="flex overflow-hidden w-full"
-                        onMouseEnter极市={handleMouseEnter}
+                        className="flex overflow-x-auto md:overflow-hidden w-full hide-scrollbar"
+                        onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         ref={carouselRef}
                     >
                         <div
                             className="flex transition-all duration-500 ease-in-out"
-                            style={{ transform: `translateX(-${instructorStartIndex * (320 + 16)}px)` }}
+                            style={{ transform: `translateX(-${instructorStartIndex * (window.innerWidth < 768 ? 260 : 320)}px)` }}
                         >
                             {/* Create an infinite loop by duplicating the items */}
                             {[...instructors, ...instructors, ...instructors].map((instructor, index) => (
-                                <div key={index} className="bg-[#0B2A4A] rounded-lg shadow-md p-6 w-60 mx-2 text-center flex items-center justify-center flex-col hover:shadow-lg transition-shadow duration-300">
-                                    <div className='border-3 h-[150px] w-[150px] border-white rounded-full flex items-center justify-center overflow-hidden'>
+                                <div key={index} className="bg-[#0B2A4A] rounded-lg shadow-md p-4 md:p-6 w-60 mx-2 text-center flex items-center justify-center flex-col hover:shadow-lg transition-shadow duration-300 flex-shrink-0">
+                                    <div className='border-3 h-28 w-28 md:h-[150px] md:w-[150px] border-white rounded-full flex items-center justify-center overflow-hidden'>
                                         <img
                                             src={instructor.image}
                                             alt={instructor.name}
@@ -468,6 +528,38 @@ const Home = () => {
                         </div>
                     </div>
 
+                    {/* Mobile navigation buttons */}
+                    <div className="flex md:hidden justify-center mt-6 space-x-4">
+                        <button
+                            onClick={() => {
+                                setInstructorStartIndex(prev => {
+                                    const newIndex = prev === 0 ? instructors.length - 1 : prev - 1;
+                                    return newIndex;
+                                });
+                                resetAutoScroll();
+                            }}
+                            className="p-3 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setInstructorStartIndex(prev => {
+                                    const newIndex = (prev + 1) % instructors.length;
+                                    return newIndex;
+                                });
+                                resetAutoScroll();
+                            }}
+                            className="p-3 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M9 6l6 6-6 6" />
+                            </svg>
+                        </button>
+                    </div>
+
                     {/* Dots indicator */}
                     <div className="flex justify-center mt-8 space-x-2">
                         {instructors.map((_, index) => (
@@ -484,6 +576,19 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Add CSS for hiding scrollbar on mobile */}
+            <style>
+                {`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                `}
+            </style>
         </>
     );
 };
