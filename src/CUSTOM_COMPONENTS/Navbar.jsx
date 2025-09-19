@@ -14,7 +14,7 @@ const Navbar = () => {
     const toggleMenu = () => setIsOpen(!isOpen);
 
     useEffect(() => {
-        fetch("/courses.json")   // ✅ Path relative to public/
+        fetch("/navCourse.json")   // ✅ Path relative to public/
           .then((res) => res.json())
           .then((data) => setCourses(data))
           .catch((err) => console.error(err));
@@ -114,12 +114,12 @@ const Navbar = () => {
                             {/* Full-width Dropdown */}
                             {isCoursesHovered && (
                                 <div
-                                    className="absolute left-1/2 transform -translate-x-[70%] mt-8 w-screen max-w-8xl px-6"
+                                    className="absolute left-1/2 transform -translate-x-1/2 mt-8 w-screen max-w-5xl px-8"
                                     onMouseEnter={handleCoursesHover}
                                     onMouseLeave={handleCoursesLeave}
                                 >
                                     <div className="rounded-lg shadow-lg overflow-hidden">
-                                        <div className="relative bg-white grid grid-cols-2 md:grid-cols-4 gap-4 p-8">
+                                        <div className="relative bg-white grid grid-cols-2 md:grid-cols-3 gap-4 p-8">
                                             {/* Decorative element */}
                                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0B2A4A] to-[#D6A419]"></div>
 
