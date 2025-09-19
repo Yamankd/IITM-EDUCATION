@@ -4,7 +4,7 @@ import Routing from './routings/Routing'
 import Footer from './CUSTOM_COMPONENTS/Footer'
 import Faq from './CUSTOM_COMPONENTS/Faq'
 import { useLocation } from 'react-router-dom'
-
+import GoBackButton from './CUSTOM_COMPONENTS/goBack'
 const App = () => {
 
   const location = useLocation();
@@ -17,6 +17,7 @@ const App = () => {
       <Navbar />
       <Routing />
       {location.pathname === '/' && <Faq />}
+      <GoBackButton/>
       <Footer />
     </>
   )
