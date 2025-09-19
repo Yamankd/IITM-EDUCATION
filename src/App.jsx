@@ -9,13 +9,14 @@ const App = () => {
 
   const location = useLocation();
   console.log(location);
-  useEffect(()=>{
-    window.scrollTo(0,0);
-  },[location.pathname])
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname])
   return (
     <>
       <Navbar />
       <Routing />
+
       {location.pathname === '/' && <Faq />}
       <GoBackButton/>
       <Footer />
