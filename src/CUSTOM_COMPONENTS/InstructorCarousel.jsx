@@ -18,7 +18,7 @@ const InstructorCarousel = () => {
     const instructors = [
         { name: "Yamank Dhuriya", role: "MERN Developer", image: "https://avatars.githubusercontent.com/u/148179853?v=4" },
         { name: "Deepak Kumar", role: "Accounts & Finance", image: deepakImage },
-        { name: "Rohit Mahour", role: "Accounts & Finance", image: rohit },
+        { name: "Rohit Mahour", role: "Frontend Developer", image: rohit },
         { name: "Aashish Gupta", role: "Accounts & Finance", image: aashish },
         { name: "Deepak Yadav", role: "Python Developer", image: deepakYadav },
 
