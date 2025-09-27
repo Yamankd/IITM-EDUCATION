@@ -1,6 +1,11 @@
 // components/InstructorCarousel.js
 import React, { useState, useEffect, useRef } from 'react';
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import deepakImage from '../assets/instructorImages/deepak.png';
+import rohit from '../assets/instructorImages/rohit.png';
+import aashish from '../assets/instructorImages/aashish.jpeg';
+import deepakYadav from '../assets/instructorImages/deepakYadav.png';
+
 
 const InstructorCarousel = () => {
     const [currentIndex, setCurrentIndex] = useState(1); // Start at the first "real" item
@@ -12,19 +17,11 @@ const InstructorCarousel = () => {
 
     const instructors = [
         { name: "Yamank Dhuriya", role: "MERN Developer", image: "https://avatars.githubusercontent.com/u/148179853?v=4" },
-        { name: "Deepak Kumar", role: "Frontend Developer", image: "https://randomuser.me/api/portraits/men/33.jpg" },
-        { name: "Amarjeet Singh", role: "Backend Engineer", image: "https://randomuser.me/api/portraits/women/44.jpg" },
-        { name: "Deepak Yadav", role: "Data Scientist", image: "https://randomuser.me/api/portraits/women/45.jpg" },
-        { name: "Aashish Gupta", role: "DevOps Specialist", image: "/staff_images/aashish.jpeg" },
-        { name: "Sachin Kumar", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/47.jpg" },
-        { name: "Prem Kumar", role: "Product Manager", image: "https://randomuser.me/api/portraits/men/48.jpg" },
-        { name: "Ritu Singh", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/49.jpg" },
-        { name: "Mahima Sharma", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/50.jpg" },
-        { name: "Khusboo Kumari", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/51.jpg" },
-        { name: "Khushi", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/52.jpg" },
-        { name: "Tejaswi Sharma", role: "Product Manager", image: "https://randomuser.me/api/portraits/women/53.jpg" },
-        { name: "Rohit Mahour", role: "Product Manager", image: "https://randomuser.me/api/portraits/men/54.jpg" },
-        { name: "Vijay Verma", role: "Product Manager", image: "https://randomuser.me/api/portraits/men/55.jpg" },
+        { name: "Deepak Kumar", role: "Accounts & Finance", image: deepakImage },
+        { name: "Rohit Mahour", role: "Accounts & Finance", image: rohit },
+        { name: "Aashish Gupta", role: "Accounts & Finance", image: aashish },
+        { name: "Deepak Yadav", role: "Python Developer", image: deepakYadav },
+
     ];
 
     // Create a new array with clones for seamless looping
