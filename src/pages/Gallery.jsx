@@ -39,7 +39,7 @@ const gridItems = [
   },
   {
     name: "AMOUR",
-    src: "https://i.pinimg.com/736x/b2/1e/21/b21e2138327dc1623cfc479810049d1e.jpg",
+    src: "https://i.pinimg.com/736x/c9/dd/2e/c9dd2ebf8a769008af9adb9f1a4012b1.jpg",
   },
   {
     name: "LAKESIDE",
