@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import InstructorCarousel from '../CUSTOM_COMPONENTS/InstructorCarousel';
+import EventsShowcase from '../CUSTOM_COMPONENTS/EventsShowcase';
 
 const Home = () => {
     const [particles, setParticles] = useState([]);
@@ -294,6 +295,7 @@ const Home = () => {
                 </div>
             </div>
             <InstructorCarousel />
+            <EventsShowcase />
         </>
     );
 };

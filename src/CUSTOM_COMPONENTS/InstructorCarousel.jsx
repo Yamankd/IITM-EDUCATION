@@ -5,6 +5,7 @@ import deepakImage from '../assets/instructorImages/deepak.png';
 import rohit from '../assets/instructorImages/rohit.png';
 import aashish from '../assets/instructorImages/aashish.jpeg';
 import deepakYadav from '../assets/instructorImages/deepakYadav.png';
+import mahi from '../assets/instructorImages/mahi.jpeg';
 
 
 const InstructorCarousel = () => {
@@ -16,11 +17,12 @@ const InstructorCarousel = () => {
     const cardRef = useRef(null);
 
     const instructors = [
-        { name: "Yamank Dhuriya", role: "MERN Developer", image: "https://avatars.githubusercontent.com/u/148179853?v=4" },
+        // { name: "Yamank Dhuriya", role: "MERN Developer", image: "https://avatars.githubusercontent.com/u/148179853?v=4" },
         { name: "Deepak Kumar", role: "Accounts & Finance", image: deepakImage },
         { name: "Rohit Mahour", role: "Frontend Developer", image: rohit },
         { name: "Aashish Gupta", role: "Accounts & Finance", image: aashish },
         { name: "Deepak Yadav", role: "Python Developer", image: deepakYadav },
+        { name: "Mahi Sharma", role: "Human Resource", image: mahi },
 
     ];
 
