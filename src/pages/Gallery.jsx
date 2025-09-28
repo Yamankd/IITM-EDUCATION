@@ -3,71 +3,72 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { color } from "framer-motion";
 
 const gridItems = [
   {
     name: "SMART TONY",
-    src: "https://i.pinimg.com/1200x/19/fc/fb/19fcfbb5debcb7d95a5f73a556a54b39.jpg",
+    src: "#",
   },
   {
     name: "Leopard",
-    src: "https://i.pinimg.com/1200x/47/da/2d/47da2d09a9bb2394dd764adc789ab193.jpg",
+    src: "#",
   },
   {
     name: "ABOUT US",
-    src: "https://i.pinimg.com/736x/f6/d6/d0/f6d6d040430fd8f2ad22433f484097cb.jpg",
+    src: "#",
   },
   {
     name: "SUBSIDIZED BOARD",
-    src: "https://i.pinimg.com/736x/53/8d/a9/538da97ebccd34bd14d0f1d04d4a29c3.jpg",
+    src: "#",
   },
   {
     name: "Twitter Feed",
-    src: "https://i.pinimg.com/736x/0d/8c/f6/0d8cf6d416a8e2683ef77f1f12f397fb.jpg",
+    src: "#",
   },
   {
     name: "OUR CREDO",
-    src: "https://i.pinimg.com/736x/ba/68/79/ba6879befda4c03360f8bcae238bd614.jpg",
+    src: "#",
   },
   {
     name: "BOUNDARY",
-    src: "https://i.pinimg.com/736x/ad/dc/ca/addccaf0bf3ffc7a5d899e00f33bbe48.jpg",
+    src: "#",
   },
   {
     name: "PINE",
-    src: "https://i.pinimg.com/736x/b2/1e/21/b21e2138327dc1623cfc479810049d1e.jpg",
+    src: "#",
   },
   {
     name: "AMOUR",
-    src: "https://i.pinimg.com/736x/c9/dd/2e/c9dd2ebf8a769008af9adb9f1a4012b1.jpg",
+    src: "#",
   },
   {
     name: "LAKESIDE",
-    src: "https://i.pinimg.com/736x/f0/51/f8/f051f8b1d4831d2a3089f3add9ed26e5.jpg",
+    src: "#",
   },
   {
     name: "DUMMY",
-    src: "https://i.pinimg.com/736x/67/93/eb/6793eb18e70311ae8ff451596133ffb9.jpg",
+    src: "#",
   },
   {
     name: "Motorcycle",
-    src: "https://i.pinimg.com/736x/27/fd/32/27fd3208e9ccc2286bdb457b51f8fee5.jpg",
+    src: "#",
   },
   {
     name: "Pattern",
-    src: "https://i.pinimg.com/736x/21/ec/cb/21eccb05f73cbf266193bd3288bbe4bf.jpg",
+    src: "#",
   },
   {
     name: "SHARE NEWS",
-    src: "https://i.pinimg.com/1200x/1e/18/42/1e184225a4a3cb0b2c31cf2f49f5e9b0.jpg",
+    src: "#",
   },
   {
     name: "Robot",
-    src: "https://i.pinimg.com/736x/2e/27/b7/2e27b7fdb359646f478966435744a0c2.jpg",
+    src: "#",
   },
   {
     name: "BANANA",
-    src: "https://i.pinimg.com/736x/68/6b/43/686b4353afe7563c1c54f725c0d2fa41.jpg",
+    src: "#",
   },
 ];
 
@@ -113,6 +114,7 @@ const Gallery = () => {
           </div>
         ))}
       </div>
+      <hr style={{ color: "#364153", width: "98%", margin: "auto" }} />
     </div>
   );
 };
