@@ -27,16 +27,31 @@ const scaleIn = {
     transition: { duration: 0.8, ease: "easeOut" },
   },
 };
+const images = [
+  "/images/img1.jpg",
+  "/images/img2.jpg",
+  "/images/img3.jpg",
+  "/images/img4.jpg",
+  "/images/img5.jpg",
+  "/images/img6.jpg",
+  "/images/img7.jpg",
+  "/images/img8.jpg",
+  "/images/img9.jpg",
+  "/images/img10.jpg",
+];
 
 // Component for the main hero quote
 const HeroQuote = () => (
-  <section className="flex flex-col items-center justify-center py-50 min-h-[80vh] px-6 text-center space-y-10 relative overflow-hidden">
-    {/* Decorative Gold Glow (background) */}
-    <div className="absolute w-90 h-80 bg-[#ffbb00] rounded-full blur-3xl opacity-20 top-20 left-1/2 -translate-x-1/2 animate-bounce" />
+  <section className="flex flex-col  pt-40 items-center justify-center min-h-[80vh] px-6 text-center space-y-10 relative overflow-hidden">
+    {/* Decorative Glow */}
+    <div className="absolute w-96 h-96 bg-[#ffbb00] rounded-full blur-3xl opacity-20 top-20 left-1/2 -translate-x-1/2 animate-bounce" />
 
+    {/* Hero Quote */}
     <motion.h1
       className="text-3xl md:text-5xl font-extrabold text-white leading-snug max-w-4xl relative z-10"
       variants={fadeInUp}
+      initial="hidden"
+      animate="visible"
     >
       “Learn today, lead tomorrow —
       <motion.span
@@ -49,18 +64,47 @@ const HeroQuote = () => (
       </motion.span>
       ”
     </motion.h1>
+
+    {/* Decorative Line */}
     <motion.div
-      className="w-32 h-1 bg-gradient-to-r from-transparent via-[#D6A419] to-transparent"
+      className="w-100 mb-2 h-1 bg-gradient-to-r from-transparent via-[#D6A419] to-transparent"
       initial={{ scaleX: 0 }}
       animate={{ scaleX: 1 }}
       transition={{ duration: 1, delay: 0.5 }}
     />
+
+    {/* Image Carousel Section */}
+    <div className="w-screen py-8 relative overflow-hidden">
+      <motion.div
+        className="flex gap-10"
+        animate={{ x: ["0%", "-100%"] }}
+        transition={{
+          ease: "linear",
+          duration: 40,
+          repeat: Infinity,
+        }}
+      >
+        {/* Duplicate image list for seamless infinite scroll */}
+        {[...images, ...images].map((src, index) => (
+          <motion.div
+            key={index}
+            className="flex-shrink-0 rounded-full bg-amber-900/50 shadow-md hover:scale-110 transition-transform duration-300"
+          >
+            <img
+              src={src}
+              alt={`Icon ${index + 1}`}
+              className="w-16 h-16 md:w-30 md:h-30 object-contain rounded-full"
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   </section>
 );
 
 // //image animation of the founder of the coaching.
 const imageAnimation = {
-  hidden: { opacity: 0, scale: 0.8, rotate: -10 },
+  hidden: { opacity: 0, scale: 2, rotate: -10 },
   visible: {
     opacity: 1,
     scale: 1,
@@ -83,7 +127,7 @@ const CoreContent = () => (
       <img
         src="/your-image-path.jpg"
         alt="Beautiful scenery"
-        className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full shadow-2xl border-4 border-[#D6A419]"
+        className="w-64 h-64 md:w-80 md:h-80  object-cover rounded-full shadow-2xl border-4 border-[#D6A419]"
       />
     </motion.div>
 
@@ -179,7 +223,7 @@ const About = () => {
       variants={containerVariants}
     >
       <HeroQuote />
-      {/* <Photo /> */}
+
       <CoreContent />
       <ClosingStatement />
     </motion.main>
