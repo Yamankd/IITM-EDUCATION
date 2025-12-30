@@ -11,6 +11,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "experss": "^0.0.1-security"
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "experss": "^0.0.1-security",
+    "nodemon": "^3.1.11"
   }
 }
