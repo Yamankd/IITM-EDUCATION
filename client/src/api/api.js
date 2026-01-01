@@ -1,8 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/iitm",
-  withCredentials: true, // 👈 VERY IMPORTANT
+  baseURL: process.env.REACT_APP_API_URL, // automatically picks env
+  withCredentials: true, // cookies/auth
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export default api;

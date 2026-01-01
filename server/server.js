@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   res.send("<h1>Home Page</h1>");
 });
 
-app.get("/test", (req, res) => {
+app.get("/iitm/test", (req, res) => {
   res.send("<h1>This is test  route.</h1>");
 });
 
