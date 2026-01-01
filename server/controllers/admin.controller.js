@@ -45,7 +45,7 @@ const admin_Login = async (req, res) => {
     const { email, password } = req.body;
 
     const admin = await adminSchema.findOne({ email }).select("+password");
-    console.log(admin)
+    // console.log(admin)
     if (!admin) {
       return res.status(404).json({
         message: "Admin not found",
@@ -53,7 +53,7 @@ const admin_Login = async (req, res) => {
     }
 
     const isPasswordMatch = await bcrypt.compare(password, admin.password);
-    console.log(isPasswordMatch)
+    // console.log(isPasswordMatch)
     if (!isPasswordMatch) {
       return res.status(401).json({
         message: "Invalid password",
@@ -72,7 +72,7 @@ const admin_Login = async (req, res) => {
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
@@ -93,4 +93,13 @@ const admin_Login = async (req, res) => {
   }
 };
 
-module.exports = { admin_Register, admin_Login };
+
+const AdminDashboard = (req, res) => {
+    res.status(200).json({
+      message: "Welcome to Admin Dashboard",
+      admin: req.user,
+    });
+  };
+
+
+module.exports = { admin_Register, admin_Login , AdminDashboard};
