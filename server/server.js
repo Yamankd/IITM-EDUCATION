@@ -33,7 +33,7 @@ app.get("/iitm/test", (req, res) => {
 // ====== main routes ============
 app.use("/iitm", router);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 
 // 🔥 START SERVER ONLY AFTER DB CONNECTS
