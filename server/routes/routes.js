@@ -11,6 +11,7 @@ router.post('/admin-signup',admin_Register)
 router.post('/admin-login',admin_Login)
 router.post('/hr/signup',protect,authorize,hrSignup)
 router.post('/hr/login',hrLogin)
+
 router.get('/auth-check',protect,authCheck)
 
 
