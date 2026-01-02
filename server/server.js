@@ -22,16 +22,16 @@ app.use(
 
 // ==== testing routes =======
 // Routes
-app.get("/", (req, res) => {
-  res.send("<h1>Home Page</h1>");
-});
+// app.get("/", (req, res) => {
+//   res.send("<h1>Home Page</h1>");
+// });
 
-app.get("/iitm/test", (req, res) => {
-  res.send("<h1>This is test  route.</h1>");
-});
+// app.get("/iitm/test", (req, res) => {
+//   res.send("<h1>This is test  route.</h1>");
+// });
 
 // ====== main routes ============
-app.use("/iitm", router);
+app.use("/", router);
 
 const PORT = process.env.PORT || 5000;
 
