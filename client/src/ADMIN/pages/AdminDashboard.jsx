@@ -143,8 +143,8 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, darkMode }) => {
                       ? "bg-blue-900/30 text-blue-400"
                       : "bg-blue-50 text-blue-600"
                     : darkMode
-                    ? "hover:bg-gray-700"
-                    : "hover:bg-gray-100"
+                      ? "hover:bg-gray-700"
+                      : "hover:bg-gray-100"
                 }
               `}
             >
@@ -532,8 +532,8 @@ const Students = () => {
                         student.status === "Active"
                           ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                           : student.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                       }`}
                     >
                       {student.status}
