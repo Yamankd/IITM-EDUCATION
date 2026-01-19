@@ -15,7 +15,7 @@ app.use(cookieParser());
 // CORS
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://www.digitaliitm.com"],
+    origin: ["http://localhost:5173", "https://www.digitaliitm.com", 'https://digitaliitm.com'],
     credentials: true,
   })
 );
