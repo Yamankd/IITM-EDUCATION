@@ -1,25 +1,31 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../api/api";
-import { useNavigate } from "react-router-dom";
 
 const ProtectRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
-  const navigate = useNavigate();
+
   useEffect(() => {
     api
       .get("/auth-check")
-      .then(() => setAuthorized(true))
-      .catch(
-        () => setAuthorized(false),
-        navigate("/admin/Dashboard", { replace: true })
-      )
-      .finally(() => setLoading(false));
+      .then(() => {
+        setAuthorized(true);
+      })
+      .catch((err) => {
+        // Just set authorized to false.
+        // The return statement below will handle the redirection to login.
+        setAuthorized(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return <p>Loading...</p>;
 
+  // If authorized, show the protected page (children).
+  // If NOT authorized, redirect to the login page.
   return authorized ? children : <Navigate to="/admin/loginpage" replace />;
 };
 

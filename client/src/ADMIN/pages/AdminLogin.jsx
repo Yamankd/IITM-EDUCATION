@@ -19,6 +19,17 @@ const AdminLogin = () => {
       setIsDarkMode(true);
       document.documentElement.classList.add("dark");
     }
+
+    // Check if already authenticated
+    const checkAuth = async () => {
+      try {
+        await api.get("/auth-check");
+        navigate("/admin/Dashboard", { replace: true });
+      } catch (error) {
+        // Not authenticated, stay on login page
+      }
+    };
+    checkAuth();
   }, []);
 
   const toggleDarkMode = () => {

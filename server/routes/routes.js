@@ -7,11 +7,13 @@ const protect = require('../middlewares/tokenCheck')
 
 
 
-router.post('/admin-signup', admin_Register)
+// router.post('/admin-signup', admin_Register)
 router.post('/admin-login', admin_Login)
 
 
 router.get('/auth-check', protect, authCheck)
+
+router.get('/admin/dashboard', protect, AdminDashboard);
 
 
 module.exports = router;

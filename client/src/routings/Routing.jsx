@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom"; // Import Routes instead of Router
+import { Route, Routes, Navigate } from "react-router-dom"; // Import Routes instead of Router
 import Home from "../pages/Home";
 import Courses from "../pages/Courses";
 import Team from "../pages/Team";
@@ -21,6 +21,10 @@ const Routing = () => {
       <Route path="/course/:id" element={<CourseDetail />} />
       {/* <Route path="/team" element={<Team />} /> */}
       {/* <Route path="/store" element={<Store />} /> */}
+      <Route
+        path="/admin"
+        element={<Navigate to="/admin/loginpage" replace />}
+      />
       <Route path="/admin/loginpage" element={<AdminLogin />} />
       <Route
         path="/admin/Dashboard"

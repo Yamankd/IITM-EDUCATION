@@ -2,43 +2,43 @@ const adminSchema = require("../models/adminModal");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
 
-const admin_Register = async (req, res) => {
-  try {
-    const { name, email, password, role, isActive } = req.body;
+// const admin_Register = async (req, res) => {
+//   try {
+//     const { name, email, password, role, isActive } = req.body;
 
-    const existingAdmin = await adminSchema.findOne({ email });
+//     const existingAdmin = await adminSchema.findOne({ email });
 
-    if (existingAdmin) {
-      return res.status(409).json({
-        message: "Admin already exists",
-      });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     if (existingAdmin) {
+//       return res.status(409).json({
+//         message: "Admin already exists",
+//       });
+//     }
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = await adminSchema.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      isActive,
-    });
+//     const admin = await adminSchema.create({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       role,
+//       isActive,
+//     });
 
-    res.status(201).json({
-      message: "Admin registered successfully",
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server error",
-    });
-  }
-};
+//     res.status(201).json({
+//       message: "Admin registered successfully",
+//       admin: {
+//         id: admin._id,
+//         name: admin.name,
+//         email: admin.email,
+//         role: admin.role,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
 
 const admin_Login = async (req, res) => {
   try {
@@ -103,4 +103,4 @@ const AdminDashboard = (req, res) => {
 };
 
 
-module.exports = { admin_Register, admin_Login, AdminDashboard };
+module.exports = { admin_Login, AdminDashboard };
