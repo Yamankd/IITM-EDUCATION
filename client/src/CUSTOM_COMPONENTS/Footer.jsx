@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Company Info */}
           <div className="space-y-4">
-            <NavLink to='/admin/loginpage' className="text-xl font-bold text-[#D6A419] ">
+            <NavLink to="/" className="text-xl font-bold text-[#D6A419] ">
               IITM Computer Education
             </NavLink>
             <p className="text-gray-300 pt-6">

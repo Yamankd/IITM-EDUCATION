@@ -1,6 +1,6 @@
 const authorize = (req, res, next) => {
   const role = req.user?.role?.toUpperCase();
-  if (role === "ADMIN" || role === "HR") {
+  if (role === "ADMIN") {
     return next(); // allow
   }
 

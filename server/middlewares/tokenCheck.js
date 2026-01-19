@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const protect = (req, res, next) => {
-  const token = req.cookies.adminToken || req.cookies.hrToken;
+  const token = req.cookies.adminToken;
 
   if (!token) {
     return res.status(401).json({

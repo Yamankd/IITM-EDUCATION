@@ -69,11 +69,12 @@ const admin_Login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: isProduction,                   // true if production, false if dev
+      sameSite: isProduction ? "none" : "lax", // "none" for prod, "lax" for dev
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
@@ -82,7 +83,7 @@ const admin_Login = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
-        role: admin.role, 
+        role: admin.role,
       },
     });
   } catch (error) {
@@ -95,11 +96,11 @@ const admin_Login = async (req, res) => {
 
 
 const AdminDashboard = (req, res) => {
-    res.status(200).json({
-      message: "Welcome to Admin Dashboard",
-      admin: req.user,
-    });
-  };
+  res.status(200).json({
+    message: "Welcome to Admin Dashboard",
+    admin: req.user,
+  });
+};
 
 
-module.exports = { admin_Register, admin_Login , AdminDashboard};
+module.exports = { admin_Register, admin_Login, AdminDashboard };
