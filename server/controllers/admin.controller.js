@@ -103,4 +103,13 @@ const AdminDashboard = (req, res) => {
 };
 
 
-module.exports = { admin_Login, AdminDashboard };
+const admin_Logout = (req, res) => {
+  res.clearCookie("adminToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+  res.status(200).json({ message: "Logout successful" });
+};
+
+module.exports = { admin_Login, AdminDashboard, admin_Logout };

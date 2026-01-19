@@ -2,8 +2,7 @@ import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom"; // Import Routes instead of Router
 import Home from "../pages/Home";
 import Courses from "../pages/Courses";
-import Team from "../pages/Team";
-import Store from "../pages/Store";
+
 import CourseDetail from "../pages/CourseDetail";
 import About from "../pages/About";
 import Gallery from "../pages/Gallery";
