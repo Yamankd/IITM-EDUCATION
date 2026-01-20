@@ -69,11 +69,14 @@ const admin_Login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    const isProduction = process.env.NODE_ENV === "production";
+    // Default to production settings (Secure, SameSite=None) unless explicitly in Development
+    // This fixes the issue where missing NODE_ENV on Render causes cookies to fail cross-site
+    const isDev = process.env.NODE_ENV === "development";
+
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: isProduction,                   // true if production, false if dev
-      sameSite: isProduction ? "none" : "lax", // "none" for prod, "lax" for dev
+      secure: !isDev,                   // True in Production (or if NODE_ENV is missing)
+      sameSite: isDev ? "lax" : "none", // 'None' required for cross-site (Netlify -> Render)
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -104,10 +107,12 @@ const AdminDashboard = (req, res) => {
 
 
 const admin_Logout = (req, res) => {
+  const isDev = process.env.NODE_ENV === "development";
+
   res.clearCookie("adminToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: !isDev,
+    sameSite: isDev ? "lax" : "none",
   });
   res.status(200).json({ message: "Logout successful" });
 };

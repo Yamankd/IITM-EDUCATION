@@ -12,29 +12,41 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS
+// Define allowed origins
+const allowedOrigins = [
+  "http://localhost:5173",                // Local development
+  "https://www.digitaliitm.com",          // Production Custom Domain
+  "https://digitaliitm.com",              // Production Root Domain
+  process.env.CLIENT_URL,                 // Dynamic URL from Render Env Var (e.g. your-app.netlify.app)
+];
+
+console.log("Allowed Origins:", allowedOrigins);
+
+// CORS Configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://www.digitaliitm.com", 'https://digitaliitm.com'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // Check if the origin is in the allowed list
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log("🚫 Blocked by CORS:", origin); // Logs the URL that is failing
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
-
-// ==== testing routes =======
-// Routes
-// app.get("/", (req, res) => {
-//   res.send("<h1>Home Page</h1>");
-// });
-
-// app.get("/iitm/test", (req, res) => {
-//   res.send("<h1>This is test  route.</h1>");
-// });
 
 // ====== main routes ============
 app.use("/", router);
 
-const PORT = process.env.PORT || 5000;
-
+const PORT = process.env.PORT || 3000;
 
 // 🔥 START SERVER ONLY AFTER DB CONNECTS
 const startServer = async () => {
@@ -44,7 +56,7 @@ const startServer = async () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("❌ Server failed to start");
+    console.error("❌ Server failed to start", error);
   }
 };
 
