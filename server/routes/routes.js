@@ -20,6 +20,13 @@ router.get('/courses/:id', getCourseById);
 router.put('/courses/:id', protect, updateCourse);
 router.delete('/courses/:id', protect, deleteCourse);
 
+// FAQ Routes
+const { getFaqs, createFaq, deleteFaq, reorderFaqs } = require('../controllers/faq.controller');
+router.get('/faqs', getFaqs);
+router.post('/faqs', protect, createFaq);
+router.put('/faqs/reorder', protect, reorderFaqs);
+router.delete('/faqs/:id', protect, deleteFaq);
+
 router.get('/auth-check', protect, authCheck)
 
 router.get('/admin/dashboard', protect, AdminDashboard);

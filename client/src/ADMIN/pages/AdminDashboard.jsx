@@ -16,7 +16,10 @@ import {
   Moon,
   Sun,
   Plus,
+  Trash2,
+  GripVertical,
 } from "lucide-react";
+import { Reorder } from "framer-motion";
 
 // Main Component
 const AdminDashboard = () => {
@@ -121,7 +124,7 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
     { id: "students", label: "Students", icon: <Users size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
     { id: "gallery", label: "Gallery", icon: <ImageIcon size={20} /> },
-    { id: "faq", label: "FAQ & Help", icon: <HelpCircle size={20} /> },
+    { id: "faq", label: "FAQ", icon: <HelpCircle size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
   ];
 
@@ -139,19 +142,19 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
         bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
         transform transition-all duration-300 ease-in-out
         ${/* Sidebar Logic: Full width on mobile/open, Mini width on desktop/closed */ ""}
-        ${isOpen ? "translate-x-0 w-64" : "-translate-x-full lg:translate-x-0 lg:w-20 lg:hover:w-64 group"}
+        ${isOpen ? "translate-x-0 w-64" : "-translate-x-full lg:translate-x-0 lg:w-20"}
       `}
       >
         {/* Logo Area */}
         <div className="h-16 flex items-center justify-center border-b border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="font-bold text-xl text-blue-600 dark:text-blue-400 flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
-              EA
+              DI
             </div>
             <span
-              className={`${isOpen ? "block" : "hidden lg:group-hover:block"} transition-all duration-200 whitespace-nowrap`}
+              className={`${isOpen ? "block" : "hidden"} transition-all duration-200 whitespace-nowrap`}
             >
-              EduAdmin
+              DIGITAL IITM
             </span>
           </div>
         </div>
@@ -163,7 +166,7 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`
-                w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors overflow-hidden
+                w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group relative
                 ${
                   activeTab === item.id
                     ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
@@ -173,10 +176,15 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
             >
               <div className="flex-shrink-0">{item.icon}</div>
               <span
-                className={`whitespace-nowrap ${isOpen ? "block" : "hidden lg:group-hover:block"}`}
+                className={`whitespace-nowrap ${isOpen ? "block" : "hidden"}`}
               >
                 {item.label}
               </span>
+              {!isOpen && (
+                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-md">
+                  {item.label}
+                </div>
+              )}
             </button>
           ))}
         </nav>
@@ -185,16 +193,12 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
         <div className="absolute bottom-0 w-full p-4 border-t border-gray-100 dark:border-gray-700">
           <button
             onClick={onLogout}
-            className="flex items-center gap-3 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors w-full px-3 py-2 overflow-hidden"
+            className="flex items-center gap-3 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors w-full px-3 py-2 group relative"
           >
             <div className="flex-shrink-0">
               <LogOut size={20} />
             </div>
-            <span
-              className={`${isOpen ? "block" : "hidden lg:group-hover:block"}`}
-            >
-              Logout
-            </span>
+            <span className={`${isOpen ? "block" : "hidden"}`}>Logout</span>
           </button>
         </div>
       </aside>
@@ -213,23 +217,9 @@ const Header = ({ toggleSidebar, darkMode }) => (
       >
         <Menu size={20} />
       </button>
-
-      {/* Simple Search */}
-      <div className="hidden md:flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2 w-64 transition-colors">
-        <Search size={18} className="text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search..."
-          className="bg-transparent border-none focus:outline-none ml-2 text-sm w-full text-gray-700 dark:text-gray-200"
-        />
-      </div>
     </div>
 
     <div className="flex items-center gap-4">
-      <button className="relative p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
-        <Bell size={20} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-      </button>
       <div className="w-8 h-8 bg-blue-500 rounded-full text-white flex items-center justify-center font-bold shadow-sm">
         A
       </div>
@@ -240,94 +230,7 @@ const Header = ({ toggleSidebar, darkMode }) => (
 // --- Sub-Components (Unchanged content, kept for completeness) ---
 
 const Overview = () => {
-  const stats = [
-    {
-      label: "Total Students",
-      value: "2,847",
-      change: "+12%",
-      icon: <Users className="text-blue-500" />,
-    },
-    {
-      label: "Active Courses",
-      value: "48",
-      change: "+5%",
-      icon: <BookOpen className="text-purple-500" />,
-    },
-    {
-      label: "Gallery Images",
-      value: "156",
-      change: "+24",
-      icon: <ImageIcon className="text-pink-500" />,
-    },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-        Dashboard Overview
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stats.map((stat, idx) => (
-          <div
-            key={idx}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                {stat.icon}
-              </div>
-              <span className="text-xs font-medium px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
-                {stat.change}
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {stat.value}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {stat.label}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-all">
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-          <h3 className="font-semibold text-gray-800 dark:text-white">
-            Recent Activities
-          </h3>
-          <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-            View All <ChevronRight size={16} />
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-            <thead className="bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-              <tr>
-                <th className="px-6 py-3 font-medium">User</th>
-                <th className="px-6 py-3 font-medium">Action</th>
-                <th className="px-6 py-3 font-medium">Time</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {[1, 2, 3].map((item) => (
-                <tr
-                  key={item}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="px-6 py-4">Admin User</td>
-                  <td className="px-6 py-4">Updated course material</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
-                      2 mins ago
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+  return <></>;
 };
 
 const SettingsView = ({ darkMode, toggleDarkMode }) => {
@@ -368,107 +271,168 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
   );
 };
 
-const GalleryView = () => (
-  <div className="space-y-6">
-    <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-        Gallery
-      </h2>
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors">
-        <Plus size={16} /> Upload Image
-      </button>
-    </div>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-        <div
-          key={item}
-          className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer group"
-        >
-          <ImageIcon
-            className="text-gray-400 group-hover:text-blue-500 transition-colors"
-            size={32}
-          />
-        </div>
-      ))}
-    </div>
-  </div>
-);
+const GalleryView = () => <></>;
 
-const FAQView = () => (
-  <div className="max-w-3xl space-y-6">
-    <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-        FAQ Manager
-      </h2>
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors">
-        <Plus size={16} /> Add Question
-      </button>
-    </div>
-    <div className="space-y-4">
-      {[1, 2, 3].map((item) => (
-        <div
-          key={item}
-          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
-                How do I reset my password?
-              </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Modified 2 days ago
-              </p>
-            </div>
-            <button className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 p-1">
-              <Settings size={16} />
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+const FAQView = () => {
+  const [faqs, setFaqs] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
 
-const CoursesView = () => (
-  <div className="space-y-6">
-    <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-        Courses
-      </h2>
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors">
-        <Plus size={16} /> New Course
-      </button>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[1, 2, 3, 4].map((item) => (
-        <div
-          key={item}
-          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-all"
+  const fetchFaqs = async () => {
+    try {
+      const response = await api.get("/faqs");
+      setFaqs(response.data);
+    } catch (error) {
+      console.error("Error fetching FAQs", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFaqs();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this FAQ?")) return;
+    try {
+      await api.delete(`/faqs/${id}`);
+      fetchFaqs(); // Refresh list
+    } catch (error) {
+      console.error("Error deleting FAQ", error);
+    }
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post("/faqs", { question: newQuestion, answer: newAnswer });
+      setShowAddForm(false);
+      setNewQuestion("");
+      setNewAnswer("");
+      fetchFaqs();
+    } catch (error) {
+      console.error("Error creating FAQ", error);
+    }
+  };
+
+  return (
+    <div className="max-w-3xl space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          FAQ Manager
+        </h2>
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
         >
-          <div className="h-32 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            <BookOpen className="text-gray-400 dark:text-gray-500" size={32} />
+          {showAddForm ? (
+            "Cancel"
+          ) : (
+            <>
+              <Plus size={16} /> Add Question
+            </>
+          )}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <form
+          onSubmit={handleCreate}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-4"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-white">
+            Add New Question
+          </h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Question
+            </label>
+            <input
+              type="text"
+              required
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="e.g., How do I reset my password?"
+            />
           </div>
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-semibold px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full">
-                Development
-              </span>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Answer
+            </label>
+            <textarea
+              required
+              rows={3}
+              value={newAnswer}
+              onChange={(e) => setNewAnswer(e.target.value)}
+              className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Enter the answer here..."
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
+          >
+            Save FAQ
+          </button>
+        </form>
+      )}
+
+      <Reorder.Group
+        axis="y"
+        values={faqs}
+        onReorder={setFaqs}
+        className="space-y-4"
+      >
+        {faqs.map((item) => (
+          <Reorder.Item
+            key={item._id}
+            value={item}
+            onDragEnd={async () => {
+              // Determine new order based on current 'faqs' state
+              const newOrder = faqs.map((f) => f._id);
+              try {
+                await api.put("/faqs/reorder", { order: newOrder });
+              } catch (err) {
+                console.error("Failed to save order", err);
+              }
+            }}
+            className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all flex items-start gap-3"
+          >
+            <div className="mt-1 text-gray-400 cursor-move hover:text-gray-600 dark:hover:text-gray-300">
+              <GripVertical size={20} />
             </div>
-            <h3 className="font-bold text-gray-900 dark:text-white mb-1">
-              Full Stack Web Dev
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Last updated 2 hours ago
-            </p>
-            <button className="w-full py-2 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-              Manage Content
-            </button>
-          </div>
-        </div>
-      ))}
+            <div className="flex-1 flex justify-between items-start">
+              <div>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  {item.question}
+                </h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {item.answer}
+                </p>
+              </div>
+              <button
+                onClick={() => handleDelete(item._id)}
+                className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1"
+                title="Delete FAQ"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
+
+      {faqs.length === 0 && !showAddForm && (
+        <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+          No FAQs found. Add one to get started!
+        </p>
+      )}
     </div>
-  </div>
-);
+  );
+};
+
+const CoursesView = () => <></>;
 
 const Placeholder = ({ title, icon }) => (
   <div className="flex flex-col items-center justify-center h-96 text-gray-400 dark:text-gray-500">
