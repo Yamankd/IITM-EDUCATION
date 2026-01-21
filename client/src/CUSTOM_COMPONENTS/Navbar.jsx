@@ -196,7 +196,7 @@ const Navbar = () => {
               Team
             </NavLink> */}
             <NavLink
-              to="/admin/loginpage"
+              to="/admin-login"
               className={({ isActive }) =>
                 isActive
                   ? "text-[#D6A419] font-semibold"

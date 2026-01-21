@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import api from "../api/api";
+
 const Courses = () => {
   const [courses, setCourses] = useState([]);
-  console.log(courses);
-
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
   const [selectedDuration, setSelectedDuration] = useState("all");
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetch("/courses.json") 
-      .then((res) => res.json())
-      .then((data) => setCourses(data))
-      .catch((err) => console.error(err));
+    fetchCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const { data } = await api.get("/courses");
+      setCourses(data);
+      setFilteredCourses(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      setLoading(false);
+    }
+  };
 
   // Categories for filter
   const categories = [
@@ -37,17 +47,6 @@ const Courses = () => {
   ];
 
   useEffect(() => {
-    setTimeout(() => {
-        fetch("/courses.json")
-        .then((res) => res.json())
-        .then((data) => setCourses(data))
-        .catch((err) => console.error(err));
-        setLoading(false);
-    }, []);
-    }, 1000);
- 
-
-  useEffect(() => {
     filterCourses();
   }, [searchTerm, selectedCategory, selectedLevel, selectedDuration, courses]);
 
@@ -59,15 +58,17 @@ const Courses = () => {
       results = results.filter(
         (course) =>
           course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          course.category.toLowerCase().includes(searchTerm.toLowerCase())
+          course.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          course.category.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
     // Category filter
     if (selectedCategory !== "all") {
       results = results.filter(
-        (course) => course.category === selectedCategory
+        (course) => course.category === selectedCategory,
       );
     }
 
@@ -77,6 +78,7 @@ const Courses = () => {
     }
 
     // Duration filter
+    // improved duration parsing to handle "12 Weeks" string format
     if (selectedDuration !== "all") {
       switch (selectedDuration) {
         case "Under 10 weeks":
@@ -272,12 +274,12 @@ const Courses = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredCourses.map((course) => (
                   <div
-                    key={course.id}
+                    key={course._id}
                     className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                   >
                     <div className="relative">
                       <img
-                        src={course.image}
+                        src={course.image || "https://via.placeholder.com/300"}
                         alt={course.title}
                         className="w-full h-48 object-cover"
                       />
@@ -297,7 +299,9 @@ const Courses = () => {
                       <h3 className="text-xl font-bold text-[#0B2A4A] mb-2">
                         {course.title}
                       </h3>
-                      <p className="text-gray-600 mb-4">{course.description}</p>
+                      <p className="text-gray-600 mb-4 line-clamp-2">
+                        {course.description}
+                      </p>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center">
                           <svg
@@ -317,15 +321,15 @@ const Courses = () => {
                             course.level === "Beginner"
                               ? "bg-green-100 text-green-800"
                               : course.level === "Intermediate"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-purple-100 text-purple-800"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-purple-100 text-purple-800"
                           }`}
                         >
                           {course.level}
                         </span>
                       </div>
                       <NavLink
-                        to={`/course/${course.id}`}
+                        to={`/course/${course._id}`}
                         className="block w-full text-center px-4 py-2 bg-[#D6A419] text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors"
                       >
                         View Course

@@ -1,32 +1,15 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { section } from "framer-motion/client";
 
-// REFACTORED: Animation variants for cleaner JSX and easier management.
-const containerVariants = {
-  hidden: { opacity: 0 },
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.2, // Animates children one after another
-      duration: 0.8,
-    },
-  },
-};
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
+    y: 0,
     transition: { duration: 0.8, ease: "easeOut" },
   },
 };
+
 const images = [
   "/images/img1.jpg",
   "/images/img2.jpg",
@@ -40,193 +23,150 @@ const images = [
   "/images/img10.jpg",
 ];
 
-// Component for the main hero quote
-const HeroQuote = () => (
-  <section className="flex flex-col  pt-40 items-center justify-center min-h-[80vh] px-6 text-center space-y-10 relative overflow-hidden">
-    {/* Decorative Glow */}
-    <div className="absolute w-96 h-96 bg-[#ffbb00] rounded-full blur-3xl opacity-20 top-20 left-1/2 -translate-x-1/2 animate-bounce" />
-
-    {/* Hero Quote */}
-    <motion.h1
-      className="text-3xl md:text-5xl font-extrabold text-white leading-snug max-w-4xl relative z-10"
-      variants={fadeInUp}
-      initial="hidden"
-      animate="visible"
-    >
-      “Learn today, lead tomorrow —
-      <motion.span
-        className="text-[#D6A419] drop-shadow-md"
-        animate={{ opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        {" "}
-        with the power of computers in your hands.
-      </motion.span>
-      ”
-    </motion.h1>
-
-    {/* Decorative Line */}
-    <motion.div
-      className="w-100 mb-2 h-1 bg-gradient-to-r from-transparent via-[#D6A419] to-transparent"
-      initial={{ scaleX: 0 }}
-      animate={{ scaleX: 1 }}
-      transition={{ duration: 1, delay: 0.5 }}
-    />
-
-    {/* Image Carousel Section */}
-    <div className="w-screen py-8 relative overflow-hidden">
-      <motion.div
-        className="flex gap-10"
-        animate={{ x: ["0%", "-100%"] }}
-        transition={{
-          ease: "linear",
-          duration: 40,
-          repeat: Infinity,
-        }}
-      >
-        {/* Duplicate image list for seamless infinite scroll */}
-        {[...images, ...images].map((src, index) => (
-          <motion.div
-            key={index}
-            className="flex-shrink-0 rounded-full bg-amber-900/50 shadow-md hover:scale-110 transition-transform duration-300"
-          >
-            <img
-              src={src}
-              alt={`Icon ${index + 1}`}
-              className="w-16 h-16 md:w-30 md:h-30 object-contain rounded-full"
-            />
-          </motion.div>
-        ))}
-      </motion.div>
-    </div>
-  </section>
-);
-
-// //image animation of the founder of the coaching.
-const imageAnimation = {
-  hidden: { opacity: 0, scale: 2, rotate: -10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    rotate: 0,
-    transition: { duration: 1, type: "spring", stiffness: 80 },
-  },
-};
-
-// Component for the core "About Us" content
-const CoreContent = () => (
-  <section className="px-6  flex flex-col md:flex-row items-center justify-between gap-10 md:gap-20">
-    {/* Image Section */}
-    <motion.div
-      className="flex justify-center items-center w-full md:w-1/2"
-      variants={imageAnimation}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-    >
-      <img
-        src="/your-image-path.jpg"
-        alt="Beautiful scenery"
-        className="w-64 h-64 md:w-80 md:h-80  object-cover rounded-full shadow-2xl border-4 border-[#D6A419]"
-      />
-    </motion.div>
-
-    {/* Text Section */}
-    <div className="w-full md:w-1/2 text-center md:text-left flex flex-col items-center md:items-start justify-center space-y-6">
-      <motion.h2
-        className="text-4xl md:text-5xl font-bold text-[#D6A419]"
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        About Us
-      </motion.h2>
-
-      <motion.h3
-        className="text-2xl md:text-3xl font-semibold text-white"
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        Welcome To IITM COMPUTER EDUCATION
-      </motion.h3>
-
-      <motion.p
-        className="text-lg text-white/80 leading-relaxed max-w-3xl"
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        At{" "}
-        <span className="font-semibold text-[#D6A419]">
-          IITM Computer Education
-        </span>
-        , we believe in transforming dreams into reality. Since 2010, we’ve been
-        a trusted name, offering courses from basic computing to advanced
-        technologies.
-      </motion.p>
-
-      <motion.p
-        className="text-lg text-white/80 leading-relaxed max-w-3xl"
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        Our mission is to provide{" "}
-        <span className="font-bold text-[#D6A419]">
-          practical, industry-focused training
-        </span>
-        . With experienced instructors and a hands-on approach, we ensure
-        students are career-ready from day one.
-      </motion.p>
-
-      <motion.blockquote
-        className="text-xl italic font-medium border-l-4 border-[#D6A419] pl-4 text-amber-300/90 mt-6 max-w-3xl"
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        “Learning computers is not just about the future — it’s about unlocking
-        your potential today.”
-      </motion.blockquote>
-    </div>
-  </section>
-);
-
-// Component for the closing statement
-const ClosingStatement = () => (
-  <section className="px-6 py-16 text-center">
-    <motion.p
-      className="text-xl md:text-3xl font-semibold leading-relaxed max-w-3xl mx-auto"
-      variants={scaleIn}
-    >
-      We don’t just teach computers —{" "}
-      <span className="text-[#D6A419]">
-        we inspire confidence to create your digital future.
-      </span>
-    </motion.p>
-  </section>
-);
-
 const About = () => {
   return (
-    // STRUCTURE: A single <main> container for better semantics and styling.
-    <motion.main
-      className="bg-[#0B2A4A] text-white"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      <HeroQuote />
+    <div className="bg-[#0B2A4A] min-h-screen text-white overflow-hidden font-sans">
+      {/* Hero Section */}
+      <section className="relative py-24 flex flex-col items-center text-center px-4">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D6A419] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D6A419] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
-      <CoreContent />
-      <ClosingStatement />
-    </motion.main>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants}
+          className="relative z-10 max-w-4xl"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            “Learn today, lead tomorrow — <br className="hidden md:block" />
+            <span className="text-[#D6A419]">with the power of computers.</span>
+            ”
+          </h1>
+          <div className="w-24 h-1 bg-[#D6A419] mx-auto rounded-full mb-8" />
+        </motion.div>
+
+        {/* Infinite Image Marquee */}
+        <div className="w-full max-w-[100vw] overflow-hidden py-12">
+          <motion.div
+            className="flex gap-8 w-max"
+            animate={{ x: [0, -1035] }} // Seamless loop value dependent on width, approximated
+            transition={{ ease: "linear", duration: 30, repeat: Infinity }}
+          >
+            {[...images, ...images].map((src, idx) => (
+              <div
+                key={idx}
+                className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-[#D6A419]/30 overflow-hidden flex-shrink-0 shadow-lg"
+              >
+                <img
+                  src={src}
+                  alt="Gallery"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          {/* Image Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-[#D6A419] rounded-2xl rotate-3 opacity-20 transform scale-105" />
+            <img
+              src="/your-image-path.jpg"
+              alt="About Us"
+              className="relative rounded-2xl shadow-2xl w-full object-cover border border-white/10 aspect-square"
+            />
+          </motion.div>
+
+          {/* Text Side */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
+            <div>
+              <h2 className="text-[#D6A419] font-bold tracking-wider text-sm uppercase mb-2">
+                About Us
+              </h2>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                Welcome To Digital IITM
+              </h3>
+              <p className="text-gray-300 leading-relaxed text-lg">
+                At{" "}
+                <span className="text-[#D6A419] font-semibold">
+                  Digital IITM
+                </span>
+                , we believe in transforming dreams into reality. Since 2010,
+                we’ve been a trusted name, offering courses from basic computing
+                to advanced technologies.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-[#D6A419]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#D6A419] text-xl">🎯</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-xl mb-1">Our Mission</h4>
+                  <p className="text-gray-400">
+                    To provide practical, industry-focused training that ensures
+                    career readiness from day one.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-[#D6A419]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#D6A419] text-xl">💡</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-xl mb-1">Our Vision</h4>
+                  <p className="text-gray-400">
+                    Unlocking potential through accessible, high-quality
+                    computer education for everyone.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <blockquote className="border-l-4 border-[#D6A419] pl-6 italic text-xl text-gray-300">
+              "Learning computers is not just about the future — it’s about
+              unlocking your potential today."
+            </blockquote>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer / Closing */}
+      <section className="py-20 text-center px-4 bg-[#09223a]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-2xl md:text-3xl font-bold max-w-3xl mx-auto leading-normal">
+            We don’t just teach technology — <br />
+            <span className="text-[#D6A419]">
+              we inspire confidence to create your digital future.
+            </span>
+          </h2>
+        </motion.div>
+      </section>
+    </div>
   );
 };
 

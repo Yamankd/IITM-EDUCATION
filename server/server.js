@@ -15,6 +15,8 @@ app.use(cookieParser());
 // Define allowed origins
 const allowedOrigins = [
   "http://localhost:5173",                // Local development
+  "http://127.0.0.1:5173",                // Local development (IP)
+  "http://localhost:5174",                // Local development (Alt port)
   "https://www.digitaliitm.com",          // Production Custom Domain
   "https://digitaliitm.com",              // Production Root Domain
   process.env.CLIENT_URL,                 // Dynamic URL from Render Env Var (e.g. your-app.netlify.app)

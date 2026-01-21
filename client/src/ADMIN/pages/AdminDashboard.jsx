@@ -18,6 +18,8 @@ import {
   Plus,
   Trash2,
   GripVertical,
+  Edit2,
+  X,
 } from "lucide-react";
 import { Reorder } from "framer-motion";
 
@@ -57,7 +59,7 @@ const AdminDashboard = () => {
     localStorage.removeItem("theme");
 
     // Redirect
-    navigate("/admin/loginpage", { replace: true });
+    navigate("/admin-login", { replace: true });
   };
 
   const toggleDarkMode = () => {
@@ -233,40 +235,618 @@ const Overview = () => {
   return <></>;
 };
 
-const SettingsView = ({ darkMode, toggleDarkMode }) => {
+const CoursesView = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    level: "Beginner",
+    duration: "",
+    price: 0,
+    description: "",
+    longDescription: "",
+    image: "",
+    instructor: { name: "", bio: "", image: "" },
+    learningOutcomes: [],
+    requirements: [],
+    syllabus: [],
+  });
+
+  const [currentOutcome, setCurrentOutcome] = useState("");
+  const [currentRequirement, setCurrentRequirement] = useState("");
+  const [currentSyllabusWeek, setCurrentSyllabusWeek] = useState({
+    week: "",
+    title: "",
+    topics: "",
+  });
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const { data } = await api.get("/courses");
+      setCourses(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this course?")) {
+      try {
+        await api.delete(`/courses/${id}`);
+        setCourses(courses.filter((c) => c._id !== id));
+      } catch (error) {
+        console.error("Error deleting course:", error);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingCourse) {
+        const { data } = await api.put(
+          `/courses/${editingCourse._id}`,
+          formData,
+        );
+        setCourses(
+          courses.map((c) => (c._id === editingCourse._id ? data.course : c)),
+        );
+      } else {
+        const { data } = await api.post("/courses", formData);
+        setCourses([data.course, ...courses]);
+      }
+      setShowModal(false);
+      resetForm();
+    } catch (error) {
+      console.error("Error saving course:", error);
+    }
+  };
+
+  const resetForm = () => {
+    setEditingCourse(null);
+    setFormData({
+      title: "",
+      category: "",
+      level: "Beginner",
+      duration: "",
+      price: 0,
+      description: "",
+      longDescription: "",
+      image: "",
+      instructor: { name: "", bio: "", image: "" },
+      learningOutcomes: [],
+      requirements: [],
+      syllabus: [],
+    });
+  };
+
+  const handleEdit = (course) => {
+    setEditingCourse(course);
+    setFormData(course);
+    setShowModal(true);
+  };
+
+  const addListItem = (field, value, updateFn) => {
+    if (value.trim()) {
+      setFormData({ ...formData, [field]: [...formData[field], value] });
+      updateFn("");
+    }
+  };
+
+  const removeListItem = (field, index) => {
+    const newList = formData[field].filter((_, i) => i !== index);
+    setFormData({ ...formData, [field]: newList });
+  };
+
+  const addSyllabusWeek = () => {
+    if (currentSyllabusWeek.week && currentSyllabusWeek.title) {
+      const topicsArray = currentSyllabusWeek.topics
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t);
+      setFormData({
+        ...formData,
+        syllabus: [
+          ...formData.syllabus,
+          { ...currentSyllabusWeek, topics: topicsArray },
+        ],
+      });
+      setCurrentSyllabusWeek({ week: "", title: "", topics: "" });
+    }
+  };
+
+  const removeSyllabusWeek = (index) => {
+    const newSyllabus = formData.syllabus.filter((_, i) => i !== index);
+    setFormData({ ...formData, syllabus: newSyllabus });
+  };
+
+  const filteredCourses = courses.filter(
+    (c) =>
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.category.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
-    <div className="max-w-2xl">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-        Settings
-      </h2>
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 mb-6 transition-all">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-          Preferences
-        </h3>
-        <div className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300">
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div>
+          <h2 className="text-2xl font-bold text-[#0B2A4A] dark:text-white">
+            Courses Manager
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Manage educational courses
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+          className="px-4 py-2 bg-[#D6A419] text-white rounded-lg hover:bg-yellow-500 transition-colors flex items-center gap-2 font-medium"
+        >
+          <Plus size={20} />
+          Add Course
+        </button>
+      </div>
+
+      <div className="relative">
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          size={20}
+        />
+        <input
+          type="text"
+          placeholder="Search Courses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D6A419]/20 focus:border-[#D6A419] transition-all"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D6A419]"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map((course) => (
+            <div
+              key={course._id}
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col"
+            >
+              <img
+                src={course.image || "https://via.placeholder.com/300"}
+                alt={course.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-5 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-semibold px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                    {course.category}
+                  </span>
+                  <span className="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-800 rounded-full">
+                    {course.level}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-[#0B2A4A] dark:text-white mb-2 line-clamp-2">
+                  {course.title}
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-3">
+                  {course.description}
+                </p>
+                <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <span className="font-bold text-[#D6A419]">
+                    ${course.price}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(course)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(course._id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Dark Mode
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Toggle dark theme for the dashboard
-              </p>
+          ))}
+        </div>
+      )}
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl my-8 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
+              <h3 className="text-xl font-bold text-[#0B2A4A] dark:text-white">
+                {editingCourse ? "Edit Course" : "Add New Course"}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Basic Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Category
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.category}
+                      onChange={(e) =>
+                        setFormData({ ...formData, category: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Level
+                    </label>
+                    <select
+                      value={formData.level}
+                      onChange={(e) =>
+                        setFormData({ ...formData, level: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                      <option>Beginner</option>
+                      <option>Intermediate</option>
+                      <option>Advanced</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Duration
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 12 Weeks"
+                      value={formData.duration}
+                      onChange={(e) =>
+                        setFormData({ ...formData, duration: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Price ($)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) =>
+                        setFormData({ ...formData, price: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                      Image URL
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.image}
+                      onChange={(e) =>
+                        setFormData({ ...formData, image: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Descriptions */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                    Short Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                    Long Description
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={formData.longDescription}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        longDescription: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  />
+                </div>
+
+                {/* Instructor */}
+                <div className="border-t pt-4 dark:border-gray-700">
+                  <h4 className="font-semibold mb-3 dark:text-white">
+                    Instructor Details
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={formData.instructor.name}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          instructor: {
+                            ...formData.instructor,
+                            name: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Bio"
+                      value={formData.instructor.bio}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          instructor: {
+                            ...formData.instructor,
+                            bio: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Image URL"
+                      value={formData.instructor.image}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          instructor: {
+                            ...formData.instructor,
+                            image: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Dynamic Lists: Learning Outcomes */}
+                <div className="border-t pt-4 dark:border-gray-700">
+                  <h4 className="font-semibold mb-3 dark:text-white">
+                    Learning Outcomes
+                  </h4>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={currentOutcome}
+                      onChange={(e) => setCurrentOutcome(e.target.value)}
+                      className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Add outcome..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        addListItem(
+                          "learningOutcomes",
+                          currentOutcome,
+                          setCurrentOutcome,
+                        )
+                      }
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {formData.learningOutcomes.map((item, i) => (
+                      <li
+                        key={i}
+                        className="text-sm dark:text-gray-300 flex justify-between items-center group"
+                      >
+                        {item}
+                        <button
+                          type="button"
+                          onClick={() => removeListItem("learningOutcomes", i)}
+                          className="text-red-500 opacity-0 group-hover:opacity-100"
+                        >
+                          <X size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Dynamic Lists: Requirements */}
+                <div>
+                  <h4 className="font-semibold mb-3 dark:text-white">
+                    Requirements
+                  </h4>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={currentRequirement}
+                      onChange={(e) => setCurrentRequirement(e.target.value)}
+                      className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Add requirement..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        addListItem(
+                          "requirements",
+                          currentRequirement,
+                          setCurrentRequirement,
+                        )
+                      }
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {formData.requirements.map((item, i) => (
+                      <li
+                        key={i}
+                        className="text-sm dark:text-gray-300 flex justify-between items-center group"
+                      >
+                        {item}
+                        <button
+                          type="button"
+                          onClick={() => removeListItem("requirements", i)}
+                          className="text-red-500 opacity-0 group-hover:opacity-100"
+                        >
+                          <X size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Syllabus */}
+                <div className="border-t pt-4 dark:border-gray-700">
+                  <h4 className="font-semibold mb-3 dark:text-white">
+                    Syllabus
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Week (e.g. 1)"
+                      value={currentSyllabusWeek.week}
+                      onChange={(e) =>
+                        setCurrentSyllabusWeek({
+                          ...currentSyllabusWeek,
+                          week: e.target.value,
+                        })
+                      }
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={currentSyllabusWeek.title}
+                      onChange={(e) =>
+                        setCurrentSyllabusWeek({
+                          ...currentSyllabusWeek,
+                          title: e.target.value,
+                        })
+                      }
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Topics (comma separated)"
+                      value={currentSyllabusWeek.topics}
+                      onChange={(e) =>
+                        setCurrentSyllabusWeek({
+                          ...currentSyllabusWeek,
+                          topics: e.target.value,
+                        })
+                      }
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addSyllabusWeek}
+                    className="w-full py-2 bg-blue-600 text-white rounded-lg mb-4"
+                  >
+                    Add Week
+                  </button>
+
+                  <div className="space-y-2">
+                    {formData.syllabus.map((week, i) => (
+                      <div
+                        key={i}
+                        className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 flex justify-between items-start"
+                      >
+                        <div>
+                          <span className="font-bold block text-sm">
+                            Week {week.week}: {week.title}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {week.topics.join(", ")}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeSyllabusWeek(i)}
+                          className="text-red-500"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-700">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-[#D6A419] text-white rounded-lg hover:bg-yellow-500 font-medium"
+                  >
+                    Save Course
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-          <button
-            onClick={toggleDarkMode}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${darkMode ? "bg-blue-600" : "bg-gray-200"}`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${darkMode ? "translate-x-6" : "translate-x-1"}`}
-            />
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -316,7 +896,7 @@ const FAQView = () => {
   };
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
           FAQ Manager
@@ -432,7 +1012,48 @@ const FAQView = () => {
   );
 };
 
-const CoursesView = () => <></>;
+const SettingsView = ({ darkMode, toggleDarkMode }) => {
+  return (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm max-w-2xl">
+      <h2 className="text-2xl font-bold text-[#0B2A4A] dark:text-white mb-6">
+        Settings
+      </h2>
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white dark:bg-gray-600 rounded-lg shadow-sm">
+              {darkMode ? <Moon size={24} /> : <Sun size={24} />}
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">
+                Appearance
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Switch between light and dark themes
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={toggleDarkMode}
+            className={`
+              relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#D6A419] focus:ring-offset-2
+              ${darkMode ? "bg-[#D6A419]" : "bg-gray-200"}
+            `}
+          >
+            <span
+              className={`
+                inline-block h-6 w-6 transform rounded-full bg-white transition-transform
+                ${darkMode ? "translate-x-7" : "translate-x-1"}
+              `}
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Placeholder = ({ title, icon }) => (
   <div className="flex flex-col items-center justify-center h-96 text-gray-400 dark:text-gray-500">
