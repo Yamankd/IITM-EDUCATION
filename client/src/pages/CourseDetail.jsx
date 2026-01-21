@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
+import {
+  X,
+  Lock,
+  CheckCircle,
+  Loader2,
+  MapPin,
+  Book,
+  Users,
+  Monitor,
+} from "lucide-react";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -10,11 +20,21 @@ const CourseDetail = () => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Lead Generation State
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [submittingLead, setSubmittingLead] = useState(false);
+  const [leadFormData, setLeadFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    message: "",
+  });
+
   useEffect(() => {
     const fetchCourse = async () => {
       setLoading(true);
       try {
-        // Fetch from backend API: /courses/:id
         const { data } = await api.get(`/courses/${id}`);
         setCourse(data);
         setLoading(false);
@@ -41,267 +61,468 @@ const CourseDetail = () => {
   };
 
   const enrollCourse = () => {
-    // In a real application, this would redirect to payment or enrollment process
-    alert(`Enrolling in ${course.title}`);
+    // For offline, this might redirect to a registration form or contact page
+    alert(`Starting admission process for ${course.title}`);
+  };
+
+  // --- LEAD GENERATION LOGIC ---
+  const handleTabClick = (tab) => {
+    if (tab === "syllabus") {
+      const isLeadCaptured = localStorage.getItem("leadCaptured");
+
+      if (!isLeadCaptured) {
+        setShowLeadModal(true);
+        return;
+      }
+    }
+    setActiveTab(tab);
+  };
+
+  const handleLeadSubmit = async (e) => {
+    e.preventDefault();
+    setSubmittingLead(true);
+
+    try {
+      await api.post("/leads", {
+        ...leadFormData,
+        courseId: id,
+        courseTitle: course.title,
+      });
+
+      localStorage.setItem("leadCaptured", "true");
+      setShowLeadModal(false);
+      setActiveTab("syllabus");
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setSubmittingLead(false);
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D6A419]"></div>
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#D6A419] mb-4"></div>
+          <p className="text-[#0B2A4A] font-medium animate-pulse">
+            Loading course details...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 pb-12">
-        <div className="container mx-auto px-4 md:px-8 text-center">
-          <h1 className="text-2xl font-bold text-[#0B2A4A] mb-4">
-            Course Not Found
-          </h1>
-          <p className="text-gray-600 mb-6">
-            The course you're looking for doesn't exist.
-          </p>
-          <Link
-            to="/course"
-            className="px-4 py-2 bg-[#D6A419] text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors"
-          >
-            Browse All Courses
-          </Link>
+      <div className="min-h-screen bg-gray-50 pt-32 pb-12">
+        <div className="container mx-auto px-4 text-center max-w-lg">
+          <div className="bg-white rounded-2xl shadow-xl p-10">
+            <h1 className="text-3xl font-bold text-[#0B2A4A] mb-4">
+              Course Not Found
+            </h1>
+            <Link
+              to="/course"
+              className="inline-flex px-8 py-3 bg-[#D6A419] text-white font-bold rounded-xl hover:bg-yellow-500 transition-all"
+            >
+              Browse All Courses
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12">
-      <div className="container mx-auto px-4 md:px-8">
+    <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans relative">
+      {/* --- LEAD CAPTURE MODAL --- */}
+      {showLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+            <div className="bg-[#0B2A4A] p-6 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-[#D6A419] rounded-full opacity-20"></div>
+
+              <button
+                onClick={() => setShowLeadModal(false)}
+                className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+
+              <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                <Lock className="text-[#D6A419]" size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-1">
+                Unlock Syllabus
+              </h3>
+              <p className="text-blue-100 text-sm">
+                Fill in your details to view the full curriculum.
+              </p>
+            </div>
+
+            <div className="p-8">
+              <form onSubmit={handleLeadSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="John Doe"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#D6A419] focus:border-transparent outline-none transition-all"
+                      value={leadFormData.name}
+                      onChange={(e) =>
+                        setLeadFormData({
+                          ...leadFormData,
+                          name: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="john@example.com"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#D6A419] focus:border-transparent outline-none transition-all"
+                      value={leadFormData.email}
+                      onChange={(e) =>
+                        setLeadFormData({
+                          ...leadFormData,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="+91 98765 43210"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#D6A419] focus:border-transparent outline-none transition-all"
+                      value={leadFormData.phone}
+                      onChange={(e) =>
+                        setLeadFormData({
+                          ...leadFormData,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Your City / Address"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#D6A419] focus:border-transparent outline-none transition-all"
+                      value={leadFormData.address}
+                      onChange={(e) =>
+                        setLeadFormData({
+                          ...leadFormData,
+                          address: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Message (Optional)
+                  </label>
+                  <textarea
+                    placeholder="Any specific questions?"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#D6A419] focus:border-transparent outline-none transition-all h-20 resize-none"
+                    value={leadFormData.message}
+                    onChange={(e) =>
+                      setLeadFormData({
+                        ...leadFormData,
+                        message: e.target.value,
+                      })
+                    }
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submittingLead}
+                  className="w-full py-3.5 bg-[#D6A419] text-white font-bold rounded-xl hover:bg-yellow-500 shadow-lg shadow-yellow-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {submittingLead ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />{" "}
+                      Unlocking...
+                    </>
+                  ) : (
+                    "Unlock Content"
+                  )}
+                </button>
+                <p className="text-xs text-center text-gray-400 mt-4">
+                  We respect your privacy. No spam, ever.
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Page Content */}
+      <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         {/* Breadcrumb */}
-        <nav className="flex mb-6" aria-label="Breadcrumb">
+        <nav className="flex mb-8 text-sm font-medium" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link to="/" className="text-gray-500 hover:text-[#0B2A4A]">
+              <Link
+                to="/"
+                className="text-gray-400 hover:text-[#0B2A4A] transition-colors"
+              >
                 Home
               </Link>
             </li>
-            <li className="flex items-center">
-              <span className="text-gray-400 mx-2">/</span>
-              <Link to="/course" className="text-gray-500 hover:text-[#0B2A4A]">
+            <li className="flex items-center text-gray-300">
+              <svg
+                className="w-4 h-4 mx-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+              <Link
+                to="/course"
+                className="text-gray-400 hover:text-[#0B2A4A] transition-colors"
+              >
                 Courses
               </Link>
             </li>
-            <li className="flex items-center">
-              <span className="text-gray-400 mx-2">/</span>
-              <span className="text-[#0B2A4A] font-medium">{course.title}</span>
+            <li className="flex items-center text-gray-300">
+              <svg
+                className="w-4 h-4 mx-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+              <span className="text-[#0B2A4A] line-clamp-1">
+                {course.title}
+              </span>
             </li>
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-              <img
-                src={course.image || "https://via.placeholder.com/800x400"}
-                alt={course.title}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex flex-wrap items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <span className="px-3 py-1 bg-[#0B2A4A] text-white text-sm font-medium rounded-full">
-                      {course.category}
-                    </span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Header Card */}
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="relative h-64 md:h-80 w-full group">
+                <img
+                  src={course.image || "https://via.placeholder.com/800x400"}
+                  alt={course.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <span className="px-3 py-1 bg-[#D6A419] text-white text-xs font-bold uppercase tracking-wider rounded-md shadow-sm mb-3 inline-block">
+                    {course.category}
+                  </span>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 leading-tight drop-shadow-md">
+                    {course.title}
+                  </h1>
+                </div>
+              </div>
+
+              <div className="p-8">
+                {/* Metadata Row */}
+                <div className="flex flex-wrap items-center justify-between mb-8 gap-4 pb-6 border-b border-gray-100">
+                  <div className="flex items-center gap-4">
+                    {course.instructor && (
+                      <div className="flex items-center gap-3 pr-4 border-r border-gray-200">
+                        <img
+                          src={
+                            course.instructor.image ||
+                            "https://via.placeholder.com/100"
+                          }
+                          alt="Instructor"
+                          className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover"
+                        />
+                        <div>
+                          <p className="text-xs text-gray-400 font-semibold uppercase">
+                            Instructor
+                          </p>
+                          <p className="text-sm font-bold text-[#0B2A4A]">
+                            {course.instructor.name}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      className={`px-3 py-1 text-xs font-bold rounded-full ${
                         course.level === "Beginner"
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-green-50 text-green-700 border border-green-100"
                           : course.level === "Intermediate"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-purple-100 text-purple-800"
+                            ? "bg-blue-50 text-blue-700 border border-blue-100"
+                            : "bg-purple-50 text-purple-700 border border-purple-100"
                       }`}
                     >
                       {course.level}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {course.duration}
-                    </span>
                   </div>
-
-                  {/* Copy Link Button */}
                   <button
                     onClick={copyCourseLink}
-                    className="flex items-center text-sm text-gray-500 hover:text-[#0B2A4A] mt-2 sm:mt-0"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-[#0B2A4A] hover:bg-gray-50 transition-colors"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-1"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                    </svg>
-                    {copied ? "Copied!" : "Copy Link"}
+                    {copied ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                        ></path>
+                      </svg>
+                    )}
+                    {copied ? "Link Copied!" : "Share"}
                   </button>
                 </div>
 
-                <h1 className="text-3xl font-bold text-[#0B2A4A] mb-4">
-                  {course.title}
-                </h1>
-                <p className="text-gray-700 text-lg mb-6">
-                  {course.longDescription || course.description}
-                </p>
+                <div className="prose prose-lg max-w-none text-gray-600 mb-8">
+                  <p className="leading-relaxed">
+                    {" "}
+                    {course.longDescription || course.description}
+                  </p>
+                </div>
 
-                <div className="flex items-center mb-6">
-                  <div className="flex items-center mr-6">
-                    <svg
-                      className="w-5 h-5 text-yellow-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="ml-1 text-gray-700 font-medium">
+                {/* Rating Box */}
+                <div className="flex items-center gap-6 bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold text-[#0B2A4A] mr-2">
                       {course.rating || 4.5}
                     </span>
-                    <span className="text-gray-500 ml-1">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <svg
+                          key={i}
+                          className="w-5 h-5 fill-current"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="text-gray-400 text-sm ml-2">
                       ({course.reviews || 0} reviews)
                     </span>
                   </div>
-                  <div className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-gray-500"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="ml-1 text-gray-700">
-                      {(course.students || 0).toLocaleString()} students
-                    </span>
+                  <div className="h-8 w-px bg-gray-300 hidden sm:block"></div>
+                  <div className="flex items-center text-gray-700 font-medium">
+                    {(course.students || 0).toLocaleString()} students enrolled
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Instructor Info */}
-                {course.instructor && (
-                  <div className="flex items-center p-4 bg-gray-50 rounded-lg mb-6">
-                    <img
-                      src={
-                        course.instructor.image ||
-                        "https://via.placeholder.com/100"
-                      }
-                      alt={course.instructor.name || "Instructor"}
-                      className="w-12 h-12 rounded-full object-cover mr-4"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-[#0B2A4A]">
-                        Instructor
-                      </h3>
-                      <p className="text-gray-700">{course.instructor.name}</p>
-                    </div>
-                  </div>
-                )}
+            {/* Tabs Section */}
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="border-b border-gray-100">
+                <nav className="flex overflow-x-auto">
+                  {["overview", "syllabus", "instructor", "reviews"].map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => handleTabClick(tab)}
+                        className={`py-5 px-8 font-bold text-sm uppercase tracking-wide transition-colors whitespace-nowrap relative
+                           ${activeTab === tab ? "text-[#D6A419]" : "text-gray-500 hover:text-[#0B2A4A]"}
+                         `}
+                      >
+                        {tab === "syllabus" &&
+                          !localStorage.getItem("leadCaptured") && (
+                            <Lock
+                              size={14}
+                              className="inline-block mr-2 mb-1"
+                            />
+                          )}
+                        {tab}
+                        {activeTab === tab && (
+                          <span className="absolute bottom-0 left-0 w-full h-1 bg-[#D6A419] rounded-t-full"></span>
+                        )}
+                      </button>
+                    ),
+                  )}
+                </nav>
+              </div>
 
-                {/* Tabs */}
-                <div className="border-b border-gray-200 mb-6">
-                  <nav className="flex -mb-px">
-                    <button
-                      onClick={() => setActiveTab("overview")}
-                      className={`py-3 px-4 font-medium text-sm border-b-2 ${
-                        activeTab === "overview"
-                          ? "border-[#D6A419] text-[#0B2A4A]"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("syllabus")}
-                      className={`py-3 px-4 font-medium text-sm border-b-2 ${
-                        activeTab === "syllabus"
-                          ? "border-[#D6A419] text-[#0B2A4A]"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Syllabus
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("instructor")}
-                      className={`py-3 px-4 font-medium text-sm border-b-2 ${
-                        activeTab === "instructor"
-                          ? "border-[#D6A419] text-[#0B2A4A]"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Instructor
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("reviews")}
-                      className={`py-3 px-4 font-medium text-sm border-b-2 ${
-                        activeTab === "reviews"
-                          ? "border-[#D6A419] text-[#0B2A4A]"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
-                      }`}
-                    >
-                      Reviews
-                    </button>
-                  </nav>
-                </div>
-
-                {/* Tab Content */}
+              <div className="p-8">
                 {activeTab === "overview" && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">
+                  <div className="animate-fadeIn">
+                    <h3 className="text-xl font-bold text-[#0B2A4A] mb-6">
                       What you'll learn
                     </h3>
-                    {course.learningOutcomes &&
-                    course.learningOutcomes.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {course.learningOutcomes?.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-10">
                         {course.learningOutcomes.map((outcome, index) => (
-                          <div key={index} className="flex items-start">
-                            <svg
-                              className="h-5 w-5 text-[#D6A419] mt-0.5 mr-2 flex-shrink-0"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span>{outcome}</span>
+                          <div
+                            key={index}
+                            className="flex items-start p-3 rounded-xl bg-gray-50/80 border border-gray-100"
+                          >
+                            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
+                            <span className="text-gray-700 font-medium text-sm">
+                              {outcome}
+                            </span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-500 italic mb-6">
+                      <p className="text-gray-500 italic mb-10">
                         No specific learning outcomes listed.
                       </p>
                     )}
 
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">
-                      Pre Requisite
+                    <h3 className="text-xl font-bold text-[#0B2A4A] mb-6">
+                      Prerequisites
                     </h3>
-                    {course.requirements && course.requirements.length > 0 ? (
-                      <ul className="list-disc list-inside space-y-2 mb-6">
-                        {course.requirements.map((requirement, index) => (
-                          <li key={index} className="text-gray-700">
-                            {requirement}
+                    {course.requirements?.length > 0 ? (
+                      <ul className="space-y-3 mb-6">
+                        {course.requirements.map((req, index) => (
+                          <li
+                            key={index}
+                            className="flex items-center text-gray-700"
+                          >
+                            <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mr-3"></div>
+                            {req}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-gray-500 italic mb-6">
+                      <p className="text-gray-500 italic">
                         No prerequisites listed.
                       </p>
                     )}
@@ -309,41 +530,30 @@ const CourseDetail = () => {
                 )}
 
                 {activeTab === "syllabus" && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">
+                  <div className="animate-fadeIn">
+                    <h3 className="text-xl font-bold text-[#0B2A4A] mb-6">
                       Course Content
                     </h3>
                     <div className="space-y-4">
-                      {course.syllabus && course.syllabus.length > 0 ? (
+                      {course.syllabus?.length > 0 ? (
                         course.syllabus.map((item, index) => (
                           <div
                             key={index}
-                            className="border border-gray-200 rounded-lg overflow-hidden"
+                            className="border border-gray-200 rounded-xl overflow-hidden hover:border-[#D6A419]/30 hover:shadow-md transition-all"
                           >
-                            <button className="flex justify-between items-center w-full p-4 bg-gray-50 hover:bg-gray-100">
-                              <span className="font-medium text-left">
+                            <div className="flex justify-between items-center w-full p-5 bg-gray-50 border-b border-gray-100">
+                              <span className="font-bold text-[#0B2A4A] text-lg">
                                 Week {item.week}: {item.title}
                               </span>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-500"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                            <div className="p-4 bg-white">
-                              <ul className="list-disc list-inside space-y-1">
+                            </div>
+                            <div className="p-5 bg-white">
+                              <ul className="space-y-3">
                                 {item.topics.map((topic, topicIndex) => (
                                   <li
                                     key={topicIndex}
-                                    className="text-gray-700"
+                                    className="text-gray-600 flex items-start"
                                   >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#D6A419] mr-3 mt-2"></div>
                                     {topic}
                                   </li>
                                 ))}
@@ -360,25 +570,26 @@ const CourseDetail = () => {
                   </div>
                 )}
 
+                {/* Other tabs remain similar... */}
                 {activeTab === "instructor" && course.instructor && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">
-                      About the Instructor
+                  <div className="animate-fadeIn">
+                    <h3 className="text-xl font-bold text-[#0B2A4A] mb-6">
+                      Meet Your Instructor
                     </h3>
-                    <div className="flex items-start">
+                    <div className="flex flex-col md:flex-row items-start gap-8 bg-gray-50 p-8 rounded-2xl border border-gray-100">
                       <img
-                        src={
-                          course.instructor.image ||
-                          "https://via.placeholder.com/100"
-                        }
+                        src={course.instructor.image}
                         alt={course.instructor.name}
-                        className="w-16 h-16 rounded-full object-cover mr-4"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
                       />
                       <div>
-                        <h4 className="text-lg font-semibold text-[#0B2A4A]">
+                        <h4 className="text-2xl font-bold text-[#0B2A4A] mb-2">
                           {course.instructor.name}
                         </h4>
-                        <p className="text-gray-600 mb-3">
+                        <p className="text-[#D6A419] font-medium mb-4 text-sm uppercase">
+                          Course Instructor
+                        </p>
+                        <p className="text-gray-600 leading-relaxed">
                           {course.instructor.bio}
                         </p>
                       </div>
@@ -387,126 +598,74 @@ const CourseDetail = () => {
                 )}
 
                 {activeTab === "reviews" && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#0B2A4A] mb-4">
-                      Student Reviews
-                    </h3>
-                    <div className="bg-gray-50 p-6 rounded-lg text-center">
-                      <p className="text-gray-500">
-                        No reviews yet. Be the first to review this course!
-                      </p>
-                    </div>
+                  <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                    <p className="text-gray-500">No reviews yet.</p>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Right Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-md p-6 sticky top-28">
-              <div className="mb-6">
-                <div className="text-3xl font-bold text-[#0B2A4A] mb-2">
-                  ${course.price}
+            <div className="bg-white rounded-3xl shadow-xl p-8 sticky top-32 border border-gray-100">
+              <div className="mb-8 pb-8 border-b border-gray-100">
+                <p className="text-gray-500 font-medium text-sm mb-1">
+                  Total Course Fee
+                </p>
+                <div className="flex items-end gap-2 mb-2">
+                  <span className="text-5xl font-extrabold text-[#0B2A4A]">
+                    ₹{course.price}
+                  </span>
+                  {/* Optional: Add strike-through price if applicable */}
                 </div>
-                <div className="text-sm text-gray-500">One-time payment</div>
-              </div>
-
-              <button
-                onClick={enrollCourse}
-                className="w-full py-3 bg-[#D6A419] text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors mb-4"
-              >
-                Enroll Now
-              </button>
-
-              <button className="w-full py-3 border border-[#0B2A4A] text-[#0B2A4A] font-semibold rounded-lg hover:bg-gray-50 transition-colors mb-6">
-                Add to Wishlist
-              </button>
-
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <svg
-                    className="w-5 h-5 mr-2 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>{course.duration} of content</span>
-                </div>
-
-                <div className="flex items-center text-sm text-gray-600">
-                  <svg
-                    className="w-5 h-5 mr-2 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>Full lifetime access</span>
-                </div>
-
-                <div className="flex items-center text-sm text-gray-600">
-                  <svg
-                    className="w-5 h-5 mr-2 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Certificate of completion</span>
+                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  Admissions Open
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 mt-6">
-              <h3 className="font-semibold text-[#0B2A4A] mb-4">
-                Share this course
-              </h3>
-              <div className="flex space-x-3">
-                <button className="flex-1 flex items-center justify-center p-2 bg-blue-600 text-white rounded-lg">
-                  <svg
-                    className="w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
+              <div className="space-y-4 mb-8">
+                <button
+                  onClick={() => alert("Syllabus download starting...")}
+                  className="w-full py-4 bg-[#D6A419] text-white font-bold text-lg rounded-xl hover:bg-yellow-500 hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <Book size={20} />
+                  Download Syllabus
                 </button>
-                <button className="flex-1 flex items-center justify-center p-2 bg-blue-800 text-white rounded-lg">
-                  <svg
-                    className="w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                </button>
-                <button className="flex-1 flex items-center justify-center p-2 bg-blue-400 text-white rounded-lg">
-                  <svg
-                    className="w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M13.486 2.001a1 1 0 00-.946.676l-2.55 7.706-7.705 2.55a1 1 0 00-.676.947V18a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1h-4.514z" />
-                  </svg>
-                </button>
+              </div>
+
+              <div className="space-y-5 text-sm text-gray-600">
+                <h4 className="font-bold text-[#0B2A4A] uppercase tracking-wide">
+                  This course includes:
+                </h4>
+                <div className="flex items-center">
+                  <span className="w-8 flex justify-center mr-2">
+                    <Users size={20} className="text-[#D6A419]" />
+                  </span>
+                  In-person Classroom Training
+                </div>
+                <div className="flex items-center">
+                  <span className="w-8 flex justify-center mr-2">
+                    <Monitor size={20} className="text-[#D6A419]" />
+                  </span>
+                  Hands-on Practical Labs
+                </div>
+                <div className="flex items-center">
+                  <span className="w-8 flex justify-center mr-2">
+                    <Book size={20} className="text-[#D6A419]" />
+                  </span>
+                  Printed Study Material
+                </div>
+                <div className="flex items-center">
+                  <span className="w-8 flex justify-center mr-2">
+                    <MapPin size={20} className="text-[#D6A419]" />
+                  </span>
+                  Offline Project Guidance
+                </div>
+                <div className="flex items-center">
+                  <span className="w-8 flex justify-center mr-2">🏆</span>
+                  Certificate of completion
+                </div>
               </div>
             </div>
           </div>

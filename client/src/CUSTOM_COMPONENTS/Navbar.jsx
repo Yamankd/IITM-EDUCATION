@@ -300,13 +300,7 @@ const Navbar = () => {
           >
             Team
           </NavLink>
-          <NavLink
-            to="/store"
-            onClick={toggleMenu}
-            className="text-lg hover:text-[#D6A419]"
-          >
-            Store
-          </NavLink>
+
           <button className="px-5 py-2 bg-[#D6A419] text-[#0B2A4A] rounded-md font-bold hover:bg-yellow-400 transition-all duration-200">
             Sign In
           </button>

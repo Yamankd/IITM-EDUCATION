@@ -104,15 +104,7 @@ const Footer = () => {
                   About
                 </NavLink>
               </li>
-              <li>
-                <NavLink
-                  to="/store"
-                  onClick={scrollToTop}
-                  className="text-gray-300 hover:text-[#D6A419] transition-colors"
-                >
-                  Store
-                </NavLink>
-              </li>
+
               <li>
                 <NavLink
                   to="#"

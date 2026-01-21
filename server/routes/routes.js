@@ -27,6 +27,11 @@ router.post('/faqs', protect, createFaq);
 router.put('/faqs/reorder', protect, reorderFaqs);
 router.delete('/faqs/:id', protect, deleteFaq);
 
+// Lead Routes
+const { createLead, getLeads } = require('../controllers/lead.controller');
+router.post('/leads', createLead);
+router.get('/leads', protect, getLeads);
+
 router.get('/auth-check', protect, authCheck)
 
 router.get('/admin/dashboard', protect, AdminDashboard);

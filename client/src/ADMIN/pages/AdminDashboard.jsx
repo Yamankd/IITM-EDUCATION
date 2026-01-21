@@ -20,8 +20,10 @@ import {
   GripVertical,
   Edit2,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { Reorder } from "framer-motion";
+import LeadsView from "./LeadsView";
 
 // Main Component
 const AdminDashboard = () => {
@@ -71,6 +73,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "overview":
         return <Overview />;
+      case "leads":
+        return <LeadsView />;
       case "students":
         return (
           <Placeholder title="Students Management" icon={<Users size={48} />} />
@@ -123,6 +127,7 @@ const AdminDashboard = () => {
 const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+    { id: "leads", label: "Leads", icon: <MessageSquare size={20} /> },
     { id: "students", label: "Students", icon: <Users size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
     { id: "gallery", label: "Gallery", icon: <ImageIcon size={20} /> },
@@ -446,7 +451,7 @@ const CoursesView = () => {
                 </p>
                 <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
                   <span className="font-bold text-[#D6A419]">
-                    ${course.price}
+                    ₹{course.price}
                   </span>
                   <div className="flex gap-2">
                     <button
