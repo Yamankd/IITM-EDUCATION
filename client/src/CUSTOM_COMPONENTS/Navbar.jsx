@@ -196,6 +196,17 @@ const Navbar = () => {
               Team
             </NavLink> */}
             <NavLink
+              to="/gallery"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-[#D6A419] font-semibold"
+                  : "hover:text-[#D6A419]"
+              }
+            >
+              Gallery
+            </NavLink>
+
+            <NavLink
               to="/admin-login"
               className={({ isActive }) =>
                 isActive
@@ -292,6 +303,14 @@ const Navbar = () => {
               </div>
             )}
           </div>
+
+          <NavLink
+            to="/gallery"
+            onClick={toggleMenu}
+            className="text-lg hover:text-[#D6A419]"
+          >
+            Gallery
+          </NavLink>
 
           <NavLink
             to="/team"

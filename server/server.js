@@ -1,4 +1,5 @@
 require("dotenv").config();
+// Force restart to load env
 const express = require("express");
 const dbConnection = require("./config/database");
 const cookieParser = require("cookie-parser");
@@ -20,7 +21,7 @@ const allowedOrigins = [
   "https://www.digitaliitm.com",          // Production Custom Domain
   "https://digitaliitm.com",              // Production Root Domain
   process.env.CLIENT_URL,                 // Dynamic URL from Render Env Var (e.g. your-app.netlify.app)
-];
+].filter(Boolean);
 
 console.log("Allowed Origins:", allowedOrigins);
 

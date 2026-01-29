@@ -25,7 +25,13 @@ const courseSchema = new mongoose.Schema(
     },
     duration: String, // e.g. "12 weeks"
     price: { type: Number, default: 0 },
+    salePrice: { type: Number, default: 0 }, // Discounted price
     image: String, // Thumbnail URL
+    slug: { type: String, unique: true }, // SEO friendly URL
+
+    // SEO
+    metaTitle: String,
+    metaDescription: String,
 
     // Stats
     rating: { type: Number, default: 4.5 },
@@ -46,6 +52,10 @@ const courseSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isDraft: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

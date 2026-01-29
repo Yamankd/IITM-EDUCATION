@@ -36,5 +36,21 @@ router.get('/auth-check', protect, authCheck)
 
 router.get('/admin/dashboard', protect, AdminDashboard);
 
+// Gallery Routes
+const { uploadImage, getGalleryImages, deleteImage, updateImage, bulkDeleteImages } = require('../controllers/gallery.controller');
+const upload = require('../middlewares/multer');
 
+router.post('/gallery/upload', protect, upload.array('images', 20), uploadImage);
+router.get('/gallery', getGalleryImages);
+router.put('/gallery/:id', protect, updateImage);
+router.post('/gallery/bulk-delete', protect, bulkDeleteImages);
+router.delete('/gallery/:id', protect, deleteImage);
+
+
+
+// Upload Route
+const { uploadFile } = require('../controllers/upload.controller');
+router.post('/upload', protect, upload.single('file'), uploadFile);
+
+// AI Route
 module.exports = router;
