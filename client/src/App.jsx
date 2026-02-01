@@ -1,36 +1,49 @@
-import React, { useEffect } from 'react'
-import Navbar from './CUSTOM_COMPONENTS/Navbar'
-import Routing from './routings/Routing'
-import Footer from './CUSTOM_COMPONENTS/Footer'
-import Faq from './CUSTOM_COMPONENTS/Faq'
-import { useLocation } from 'react-router-dom'
+import React, { useEffect } from "react";
+import Navbar from "./components/common/Navbar";
+import Routing from "./routings/Routing";
+import Footer from "./components/common/Footer";
+import Faq from "./components/common/Faq";
+import { useLocation } from "react-router-dom";
+import { AlertProvider } from "./context/AlertContext";
+import { ConfirmProvider } from "./components/ConfirmDialog";
+import CustomAlert from "./components/CustomAlert";
 
 const App = () => {
-  const location = useLocation()
+  const location = useLocation();
 
-  // ✅ detect admin/dashboard routes
+  // ✅ detect admin/dashboard routes and exam pages
   const isDashboard =
-    location.pathname.startsWith('/AdminDashboard') ||
-    location.pathname.startsWith('/admin')
+    location.pathname.startsWith("/AdminDashboard") ||
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/student/exam") ||
+    location.pathname === "/portal" ||
+    location.pathname === "/admin-login";
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location.pathname])
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
-    <>
-      {/* ✅ Hide Navbar on dashboard */}
-      {!isDashboard && <Navbar />}
+    <AlertProvider>
+      <ConfirmProvider>
+        <>
+          {/* ✅ Hide Navbar on dashboard and exam pages */}
+          {!isDashboard && <Navbar />}
 
-      <Routing />
+          <Routing />
 
-      {/* ✅ Show FAQ only on home */}
-      {!isDashboard && location.pathname === '/' && <Faq />}
+          {/* ✅ Show FAQ only on home */}
+          {!isDashboard && location.pathname === "/" && <Faq />}
 
-      {/* ✅ Hide Footer on dashboard */}
-      {!isDashboard && <Footer />}
-    </>
-  )
-}
+          {/* ✅ Hide Footer on dashboard and exam pages */}
+          {!isDashboard && <Footer />}
 
-export default App
+          {/* Custom Alert Component */}
+          <CustomAlert />
+        </>
+      </ConfirmProvider>
+    </AlertProvider>
+  );
+};
+
+export default App;

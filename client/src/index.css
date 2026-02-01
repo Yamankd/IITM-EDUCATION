@@ -80,3 +80,10 @@
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+/* Floating Label Styles */
+.floating-label-input:focus-within label,
+.floating-label-input input:not(:placeholder-shown) + label {
+  transform: translateY(-1.5rem) scale(0.85);
+  color: #d97706;
+}

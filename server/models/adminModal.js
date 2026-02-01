@@ -31,6 +31,16 @@ const adminSchema = new mongoose.Schema(
       default: true
     },
 
+    mobile: {
+      type: String,
+      default: ""
+    },
+
+    contactEmail: {
+      type: String,
+      default: ""
+    },
+
     lastLogin: Date
   },
   { timestamps: true }

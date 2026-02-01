@@ -3,13 +3,25 @@ const Course = require("../models/courseModal");
 // Create a new course
 const createCourse = async (req, res) => {
     try {
+        let { slug, title } = req.body;
+
+        // Auto-generate slug if missing
+        if (!slug && title) {
+            slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        }
+
         const course = new Course({
             ...req.body,
-            createdBy: req.user?._id, // Assumes req.user is set by auth middleware
+            slug,
+            createdBy: req.user?.id || req.user?._id, // Handle both id and _id
         });
         await course.save();
         res.status(201).json({ message: "Course created successfully", course });
     } catch (error) {
+        console.error("Create Course Error:", error);
+        if (error.code === 11000) {
+            return res.status(400).json({ message: "Course with this slug/title already exists" });
+        }
         res.status(500).json({ message: "Failed to create course", error: error.message });
     }
 };
@@ -44,6 +56,9 @@ const updateCourse = async (req, res) => {
         if (!course) return res.status(404).json({ message: "Course not found" });
         res.status(200).json({ message: "Course updated successfully", course });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: "Course with this slug already exists" });
+        }
         res.status(500).json({ message: "Failed to update course", error: error.message });
     }
 };

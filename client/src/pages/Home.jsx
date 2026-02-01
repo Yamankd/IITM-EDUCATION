@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
-import InstructorCarousel from "../CUSTOM_COMPONENTS/InstructorCarousel";
-import EventsShowcase from "../CUSTOM_COMPONENTS/EventsShowcase";
+import InstructorCarousel from "../components/common/InstructorCarousel";
+import EventsShowcase from "../components/common/EventsShowcase";
 
 const Home = () => {
   const [particles, setParticles] = useState([]);

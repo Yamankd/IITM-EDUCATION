@@ -12,7 +12,7 @@ const ProtectRoute = ({ children }) => {
       .then(() => {
         setAuthorized(true);
       })
-      .catch((err) => {
+      .catch(() => {
         // Just set authorized to false.
         // The return statement below will handle the redirection to login.
         setAuthorized(false);

@@ -117,4 +117,58 @@ const admin_Logout = (req, res) => {
   res.status(200).json({ message: "Logout successful" });
 };
 
-module.exports = { admin_Login, AdminDashboard, admin_Logout };
+const updateAdmin = async (req, res) => {
+  try {
+    const { email, currentPassword, newPassword } = req.body;
+    const adminId = req.user.id;
+
+    // Find admin
+    const admin = await adminSchema.findById(adminId).select("+password");
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Verify current password
+    if (!currentPassword) {
+      return res.status(400).json({ message: "Current password is required" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(currentPassword, admin.password);
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "Invalid current password" });
+    }
+
+    // Update fields
+    if (req.body.name) admin.name = req.body.name;
+    if (email) admin.email = email;
+    if (req.body.mobile !== undefined) admin.mobile = req.body.mobile;
+    if (req.body.contactEmail !== undefined) admin.contactEmail = req.body.contactEmail;
+    if (newPassword) {
+      if (newPassword.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }
+      admin.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    await admin.save();
+
+    res.status(200).json({
+      message: "Admin profile updated successfully",
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        mobile: admin.mobile,
+        contactEmail: admin.contactEmail,
+        role: admin.role,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+module.exports = { admin_Login, AdminDashboard, admin_Logout, updateAdmin };

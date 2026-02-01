@@ -4,7 +4,7 @@ const express = require("express");
 const dbConnection = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const router = require("./routes/routes");
+const routes = require('./routes/index');
 
 const app = express();
 
@@ -47,7 +47,7 @@ app.use(
 );
 
 // ====== main routes ============
-app.use("/", router);
+app.use("/", routes);
 
 const PORT = process.env.PORT || 3000;
 

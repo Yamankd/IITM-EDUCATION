@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../api/api";
 import {
   X,
@@ -11,10 +11,11 @@ import {
   Users,
   Monitor,
 } from "lucide-react";
+import { useAlert } from "../context/AlertContext";
 
 const CourseDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const { showError, showInfo } = useAlert();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -60,11 +61,6 @@ const CourseDetail = () => {
       });
   };
 
-  const enrollCourse = () => {
-    // For offline, this might redirect to a registration form or contact page
-    alert(`Starting admission process for ${course.title}`);
-  };
-
   // --- LEAD GENERATION LOGIC ---
   const handleTabClick = (tab) => {
     if (tab === "syllabus") {
@@ -94,7 +90,7 @@ const CourseDetail = () => {
       setActiveTab("syllabus");
     } catch (error) {
       console.error("Error submitting lead:", error);
-      alert("Something went wrong. Please try again.");
+      showError("Something went wrong. Please try again.");
     } finally {
       setSubmittingLead(false);
     }
@@ -357,26 +353,6 @@ const CourseDetail = () => {
                 {/* Metadata Row */}
                 <div className="flex flex-wrap items-center justify-between mb-8 gap-4 pb-6 border-b border-gray-100">
                   <div className="flex items-center gap-4">
-                    {course.instructor && (
-                      <div className="flex items-center gap-3 pr-4 border-r border-gray-200">
-                        <img
-                          src={
-                            course.instructor.image ||
-                            "https://via.placeholder.com/100"
-                          }
-                          alt="Instructor"
-                          className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover"
-                        />
-                        <div>
-                          <p className="text-xs text-gray-400 font-semibold uppercase">
-                            Instructor
-                          </p>
-                          <p className="text-sm font-bold text-[#0B2A4A]">
-                            {course.instructor.name}
-                          </p>
-                        </div>
-                      </div>
-                    )}
                     <span
                       className={`px-3 py-1 text-xs font-bold rounded-full ${
                         course.level === "Beginner"
@@ -414,12 +390,12 @@ const CourseDetail = () => {
                   </button>
                 </div>
 
-                <div className="prose prose-lg max-w-none text-gray-600 mb-8">
-                  <p className="leading-relaxed">
-                    {" "}
-                    {course.longDescription || course.description}
-                  </p>
-                </div>
+                <div
+                  className="prose prose-lg max-w-none text-gray-600 mb-8 text-justify"
+                  dangerouslySetInnerHTML={{
+                    __html: course.longDescription || course.description,
+                  }}
+                />
 
                 {/* Rating Box */}
                 <div className="flex items-center gap-6 bg-gray-50 p-4 rounded-xl">
@@ -454,29 +430,24 @@ const CourseDetail = () => {
             <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="border-b border-gray-100">
                 <nav className="flex overflow-x-auto">
-                  {["overview", "syllabus", "instructor", "reviews"].map(
-                    (tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => handleTabClick(tab)}
-                        className={`py-5 px-8 font-bold text-sm uppercase tracking-wide transition-colors whitespace-nowrap relative
+                  {["overview", "syllabus", "reviews"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => handleTabClick(tab)}
+                      className={`py-5 px-8 font-bold text-sm uppercase tracking-wide transition-colors whitespace-nowrap relative
                            ${activeTab === tab ? "text-[#D6A419]" : "text-gray-500 hover:text-[#0B2A4A]"}
                          `}
-                      >
-                        {tab === "syllabus" &&
-                          !localStorage.getItem("leadCaptured") && (
-                            <Lock
-                              size={14}
-                              className="inline-block mr-2 mb-1"
-                            />
-                          )}
-                        {tab}
-                        {activeTab === tab && (
-                          <span className="absolute bottom-0 left-0 w-full h-1 bg-[#D6A419] rounded-t-full"></span>
+                    >
+                      {tab === "syllabus" &&
+                        !localStorage.getItem("leadCaptured") && (
+                          <Lock size={14} className="inline-block mr-2 mb-1" />
                         )}
-                      </button>
-                    ),
-                  )}
+                      {tab}
+                      {activeTab === tab && (
+                        <span className="absolute bottom-0 left-0 w-full h-1 bg-[#D6A419] rounded-t-full"></span>
+                      )}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
@@ -543,7 +514,7 @@ const CourseDetail = () => {
                           >
                             <div className="flex justify-between items-center w-full p-5 bg-gray-50 border-b border-gray-100">
                               <span className="font-bold text-[#0B2A4A] text-lg">
-                                Week {item.week}: {item.title}
+                                {item.week}: {item.title}
                               </span>
                             </div>
                             <div className="p-5 bg-white">
@@ -571,31 +542,7 @@ const CourseDetail = () => {
                 )}
 
                 {/* Other tabs remain similar... */}
-                {activeTab === "instructor" && course.instructor && (
-                  <div className="animate-fadeIn">
-                    <h3 className="text-xl font-bold text-[#0B2A4A] mb-6">
-                      Meet Your Instructor
-                    </h3>
-                    <div className="flex flex-col md:flex-row items-start gap-8 bg-gray-50 p-8 rounded-2xl border border-gray-100">
-                      <img
-                        src={course.instructor.image}
-                        alt={course.instructor.name}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
-                      />
-                      <div>
-                        <h4 className="text-2xl font-bold text-[#0B2A4A] mb-2">
-                          {course.instructor.name}
-                        </h4>
-                        <p className="text-[#D6A419] font-medium mb-4 text-sm uppercase">
-                          Course Instructor
-                        </p>
-                        <p className="text-gray-600 leading-relaxed">
-                          {course.instructor.bio}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Instructor Tab Removed */}
 
                 {activeTab === "reviews" && (
                   <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
@@ -613,11 +560,21 @@ const CourseDetail = () => {
                 <p className="text-gray-500 font-medium text-sm mb-1">
                   Total Course Fee
                 </p>
-                <div className="flex items-end gap-2 mb-2">
-                  <span className="text-5xl font-extrabold text-[#0B2A4A]">
-                    ₹{course.price}
-                  </span>
-                  {/* Optional: Add strike-through price if applicable */}
+                <div className="flex flex-col">
+                  {course.salePrice && course.salePrice > 0 ? (
+                    <>
+                      <span className="text-5xl font-extrabold text-[#0B2A4A]">
+                        ₹{course.salePrice?.toLocaleString()}
+                      </span>
+                      <span className="text-lg text-gray-400 line-through">
+                        ₹{course.price?.toLocaleString()}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-5xl font-extrabold text-[#0B2A4A]">
+                      ₹{course.price?.toLocaleString()}
+                    </span>
+                  )}
                 </div>
                 <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   Admissions Open
@@ -626,7 +583,7 @@ const CourseDetail = () => {
 
               <div className="space-y-4 mb-8">
                 <button
-                  onClick={() => alert("Syllabus download starting...")}
+                  onClick={() => showInfo("Syllabus download starting...")}
                   className="w-full py-4 bg-[#D6A419] text-white font-bold text-lg rounded-xl hover:bg-yellow-500 hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   <Book size={20} />

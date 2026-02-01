@@ -76,4 +76,63 @@ const getLeads = async (req, res) => {
     }
 };
 
-module.exports = { createLead, getLeads };
+
+
+const updateLead = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const lead = await Lead.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: "Lead not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Lead status updated successfully",
+            data: lead,
+        });
+    } catch (error) {
+        console.error("Error updating lead:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update lead",
+        });
+    }
+};
+
+const deleteLead = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const lead = await Lead.findByIdAndDelete(id);
+
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: "Lead not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Lead deleted successfully",
+        });
+    } catch (error) {
+        console.error("Error deleting lead:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete lead",
+        });
+    }
+};
+
+module.exports = { createLead, getLeads, updateLead, deleteLead };

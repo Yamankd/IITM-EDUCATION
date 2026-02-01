@@ -27,8 +27,8 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       const { data } = await api.get("/courses");
-      setCourses(data);
-      setFilteredCourses(data);
+      setCourses(data.filter((course) => !course.isDraft));
+      setFilteredCourses(data.filter((course) => !course.isDraft));
       setLoading(false);
     } catch (error) {
       console.error("Error fetching courses:", error);

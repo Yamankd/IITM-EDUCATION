@@ -1,14 +1,20 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Courses from "../pages/Courses";
 import About from "../pages/About";
 import Gallery from "../pages/Gallery";
+import ContactUs from "../pages/ContactUs";
 
-import AdminLogin from "../ADMIN/pages/AdminLogin";
-import AdminDashboard from "../ADMIN/pages/AdminDashboard";
+import AdminLogin from "../pages/admin/AdminLogin";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import CourseDetail from "../pages/CourseDetail";
 import ProtectRoute from "../protectedRoutes/ProtectRoute";
+import StudentLogin from "../pages/student/StudentLogin";
+import StudentRegister from "../pages/student/StudentRegister";
+import StudentDashboard from "../pages/student/StudentDashboard";
+import ProtectStudentRoute from "../protectedRoutes/ProtectStudentRoute";
+import ExamPortal from "../pages/student/ExamPortal";
 
 const Routing = () => {
   return (
@@ -18,7 +24,9 @@ const Routing = () => {
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/about" element={<About />} />
       <Route path="/gallery" element={<Gallery />} />
-
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/admin" element={<Navigate to="/portal" replace />} />
+      <Route path="/portal" element={<AdminLogin />} />
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route
         path="/AdminDashboard"
@@ -26,6 +34,26 @@ const Routing = () => {
           <ProtectRoute>
             <AdminDashboard />
           </ProtectRoute>
+        }
+      />
+
+      {/* Student Routes */}
+      <Route path="/student/login" element={<StudentLogin />} />
+      <Route path="/student/register" element={<StudentRegister />} />
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectStudentRoute>
+            <StudentDashboard />
+          </ProtectStudentRoute>
+        }
+      />
+      <Route
+        path="/student/exam/:examId"
+        element={
+          <ProtectStudentRoute>
+            <ExamPortal />
+          </ProtectStudentRoute>
         }
       />
     </Routes>
