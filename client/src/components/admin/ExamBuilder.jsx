@@ -5,8 +5,6 @@ import {
   Save,
   Clock,
   Award,
-  Eye,
-  Edit3,
   Copy,
   AlertCircle,
   CheckCircle2,
@@ -18,6 +16,9 @@ import {
   Download,
   Upload,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
 } from "lucide-react";
 import api from "../../api/api";
 import { useAlert } from "../../context/AlertContext";
@@ -40,7 +41,8 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [previewMode, setPreviewMode] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const fileInputRef = React.useRef(null);
   const csvInputRef = React.useRef(null);
@@ -340,27 +342,36 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
     // FULL SCREEN OVERLAY
     <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col font-sans">
       {/* 1. Editor Header / Toolbar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center justify-between z-20 shadow-md relative">
-        <div className="flex items-center gap-4 flex-1">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 flex items-center justify-between z-20 shadow-md relative">
+        <div className="flex items-center gap-2 md:gap-4 flex-1">
           {onCancel && (
             <button
               onClick={onCancel}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500"
               title="Exit Exam Builder"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={20} className="md:w-6 md:h-6" />
             </button>
           )}
-          <div className="flex-1">
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-300"
+            title="Toggle Sidebar"
+          >
+            <Menu size={20} />
+          </button>
+
+          <div className="flex-1 min-w-0">
             <input
               name="title"
               value={examData.title}
               onChange={handleInputChange}
-              disabled={previewMode}
-              className="w-full text-xl md:text-2xl font-bold bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-[#D6A419] outline-none transition-colors text-[#0B2A4A] dark:text-white placeholder-gray-300 dark:placeholder-gray-600 pb-1"
+              className="w-full text-lg md:text-2xl font-bold bg-transparent border-b-2 border-transparent hover:border-gray-200 focus:border-[#D6A419] outline-none transition-colors text-[#0B2A4A] dark:text-white placeholder-gray-300 dark:placeholder-gray-600 pb-1"
               placeholder="Untitled Exam Name"
             />
-            <div className="flex items-center gap-4 mt-1 text-xs md:text-sm text-gray-500 dark:text-gray-400">
+            <div className="hidden md:flex items-center gap-4 mt-1 text-xs md:text-sm text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1">
                 <Clock size={14} />
                 {examData.durationMinutes} mins
@@ -378,18 +389,8 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setPreviewMode(!previewMode)}
-            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
-          >
-            {previewMode ? <Edit3 size={16} /> : <Eye size={16} />}
-            {previewMode ? "Edit Mode" : "Preview"}
-          </button>
-
-          <div className="h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
-
-          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 gap-1">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="hidden md:flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 gap-1">
             <button
               onClick={() => csvInputRef.current.click()}
               className="p-2 text-gray-500 dark:text-gray-300 hover:text-[#0B2A4A] dark:hover:text-white hover:bg-white dark:hover:bg-gray-600 rounded-md transition-all flex items-center gap-1"
@@ -424,210 +425,281 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
             className="hidden"
           />
 
-          <div className="h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
+          <div className="hidden md:block h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
 
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-2.5 text-sm font-bold bg-[#D6A419] text-[#0B2A4A] rounded-lg shadow-lg hover:shadow-xl hover:bg-[#eebb30] transition-all flex items-center gap-2 disabled:opacity-70 transform active:scale-95"
+            className="px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-bold bg-[#D6A419] text-[#0B2A4A] rounded-lg shadow-lg hover:shadow-xl hover:bg-[#eebb30] transition-all flex items-center gap-2 disabled:opacity-70 transform active:scale-95"
           >
             {saving ? (
               <Clock size={16} className="animate-spin" />
             ) : (
               <Save size={16} />
             )}
-            {saving ? "Saving..." : "Save Exam"}
+            <span className="hidden sm:inline">
+              {saving ? "Saving..." : "Save Exam"}
+            </span>
+            <span className="sm:hidden">{saving ? "..." : "Save"}</span>
           </button>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile Overlay */}
+        {mobileSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 md:hidden"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+        )}
+
         {/* 2. Side Panel (Question Navigator & Settings) */}
-        <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 z-10 transition-all duration-300 shadow-xl">
-          {/* Settings Tab */}
-          <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 space-y-4">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <Info size={14} /> Exam Configuration
-            </h3>
-
-            {/* Duration & Passing Score grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                  Time (Min)
-                </label>
-                <input
-                  type="number"
-                  name="durationMinutes"
-                  value={examData.durationMinutes}
-                  onChange={handleInputChange}
-                  disabled={previewMode}
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                  Pass Sc %
-                </label>
-                <input
-                  type="number"
-                  name="passingScore"
-                  value={examData.passingScore}
-                  onChange={handleInputChange}
-                  disabled={previewMode}
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Randomization Toggles */}
-            <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-              <label className="flex items-center justify-between cursor-pointer group">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                  <Shuffle size={14} className="text-[#D6A419]" />
-                  Shuffle Questions
-                </span>
-                <div className="relative inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    name="randomizeQuestions"
-                    checked={examData.randomizeQuestions}
-                    onChange={handleInputChange}
-                    disabled={previewMode}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
-                </div>
-              </label>
-
-              <label className="flex items-center justify-between cursor-pointer group">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                  <Shuffle size={14} className="text-[#D6A419]" />
-                  Shuffle Options
-                </span>
-                <div className="relative inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    name="randomizeAnswers"
-                    checked={examData.randomizeAnswers}
-                    onChange={handleInputChange}
-                    disabled={previewMode}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
-                </div>
-              </label>
-            </div>
-
-            <div className="pt-2">
-              <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                Exam Description
-              </label>
-              <textarea
-                name="description"
-                value={examData.description}
-                onChange={handleInputChange}
-                disabled={previewMode}
-                rows={2}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none resize-none"
-                placeholder="Enter brief instructions..."
-              />
-            </div>
+        <div
+          className={`
+          ${sidebarCollapsed ? "w-16" : "w-80"}
+          bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
+          flex flex-col flex-shrink-0 z-40 transition-all duration-300 shadow-xl
+          fixed md:relative inset-y-0 left-0 top-16 md:top-0
+          ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
+        >
+          {/* Sidebar Toggle Button (Desktop) */}
+          <div className="hidden md:flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-700">
+            {!sidebarCollapsed && (
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                Exam Builder
+              </h3>
+            )}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500 ml-auto"
+              title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight size={18} />
+              ) : (
+                <ChevronLeft size={18} />
+              )}
+            </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-1">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                Questions ({examData.questions.length})
+          {/* Mobile Header */}
+          <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+            <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">
+              Exam Configuration
+            </h3>
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Settings Tab */}
+          {!sidebarCollapsed && (
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 space-y-4">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <Info size={14} /> Exam Configuration
               </h3>
-              <button
-                onClick={addQuestion}
-                disabled={previewMode}
-                className="text-xs font-bold text-[#D6A419] hover:text-[#b88c12] uppercase tracking-wider flex items-center gap-1"
-              >
-                <Plus size={12} /> Add
-              </button>
-            </div>
 
-            {examData.questions.length === 0 ? (
-              <div className="text-center py-10 px-4 text-gray-400 text-sm italic">
-                No questions added yet.
+              {/* Duration & Passing Score grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                    Time (Min)
+                  </label>
+                  <input
+                    type="number"
+                    name="durationMinutes"
+                    value={examData.durationMinutes}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                    Pass Sc %
+                  </label>
+                  <input
+                    type="number"
+                    name="passingScore"
+                    value={examData.passingScore}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
+                  />
+                </div>
               </div>
-            ) : (
-              examData.questions.map((q, index) => {
-                const isComplete = isQuestionComplete(q);
-                const isSelected = index === currentQuestionIndex;
-                return (
-                  <div
-                    key={index}
-                    onClick={() => setCurrentQuestionIndex(index)}
-                    className={`group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border ${
-                      isSelected
-                        ? "bg-[#0B2A4A] border-[#0B2A4A] text-white shadow-md transform scale-[1.02]"
-                        : "bg-white dark:bg-gray-800 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    <div
-                      className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${
-                        isSelected
-                          ? "bg-[#D6A419] text-[#0B2A4A]"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-500"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                    <span className="truncate text-sm font-medium flex-1">
-                      {q.questionText || (
-                        <span className="italic opacity-50">New Question</span>
-                      )}
-                    </span>
-                    {isComplete ? (
-                      <CheckCircle2
-                        size={14}
-                        className={
-                          isSelected ? "text-[#D6A419]" : "text-green-500"
-                        }
-                      />
-                    ) : (
-                      <AlertCircle
-                        size={14}
-                        className={
-                          isSelected ? "text-orange-300" : "text-orange-400"
-                        }
-                      />
-                    )}
 
-                    {/* Hover actions */}
-                    {!isSelected && !previewMode && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeQuestion(index);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity p-1"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    )}
+              {/* Randomization Toggles */}
+              <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                    <Shuffle size={14} className="text-[#D6A419]" />
+                    Shuffle Questions
+                  </span>
+                  <div className="relative inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      name="randomizeQuestions"
+                      checked={examData.randomizeQuestions}
+                      onChange={handleInputChange}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
                   </div>
-                );
-              })
-            )}
+                </label>
 
-            <button
-              onClick={addQuestion}
-              disabled={previewMode}
-              className="w-full mt-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 hover:border-[#D6A419] hover:text-[#D6A419] transition-all flex items-center justify-center gap-2 text-sm font-semibold"
-            >
-              <Plus size={16} /> Add New Question
-            </button>
-            <button
-              onClick={() => setShowAIModal(true)}
-              disabled={previewMode}
-              className="w-full mt-2 py-3 bg-gradient-to-r from-[#0B2A4A] to-[#1a4c7a] text-white rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-1px] transition-all flex items-center justify-center gap-2 text-sm font-bold active:translate-y-0 active:scale-95"
-            >
-              <Sparkles size={16} className="text-[#D6A419]" /> Generate with AI
-            </button>
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                    <Shuffle size={14} className="text-[#D6A419]" />
+                    Shuffle Options
+                  </span>
+                  <div className="relative inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      name="randomizeAnswers"
+                      checked={examData.randomizeAnswers}
+                      onChange={handleInputChange}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                  </div>
+                </label>
+              </div>
+
+              <div className="pt-2">
+                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                  Exam Description
+                </label>
+                <textarea
+                  name="description"
+                  value={examData.description}
+                  onChange={handleInputChange}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none resize-none"
+                  placeholder="Enter brief instructions..."
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto p-3 space-y-1">
+            {!sidebarCollapsed ? (
+              <>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Questions ({examData.questions.length})
+                  </h3>
+                  <button
+                    onClick={addQuestion}
+                    className="text-xs font-bold text-[#D6A419] hover:text-[#b88c12] uppercase tracking-wider flex items-center gap-1"
+                  >
+                    <Plus size={12} /> Add
+                  </button>
+                </div>
+
+                {examData.questions.length === 0 ? (
+                  <div className="text-center py-10 px-4 text-gray-400 text-sm italic">
+                    No questions added yet.
+                  </div>
+                ) : (
+                  examData.questions.map((q, index) => {
+                    const isComplete = isQuestionComplete(q);
+                    const isSelected = index === currentQuestionIndex;
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => setCurrentQuestionIndex(index)}
+                        className={`group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border ${
+                          isSelected
+                            ? "bg-[#0B2A4A] border-[#0B2A4A] text-white shadow-md transform scale-[1.02]"
+                            : "bg-white dark:bg-gray-800 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                        }`}
+                      >
+                        <div
+                          className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${
+                            isSelected
+                              ? "bg-[#D6A419] text-[#0B2A4A]"
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-500"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <span className="truncate text-sm font-medium flex-1">
+                          {q.questionText || (
+                            <span className="italic opacity-50">
+                              New Question
+                            </span>
+                          )}
+                        </span>
+                        {isComplete ? (
+                          <CheckCircle2
+                            size={14}
+                            className={
+                              isSelected ? "text-[#D6A419]" : "text-green-500"
+                            }
+                          />
+                        ) : (
+                          <AlertCircle
+                            size={14}
+                            className={
+                              isSelected ? "text-orange-300" : "text-orange-400"
+                            }
+                          />
+                        )}
+
+                        {/* Hover actions */}
+                        {!isSelected && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeQuestion(index);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity p-1"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+
+                <button
+                  onClick={addQuestion}
+                  className="w-full mt-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 hover:border-[#D6A419] hover:text-[#D6A419] transition-all flex items-center justify-center gap-2 text-sm font-semibold"
+                >
+                  <Plus size={16} /> Add New Question
+                </button>
+                <button
+                  onClick={() => setShowAIModal(true)}
+                  className="w-full mt-2 py-3 bg-gradient-to-r from-[#0B2A4A] to-[#1a4c7a] text-white rounded-xl shadow-lg hover:shadow-xl hover:translate-y-[-1px] transition-all flex items-center justify-center gap-2 text-sm font-bold active:translate-y-0 active:scale-95"
+                >
+                  <Sparkles size={16} className="text-[#D6A419]" /> Generate
+                  with AI
+                </button>
+              </>
+            ) : (
+              // Collapsed sidebar - icon only buttons
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  onClick={addQuestion}
+                  className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-[#D6A419]"
+                  title="Add Question"
+                >
+                  <Plus size={20} />
+                </button>
+                <button
+                  onClick={() => setShowAIModal(true)}
+                  className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-[#D6A419]"
+                  title="AI Generate"
+                >
+                  <Sparkles size={20} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -654,7 +726,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                           e.target.value,
                         )
                       }
-                      disabled={previewMode}
                       className="text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent border-b border-gray-300 hover:border-[#D6A419] focus:border-[#D6A419] outline-none cursor-pointer py-0.5"
                     >
                       <option value="single-choice">Single Choice</option>
@@ -670,7 +741,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                       onClick={() => duplicateQuestion(currentQuestionIndex)}
                       className="p-2 text-gray-400 hover:text-[#0B2A4A] dark:hover:text-white transition-colors"
                       title="Duplicate"
-                      disabled={previewMode}
                     >
                       <Copy size={18} />
                     </button>
@@ -679,7 +749,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                       onClick={() => removeQuestion(currentQuestionIndex)}
                       className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                       title="Delete"
-                      disabled={previewMode}
                     >
                       <Trash2 size={18} />
                     </button>
@@ -701,7 +770,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                           e.target.value,
                         )
                       }
-                      disabled={previewMode}
                       rows={1}
                       className="w-full text-xl md:text-2xl font-medium text-gray-800 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 bg-transparent outline-none resize-none leading-relaxed"
                       placeholder="Type your question here..."
@@ -768,7 +836,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                           );
                                         }
                                       }}
-                                      disabled={previewMode}
                                       className="w-5 h-5 cursor-pointer accent-[#D6A419]"
                                     />
                                     {isCorrect && (
@@ -792,13 +859,11 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                           e.target.value,
                                         )
                                       }
-                                      disabled={previewMode}
                                       placeholder={`Option ${oIndex + 1}`}
                                       className="w-full px-5 py-3 bg-transparent outline-none rounded-xl text-gray-700 dark:text-gray-200 font-medium"
                                     />
 
-                                    {!previewMode &&
-                                      q.options.length > 2 &&
+                                    {q.options.length > 2 &&
                                       type !== "true-false" && (
                                         <button
                                           onClick={() =>
@@ -817,7 +882,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                               );
                             })}
 
-                            {!previewMode && type !== "true-false" && (
+                            {type !== "true-false" && (
                               <button
                                 onClick={() => addOption(currentQuestionIndex)}
                                 className="ml-9 px-4 py-2 text-sm font-bold text-[#D6A419] bg-[#D6A419]/10 hover:bg-[#D6A419]/20 border border-[#D6A419]/20 rounded-lg transition-colors flex items-center gap-2"
@@ -848,7 +913,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                         e.target.value,
                                       )
                                     }
-                                    disabled={previewMode}
                                     className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-white outline-none focus:border-[#D6A419]"
                                   >
                                     <option value="javascript">
@@ -879,7 +943,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                       e.target.value,
                                     )
                                   }
-                                  disabled={previewMode}
                                   rows={8}
                                   className="w-full px-5 py-3 bg-[#1e1e1e] text-blue-300 font-mono text-sm rounded-xl border border-gray-700 outline-none focus:border-[#D6A419] shadow-inner"
                                   placeholder="// Write the expected solution code..."
@@ -894,7 +957,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                       e.target.value,
                                     )
                                   }
-                                  disabled={previewMode}
                                   className="w-full px-5 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-lg font-medium text-gray-700 dark:text-white outline-none focus:ring-2 focus:ring-[#D6A419] transition-all"
                                   placeholder="Type the correct answer..."
                                 />
@@ -924,7 +986,6 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                                       e.target.checked,
                                     )
                                   }
-                                  disabled={previewMode}
                                 />
                                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                                   Case Sensitive

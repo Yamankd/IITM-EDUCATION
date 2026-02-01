@@ -7,7 +7,7 @@ const Course = require("../models/courseModal");
 // @access  Private (Admin)
 const createExam = async (req, res) => {
     try {
-        const { examId, courseId, title, description, durationMinutes, passingScore, questions } = req.body;
+        const { examId, courseId, title, description, durationMinutes, passingScore, questions, randomizeQuestions, randomizeAnswers } = req.body;
 
         if (examId) {
             // Update existing exam
@@ -21,6 +21,8 @@ const createExam = async (req, res) => {
             exam.durationMinutes = durationMinutes || exam.durationMinutes;
             exam.passingScore = passingScore || exam.passingScore;
             exam.questions = questions || exam.questions;
+            exam.randomizeQuestions = randomizeQuestions !== undefined ? randomizeQuestions : exam.randomizeQuestions;
+            exam.randomizeAnswers = randomizeAnswers !== undefined ? randomizeAnswers : exam.randomizeAnswers;
 
             const updatedExam = await exam.save();
             return res.json(updatedExam);
@@ -34,6 +36,8 @@ const createExam = async (req, res) => {
             durationMinutes,
             passingScore,
             questions,
+            randomizeQuestions: randomizeQuestions || false,
+            randomizeAnswers: randomizeAnswers || false,
         });
 
         const savedExam = await newExam.save();
@@ -71,6 +75,16 @@ const getExamsInCourseForAdmin = async (req, res) => {
     }
 };
 
+// Fisher-Yates shuffle algorithm
+const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 // @desc    Get Single Exam by ID (Student/Admin)
 // @route   GET /api/exams/:examId
 // @access  Private
@@ -80,7 +94,37 @@ const getExamById = async (req, res) => {
         if (!exam) {
             return res.status(404).json({ message: "Exam not found" });
         }
-        res.json(exam);
+
+        // Apply randomization if enabled
+        let examData = exam.toObject();
+
+        // Randomize questions order
+        if (examData.randomizeQuestions && examData.questions && examData.questions.length > 0) {
+            examData.questions = shuffleArray(examData.questions);
+        }
+
+        // Randomize answer options for each question
+        if (examData.randomizeAnswers && examData.questions && examData.questions.length > 0) {
+            examData.questions = examData.questions.map(question => {
+                // Only randomize if question has options (MCQ, True/False)
+                if (question.options && question.options.length > 0) {
+                    // Create a mapping of old index to new index
+                    const indexMap = question.options.map((_, idx) => idx);
+                    const shuffledIndices = shuffleArray(indexMap);
+
+                    // Shuffle the options
+                    const shuffledOptions = shuffledIndices.map(oldIdx => question.options[oldIdx]);
+
+                    return {
+                        ...question,
+                        options: shuffledOptions
+                    };
+                }
+                return question;
+            });
+        }
+
+        res.json(examData);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server Error" });
