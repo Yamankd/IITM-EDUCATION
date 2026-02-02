@@ -17,7 +17,8 @@ const App = () => {
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/student/exam") ||
     location.pathname === "/portal" ||
-    location.pathname === "/admin-login";
+    location.pathname === "/admin-login" ||
+    location.pathname === "/student/login";
 
   useEffect(() => {
     window.scrollTo(0, 0);

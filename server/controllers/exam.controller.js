@@ -113,7 +113,10 @@ const getExamById = async (req, res) => {
                     const shuffledIndices = shuffleArray(indexMap);
 
                     // Shuffle the options
-                    const shuffledOptions = shuffledIndices.map(oldIdx => question.options[oldIdx]);
+                    const shuffledOptions = shuffledIndices.map(oldIdx => ({
+                        ...question.options[oldIdx],
+                        originalIndex: oldIdx
+                    }));
 
                     return {
                         ...question,
@@ -180,8 +183,10 @@ const submitExam = async (req, res) => {
                     case 'multiple-choice':
                         // Multiple answers comparison (array)
                         if (Array.isArray(ans.selectedOptionIndexes) && Array.isArray(question.correctOptionIndexes)) {
-                            const sorted1 = [...ans.selectedOptionIndexes].sort();
-                            const sorted2 = [...question.correctOptionIndexes].sort();
+                            // Ensure both are arrays of numbers for comparison
+                            const sorted1 = [...ans.selectedOptionIndexes].map(Number).sort((a, b) => a - b);
+                            const sorted2 = [...question.correctOptionIndexes].map(Number).sort((a, b) => a - b);
+
                             isCorrect = JSON.stringify(sorted1) === JSON.stringify(sorted2);
                         }
                         break;
@@ -195,6 +200,7 @@ const submitExam = async (req, res) => {
                             const correctAnswer = question.caseSensitive
                                 ? question.correctAnswer.trim()
                                 : question.correctAnswer.trim().toLowerCase();
+
                             isCorrect = studentAnswer === correctAnswer;
                         }
                         break;
@@ -202,13 +208,15 @@ const submitExam = async (req, res) => {
                     case 'code':
                         // Code comparison (trimmed)
                         if (ans.textAnswer && question.correctAnswer) {
-                            isCorrect = ans.textAnswer.trim() === question.correctAnswer.trim();
+                            // Normalize newlines and trim
+                            const normalize = (str) => str.replace(/\r\n/g, '\n').trim();
+                            isCorrect = normalize(ans.textAnswer) === normalize(question.correctAnswer);
                         }
                         break;
 
                     default:
                         // Fallback to single-choice for backward compatibility
-                        isCorrect = question.correctOptionIndex === ans.selectedOptionIndex;
+                        isCorrect = Number(ans.selectedOptionIndex) === Number(question.correctOptionIndex);
                 }
 
                 if (isCorrect) correctCount++;

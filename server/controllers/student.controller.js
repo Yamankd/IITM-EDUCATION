@@ -1,6 +1,7 @@
 const Student = require("../models/student.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt"); // Ensure bcrypt is used for manual check if needed, though model handles it
+const { sendWelcomeEmail } = require("../services/email.service");
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -82,12 +83,25 @@ const createStudentByAdmin = async (req, res) => {
         });
 
         if (student) {
+            // Send welcome email with credentials (non-blocking)
+            sendWelcomeEmail(email, generatedPassword)
+                .then((result) => {
+                    if (result.success) {
+                        console.log(`✅ Welcome email sent to ${email}`);
+                    } else {
+                        console.error(`❌ Failed to send email to ${email}:`, result.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error(`❌ Email sending error for ${email}:`, error);
+                });
+
             res.status(201).json({
                 _id: student._id,
                 name: student.name,
                 email: student.email,
                 generatedPassword: generatedPassword, // Return plain text ONCE
-                message: "Student created successfully. Please save the credentials."
+                message: "Student created successfully. Login credentials have been sent to their email."
             });
         } else {
             res.status(400).json({ message: "Invalid student data" });

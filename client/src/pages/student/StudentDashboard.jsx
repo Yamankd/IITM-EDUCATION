@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/api";
 import { useConfirm } from "../../components/ConfirmDialog";
+import { generateExamPDF } from "../../utils/pdfGenerator";
+import { Download } from "lucide-react";
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
@@ -100,8 +102,6 @@ const StudentDashboard = () => {
         const result = results.find((r) => {
           const rExamId = r.examId?._id || r.examId;
           const isMatch = String(rExamId) === String(exam._id);
-          // Debugging log for matching
-          // console.log(`Checking Exam: ${exam.title} (${exam._id}) vs Result: ${rExamId} -> Match: ${isMatch}`);
           return isMatch;
         });
 
@@ -267,10 +267,12 @@ const StudentDashboard = () => {
                         </div>
                       </div>
                       <button
-                        disabled
-                        className="w-full bg-gray-200 text-gray-500 font-bold py-3 rounded-lg cursor-not-allowed"
+                        onClick={() =>
+                          generateExamPDF(exam, exam.result, student)
+                        }
+                        className="w-full bg-[#0B2A4A] text-white font-bold py-3 rounded-lg hover:bg-blue-900 transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                       >
-                        Completed
+                        <Download size={20} /> Download Report
                       </button>
                     </div>
                   </div>

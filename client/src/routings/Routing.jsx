@@ -11,7 +11,6 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import CourseDetail from "../pages/CourseDetail";
 import ProtectRoute from "../protectedRoutes/ProtectRoute";
 import StudentLogin from "../pages/student/StudentLogin";
-import StudentRegister from "../pages/student/StudentRegister";
 import StudentDashboard from "../pages/student/StudentDashboard";
 import ProtectStudentRoute from "../protectedRoutes/ProtectStudentRoute";
 import ExamPortal from "../pages/student/ExamPortal";
@@ -39,7 +38,6 @@ const Routing = () => {
 
       {/* Student Routes */}
       <Route path="/student/login" element={<StudentLogin />} />
-      <Route path="/student/register" element={<StudentRegister />} />
       <Route
         path="/student/dashboard"
         element={
