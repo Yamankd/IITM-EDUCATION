@@ -184,8 +184,13 @@ const submitExam = async (req, res) => {
                         // Multiple answers comparison (array)
                         if (Array.isArray(ans.selectedOptionIndexes) && Array.isArray(question.correctOptionIndexes)) {
                             // Ensure both are arrays of numbers for comparison
-                            const sorted1 = [...ans.selectedOptionIndexes].map(Number).sort((a, b) => a - b);
-                            const sorted2 = [...question.correctOptionIndexes].map(Number).sort((a, b) => a - b);
+                            const sorted1 = [...ans.selectedOptionIndexes]
+                                .map(val => Number(val))
+                                .filter(val => !isNaN(val)) // Safe filter
+                                .sort((a, b) => a - b);
+                            const sorted2 = [...question.correctOptionIndexes]
+                                .map(val => Number(val))
+                                .sort((a, b) => a - b);
 
                             isCorrect = JSON.stringify(sorted1) === JSON.stringify(sorted2);
                         }
@@ -194,22 +199,24 @@ const submitExam = async (req, res) => {
                     case 'fill-blank':
                         // Text comparison with case sensitivity option
                         if (ans.textAnswer && question.correctAnswer) {
+                            const normalize = (str) => str.replace(/[.,;!?]/g, '').trim();
+
                             const studentAnswer = question.caseSensitive
-                                ? ans.textAnswer.trim()
-                                : ans.textAnswer.trim().toLowerCase();
+                                ? normalize(ans.textAnswer)
+                                : normalize(ans.textAnswer).toLowerCase();
                             const correctAnswer = question.caseSensitive
-                                ? question.correctAnswer.trim()
-                                : question.correctAnswer.trim().toLowerCase();
+                                ? normalize(question.correctAnswer)
+                                : normalize(question.correctAnswer).toLowerCase();
 
                             isCorrect = studentAnswer === correctAnswer;
                         }
                         break;
 
                     case 'code':
-                        // Code comparison (trimmed)
+                        // Code comparison (Ignore all whitespace for robust logic check)
                         if (ans.textAnswer && question.correctAnswer) {
-                            // Normalize newlines and trim
-                            const normalize = (str) => str.replace(/\r\n/g, '\n').trim();
+                            // Remove all whitespace (spaces, tabs, newlines)
+                            const normalize = (str) => str.replace(/\s+/g, '');
                             isCorrect = normalize(ans.textAnswer) === normalize(question.correctAnswer);
                         }
                         break;

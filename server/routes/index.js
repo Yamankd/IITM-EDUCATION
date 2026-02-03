@@ -18,5 +18,7 @@ router.use('/gallery', galleryRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/students', studentRoutes);
 router.use('/exams', examRoutes);
+router.use('/ai', require('./ai.routes'));
+router.use('/instructors', require('./instructor.routes'));
 
 module.exports = router;

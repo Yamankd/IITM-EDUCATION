@@ -50,6 +50,8 @@ const generateCourseDetails = async (req, res) => {
       Return ONLY valid JSON with no markdown formatting or backticks. The JSON must match this structure:
       {
         "description": "Short catchy description (max 180 words)",
+        "metaTitle": "SEO optimized title (max 60 chars) - Focus on keywords",
+        "metaDescription": "SEO optimized meta description (max 160 chars) - Compelling summary",
         "learningOutcomes": ["Outcome 1", "Outcome 2", "Outcome 3", "Outcome 4", "Outcome 5"],
         "requirements": ["Requirement 1", "Requirement 2", "Requirement 3"],
         "syllabus": [
@@ -102,36 +104,77 @@ const generateExamQuestions = async (req, res) => {
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-        // Switched to gemini-2.0-flash based on available models list for this API key
+        // Aligning with the working syllabus generation model
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash"
+            model: "gemini-3-flash-preview",
+            apiVersion: "v1beta"
         });
 
         const numQuestions = Math.min(Math.max(parseInt(count) || 5, 1), 20); // Limit between 1 and 20
         const difficultyLevel = difficulty || "medium";
         const type = questionType || "mixed";
 
-        const prompt = `
-            Generate ${numQuestions} exam questions on the topic "${topic}".
-            Difficulty Level: ${difficultyLevel}.
-            Question Type: ${type} (if 'mixed', include a mix of single-choice, multiple-choice, true-false, fill-blank).
+        let schemaDescription = "";
 
-            Return a strict JSON array of objects. Each object must follow this schema exactly:
+        if (type === "multiple-choice") {
+            schemaDescription = `
+            {
+                "questionText": "Question string",
+                "questionType": "multiple-choice",
+                "options": [{ "text": "Option 1" }, { "text": "Option 2" }, { "text": "Option 3" }, { "text": "Option 4" }],
+                "correctOptionIndexes": [number] (Array of 0-indexed indices of ALL correct options),
+                "marks": number
+            }`;
+        } else if (type === "true-false") {
+            schemaDescription = `
+            {
+                "questionText": "Statement string",
+                "questionType": "true-false",
+                "options": [{ "text": "True" }, { "text": "False" }],
+                "correctOptionIndex": number (0 for True, 1 for False),
+                "marks": number
+            }`;
+        } else if (type === "fill-blank") {
+            schemaDescription = `
+            {
+                "questionText": "Question with a blank ________",
+                "questionType": "fill-blank",
+                "options": [],
+                "correctAnswer": "The exact word/phrase for the blank. NO PUNCTUATION. NO EXTRA WORDS.",
+                "marks": number
+            }`;
+        } else if (type === "code") {
+            schemaDescription = `
+            {
+                "questionText": "Coding problem description",
+                "questionType": "code",
+                "options": [],
+                "codeLanguage": "javascript (or python/java etc)",
+                "correctAnswer": "Sample solution code",
+                "marks": number
+            }`;
+        } else {
+            // Mixed or Single Choice (Default)
+            schemaDescription = `
             {
                 "questionText": "The question string",
                 "questionType": "one of: 'single-choice', 'multiple-choice', 'true-false', 'fill-blank', 'code'",
-                "options": [
-                    { "text": "Option 1" },
-                    { "text": "Option 2" },
-                    { "text": "Option 3" },
-                    { "text": "Option 4" }
-                ] (Required for single/multiple choice. 2 for true-false. Empty array for fill-blank/code),
-                "correctOptionIndex": number (0-indexed index of correct option for single-choice/true-false. null otherwise),
-                "correctOptionIndexes": [number] (Array of indices for multiple-choice. Empty otherwise),
-                "correctAnswer": "String answer for fill-blank or code questions. null otherwise",
-                "codeLanguage": "javascript" (or python/java etc. Only for 'code' type),
-                "marks": number (default 1)
-            }
+                "options": [{ "text": "Option 1" }, { "text": "Option 2" }, { "text": "Option 3" }, { "text": "Option 4" }] (Empty if fill-blank/code),
+                "correctOptionIndex": number (0-indexed index for single-choice/true-false),
+                "correctOptionIndexes": [number] (For multiple-choice),
+                "correctAnswer": "String (For fill-blank/code)",
+                "codeLanguage": "String (For code)",
+                "marks": number
+            }`;
+        }
+
+        const prompt = `
+            Generate ${numQuestions} exam questions on the topic "${topic}".
+            Difficulty Level: ${difficultyLevel}.
+            Question Type: ${type} (if 'mixed', include a mix of types).
+
+            Return a strict JSON array of objects. Each object must follow this schema exactly:
+            ${schemaDescription}
 
             Do not include markdown formatting. Just the raw JSON array.
         `;
@@ -166,13 +209,15 @@ const generateExamQuestions = async (req, res) => {
         // Clean up markdown formatting if present
         text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
+        console.log("Cleaned Text for Parsing:", text); // Debug log
+
         let questions;
         try {
             questions = JSON.parse(text);
         } catch (parseError) {
             const errorMsg = `JSON Parse Error: ${parseError.message}. Content: ${text}`;
             console.error(errorMsg);
-            logError(errorMsg);
+            // Attempt to recover if it's wrapped in an object
             return res.status(500).json({ message: "AI response was not valid JSON", raw: text });
         }
 
