@@ -429,7 +429,7 @@ const Courses = () => {
                         </div>
 
                         <NavLink
-                          to={`/course/${course._id}`}
+                          to={`/course/${course.slug || course._id}`}
                           className="block w-full text-center px-4 py-3 bg-gray-50 text-[#0B2A4A] font-bold rounded-xl border border-gray-200 hover:bg-[#0B2A4A] hover:text-white hover:border-[#0B2A4A] transition-all duration-300 shadow-sm"
                         >
                           View Details

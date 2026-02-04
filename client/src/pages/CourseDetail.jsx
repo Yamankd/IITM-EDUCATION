@@ -12,6 +12,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { useAlert } from "../context/AlertContext";
+import { Helmet } from "react-helmet-async";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -131,6 +132,44 @@ const CourseDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans relative">
+      <Helmet>
+        <title>{course.metaTitle || course.title} | Digital IITM</title>
+        <meta
+          name="description"
+          content={course.metaDescription || course.description}
+        />
+        <meta
+          name="keywords"
+          content={
+            course.category
+              ? `${course.category}, course, learning`
+              : "course, learning"
+          }
+        />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={course.metaTitle || course.title} />
+        <meta
+          property="og:description"
+          content={course.metaDescription || course.description}
+        />
+        <meta property="og:image" content={course.image} />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta
+          property="twitter:title"
+          content={course.metaTitle || course.title}
+        />
+        <meta
+          property="twitter:description"
+          content={course.metaDescription || course.description}
+        />
+        <meta property="twitter:image" content={course.image} />
+      </Helmet>
       {/* --- LEAD CAPTURE MODAL --- */}
       {showLeadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">

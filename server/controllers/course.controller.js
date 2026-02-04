@@ -36,10 +36,20 @@ const getAllCourses = async (req, res) => {
     }
 };
 
-// Get single course
+// Get single course (by ID or Slug)
 const getCourseById = async (req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const { id } = req.params;
+        let query = {};
+
+        // Check if valid ObjectId
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            query = { $or: [{ _id: id }, { slug: id }] };
+        } else {
+            query = { slug: id };
+        }
+
+        const course = await Course.findOne(query);
         if (!course) return res.status(404).json({ message: "Course not found" });
         res.status(200).json(course);
     } catch (error) {

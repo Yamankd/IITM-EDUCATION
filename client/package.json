@@ -23,6 +23,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-dropzone": "^14.3.8",
+    "react-helmet-async": "^2.0.5",
     "react-icons": "^5.5.0",
     "react-lazy-load-image-component": "^1.6.3",
     "react-masonry-css": "^1.0.16",
