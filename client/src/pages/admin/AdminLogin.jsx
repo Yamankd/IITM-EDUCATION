@@ -47,10 +47,16 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      await api.post("/admin-login", {
+      const response = await api.post("/admin-login", {
         email: formData.username,
         password: formData.password,
       });
+
+      // Store admin name in localStorage for header display
+      if (response.data.admin?.name) {
+        localStorage.setItem("adminName", response.data.admin.name);
+      }
+
       navigate("/AdminDashboard", { replace: true });
     } catch (error) {
       setErrors({

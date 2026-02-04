@@ -7,6 +7,8 @@ import { useLocation } from "react-router-dom";
 import { AlertProvider } from "./context/AlertContext";
 import { ConfirmProvider } from "./components/ConfirmDialog";
 import CustomAlert from "./components/CustomAlert";
+import CookieConsent from "./components/CookieConsent";
+import CustomScripts from "./components/CustomScripts";
 
 const App = () => {
   const location = useLocation();
@@ -41,6 +43,12 @@ const App = () => {
 
           {/* Custom Alert Component */}
           <CustomAlert />
+
+          {/* Cookie Consent Popup */}
+          <CookieConsent />
+
+          {/* Custom Head Scripts (Google Analytics, etc.) */}
+          <CustomScripts />
         </>
       </ConfirmProvider>
     </AlertProvider>

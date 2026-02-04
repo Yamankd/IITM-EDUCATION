@@ -195,24 +195,22 @@ const updateStudent = async (req, res) => {
             }
         }
 
-        student.name = name || student.name;
-        student.email = email || student.email;
-        student.mobile = mobile || student.mobile;
-        if (enrolledCourses) {
-            student.enrolledCourses = enrolledCourses;
-        }
+        // Use findByIdAndUpdate to avoid triggering password hash middleware
+        const updatedStudent = await Student.findByIdAndUpdate(
+            id,
+            {
+                name: name || student.name,
+                email: email || student.email,
+                mobile: mobile || student.mobile,
+                enrolledCourses: enrolledCourses || student.enrolledCourses
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
 
-        const updatedStudent = await student.save();
-        res.json({
-            _id: updatedStudent._id,
-            name: updatedStudent.name,
-            email: updatedStudent.email,
-            mobile: updatedStudent.mobile,
-            enrolledCourses: updatedStudent.enrolledCourses
-        });
+        res.json(updatedStudent);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error("Update student error:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
 

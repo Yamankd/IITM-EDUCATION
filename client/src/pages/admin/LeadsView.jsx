@@ -239,7 +239,7 @@ const LeadsView = () => {
                           lead.status === "resolved"
                             ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : lead.status === "contacted"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                              ? "bg-[#D6A419]/10 text-[#0B2A4A] dark:bg-[#D6A419]/20 dark:text-[#D6A419]"
                               : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
                         }`}
                       >
@@ -250,7 +250,7 @@ const LeadsView = () => {
                     </td>
                     <td className="p-4 text-gray-800 dark:text-gray-200">
                       {lead.courseId ? (
-                        <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-sm font-medium">
+                        <span className="px-2 py-1 bg-[#D6A419]/10 dark:bg-[#D6A419]/20 text-[#0B2A4A] dark:text-[#D6A419] rounded text-sm font-medium">
                           {lead.courseId.title}
                         </span>
                       ) : (

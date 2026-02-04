@@ -185,7 +185,7 @@ const CoursesView = () => {
               </div>
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-semibold px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full">
+                  <span className="text-xs font-semibold px-2 py-1 bg-[#D6A419]/10 dark:bg-[#D6A419]/20 text-[#0B2A4A] dark:text-[#D6A419] rounded-full">
                     {course.category}
                   </span>
                   <span className="text-xs font-semibold px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full">
@@ -213,7 +213,7 @@ const CoursesView = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(course)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                      className="p-2 text-[#0B2A4A] hover:bg-[#D6A419]/10 dark:text-[#D6A419] dark:hover:bg-[#D6A419]/20 rounded-lg transition-colors"
                     >
                       <Edit2 size={18} />
                     </button>

@@ -77,7 +77,7 @@ const InstructorsView = () => {
         </div>
         <button
           onClick={handleAddNew}
-          className="flex items-center gap-2 bg-[#0B2A4A] text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors shadow-lg"
+          className="flex items-center gap-2 bg-[#0B2A4A] text-white px-4 py-2 rounded-lg hover:bg-[#0B2A4A]/90 transition-colors shadow-lg"
         >
           <Plus size={20} /> Add Instructor
         </button>
@@ -146,7 +146,7 @@ const InstructorsView = () => {
                     <td className="py-4 px-6">
                       <div className="flex gap-2">
                         {inst.social?.linkedin && (
-                          <span className="text-blue-700 dark:text-blue-300 text-xs bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">
+                          <span className="text-[#0B2A4A] dark:text-[#D6A419] text-xs bg-[#D6A419]/10 dark:bg-[#D6A419]/20 px-2 py-1 rounded">
                             LI
                           </span>
                         )}
@@ -155,7 +155,7 @@ const InstructorsView = () => {
                     <td className="py-4 px-6 text-right space-x-2">
                       <button
                         onClick={() => handleEdit(inst)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                        className="p-2 text-[#0B2A4A] hover:bg-[#D6A419]/10 dark:text-[#D6A419] dark:hover:bg-[#D6A419]/20 rounded-lg transition-colors"
                       >
                         <Edit2 size={18} />
                       </button>

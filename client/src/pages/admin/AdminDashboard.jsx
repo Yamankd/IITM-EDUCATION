@@ -35,8 +35,15 @@ import ExamsView from "./ExamsView";
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("adminActiveTab") || "overview";
+  });
   const navigate = useNavigate();
+
+  // Save activeTab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("adminActiveTab", activeTab);
+  }, [activeTab]);
 
   // --- Dark Mode Logic ---
   const [darkMode, setDarkMode] = useState(() => {
@@ -185,19 +192,24 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
   );
 };
 
-const Header = ({ toggleSidebar }) => (
-  <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 sticky top-0 z-10">
-    <button
-      onClick={toggleSidebar}
-      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
-    >
-      <Menu size={20} />
-    </button>
-    <div className="w-8 h-8 bg-blue-500 rounded-full text-white flex items-center justify-center font-bold">
-      A
-    </div>
-  </header>
-);
+const Header = ({ toggleSidebar }) => {
+  const adminName = localStorage.getItem("adminName") || "Admin";
+  const adminInitial = adminName.charAt(0).toUpperCase();
+
+  return (
+    <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 sticky top-0 z-10">
+      <button
+        onClick={toggleSidebar}
+        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+      >
+        <Menu size={20} />
+      </button>
+      <div className="w-8 h-8 bg-[#0B2A4A] rounded-full text-[#D6A419] flex items-center justify-center font-bold">
+        {adminInitial}
+      </div>
+    </header>
+  );
+};
 
 const Overview = () => (
   <div className="p-10 text-center">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../api/api";
 import {
   Moon,
@@ -13,6 +13,8 @@ import {
   Check,
   Phone,
   Contact,
+  Search,
+  Cookie,
 } from "lucide-react";
 
 const SettingsView = ({ darkMode, toggleDarkMode }) => {
@@ -43,8 +45,42 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
     confirmPassword: "",
   });
 
+  const [seoSettings, setSeoSettings] = useState({
+    metaTitle: "Digital IITM - Professional IT Training",
+    metaDescription: "Learn cutting-edge technologies with expert instructors",
+    keywords: "IT training, MERN stack, web development, programming courses",
+    googleAnalyticsId: "",
+    googleTagManagerId: "", // GTM-XXXXXXX
+    faviconUrl: "",
+    ogImage: "",
+    customHeadScripts: "", // For Google Analytics and other custom scripts
+    cookieConsentEnabled: true,
+    cookieMessage:
+      "We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.",
+    cookieButtonText: "Accept",
+    privacyPolicyUrl: "/privacy-policy",
+  });
+
+  // Load saved SEO settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("seoSettings");
+    if (savedSettings) {
+      try {
+        setSeoSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Error loading SEO settings:", e);
+      }
+    }
+  }, []);
+
   const handleSaveSimulated = (section) => {
     setLoading(true);
+
+    // Save SEO settings to localStorage for cookie consent
+    if (section === "seo") {
+      localStorage.setItem("seoSettings", JSON.stringify(seoSettings));
+    }
+
     // Simulate API call for non-security settings
     setTimeout(() => {
       setLoading(false);
@@ -114,7 +150,8 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
 
   const sections = [
     { id: "general", label: "General", icon: <Globe size={18} /> },
-    { id: "profile", label: "Admin Profile", icon: <User size={18} /> }, // Consolidated section
+    { id: "profile", label: "Admin Profile", icon: <User size={18} /> },
+    { id: "seo", label: "SEO & Analytics", icon: <Search size={18} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
     { id: "appearance", label: "Appearance", icon: <Sun size={18} /> },
   ];
@@ -177,7 +214,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                           siteName: e.target.value,
                         })
                       }
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -199,7 +236,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                           supportEmail: e.target.value,
                         })
                       }
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -207,7 +244,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
               <div className="pt-4 flex justify-end">
                 <button
                   onClick={() => handleSaveSimulated("general")}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
                 >
                   {loading && success !== "general" ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -252,7 +289,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         setProfile({ ...profile, name: e.target.value })
                       }
                       placeholder="Update Name"
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -274,7 +311,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         setProfile({ ...profile, email: e.target.value })
                       }
                       placeholder="Update Login Email"
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -296,7 +333,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         setProfile({ ...profile, contactEmail: e.target.value })
                       }
                       placeholder="Update Contact Email"
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -318,7 +355,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         setProfile({ ...profile, mobile: e.target.value })
                       }
                       placeholder="Update Mobile Number"
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -350,7 +387,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                           })
                         }
                         placeholder="Min 8 characters"
-                        className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                        className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                       />
                     </div>
                   </div>
@@ -373,7 +410,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                           })
                         }
                         placeholder="Confirm new password"
-                        className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                        className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                       />
                     </div>
                   </div>
@@ -401,7 +438,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         })
                       }
                       placeholder="Required to save ANY changes"
-                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -409,7 +446,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
               <div className="pt-4 flex justify-end">
                 <button
                   onClick={handleUpdateProfile}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
                 >
                   {loading && success !== "profile" ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -471,10 +508,299 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#D6A419]/30 dark:peer-focus:ring-[#D6A419]/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
                     </label>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {activeSection === "seo" && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+              <h3 className="text-lg font-semibold dark:text-white mb-4">
+                SEO & Analytics Settings
+              </h3>
+
+              {/* Meta Tags Section */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Default Meta Tags
+                </h4>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Default Meta Title
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.metaTitle}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        metaTitle: e.target.value,
+                      })
+                    }
+                    placeholder="Your Site Name - Tagline"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Default Meta Description
+                  </label>
+                  <textarea
+                    value={seoSettings.metaDescription}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        metaDescription: e.target.value,
+                      })
+                    }
+                    placeholder="Brief description of your site (150-160 characters)"
+                    rows={3}
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {seoSettings.metaDescription.length} / 160 characters
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Keywords (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.keywords}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        keywords: e.target.value,
+                      })
+                    }
+                    placeholder="keyword1, keyword2, keyword3"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Analytics Section */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Analytics & Tracking
+                </h4>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Google Analytics ID
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.googleAnalyticsId}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        googleAnalyticsId: e.target.value,
+                      })
+                    }
+                    placeholder="G-XXXXXXXXXX or UA-XXXXXXXXX-X"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Google Tag Manager ID
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    Enter your GTM container ID (e.g., GTM-XXXXXXX). The GTM
+                    scripts will be automatically injected.
+                  </p>
+                  <input
+                    type="text"
+                    value={seoSettings.googleTagManagerId}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        googleTagManagerId: e.target.value,
+                      })
+                    }
+                    placeholder="GTM-XXXXXXX"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Favicon URL
+                  </label>
+                  <input
+                    type="url"
+                    value={seoSettings.faviconUrl}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        faviconUrl: e.target.value,
+                      })
+                    }
+                    placeholder="https://example.com/favicon.ico"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Default OG Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={seoSettings.ogImage}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        ogImage: e.target.value,
+                      })
+                    }
+                    placeholder="https://example.com/og-image.jpg"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Custom Head Scripts (Google Analytics, etc.)
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    Paste your Google Analytics or any custom scripts here. They
+                    will be injected into the &lt;head&gt; section of every
+                    page.
+                  </p>
+                  <textarea
+                    value={seoSettings.customHeadScripts}
+                    onChange={(e) =>
+                      setSeoSettings({
+                        ...seoSettings,
+                        customHeadScripts: e.target.value,
+                      })
+                    }
+                    placeholder={`<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n  gtag('config', 'G-XXXXXXXXXX');\n</script>`}
+                    rows={8}
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    ⚠️ Only paste trusted scripts. Malicious scripts can
+                    compromise your site security.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Cookie Consent Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                      <Cookie size={18} />
+                      Cookie Consent Popup
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Enable GDPR-compliant cookie notice
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={seoSettings.cookieConsentEnabled}
+                      onChange={(e) =>
+                        setSeoSettings({
+                          ...seoSettings,
+                          cookieConsentEnabled: e.target.checked,
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#D6A419]/30 dark:peer-focus:ring-[#D6A419]/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                  </label>
+                </div>
+
+                {seoSettings.cookieConsentEnabled && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Cookie Message
+                      </label>
+                      <textarea
+                        value={seoSettings.cookieMessage}
+                        onChange={(e) =>
+                          setSeoSettings({
+                            ...seoSettings,
+                            cookieMessage: e.target.value,
+                          })
+                        }
+                        rows={2}
+                        className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Accept Button Text
+                        </label>
+                        <input
+                          type="text"
+                          value={seoSettings.cookieButtonText}
+                          onChange={(e) =>
+                            setSeoSettings({
+                              ...seoSettings,
+                              cookieButtonText: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Privacy Policy URL
+                        </label>
+                        <input
+                          type="text"
+                          value={seoSettings.privacyPolicyUrl}
+                          onChange={(e) =>
+                            setSeoSettings({
+                              ...seoSettings,
+                              privacyPolicyUrl: e.target.value,
+                            })
+                          }
+                          placeholder="/privacy-policy"
+                          className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={() => handleSaveSimulated("seo")}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
+                >
+                  {loading && success !== "seo" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : success === "seo" ? (
+                    <Check size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  Save SEO Settings
+                </button>
               </div>
             </div>
           )}
@@ -497,7 +823,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                 <button
                   onClick={toggleDarkMode}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    darkMode ? "bg-blue-600" : "bg-gray-200"
+                    darkMode ? "bg-[#0B2A4A]" : "bg-gray-200"
                   }`}
                 >
                   <span
