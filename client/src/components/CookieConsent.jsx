@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Cookie } from "lucide-react";
+import api from "../api/api";
 
 const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,26 +16,34 @@ const CookieConsent = () => {
     // Check if user has already accepted cookies
     const hasAccepted = localStorage.getItem("cookieConsent");
 
-    // Load settings from localStorage (set by admin)
-    const savedSettings = localStorage.getItem("seoSettings");
-    if (savedSettings) {
+    // Load settings from API
+    const fetchSettings = async () => {
       try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings({
-          enabled: parsed.cookieConsentEnabled ?? true,
-          message: parsed.cookieMessage || settings.message,
-          buttonText: parsed.cookieButtonText || settings.buttonText,
-          privacyPolicyUrl:
-            parsed.privacyPolicyUrl || settings.privacyPolicyUrl,
-        });
-      } catch (e) {
-        console.error("Error parsing SEO settings:", e);
-      }
-    }
+        const { data } = await api.get("/settings");
+        if (data.success) {
+          const apiSettings = data.data;
+          setSettings({
+            enabled: apiSettings.cookieConsentEnabled ?? true,
+            message: apiSettings.cookieMessage || settings.message,
+            buttonText: apiSettings.cookieButtonText || settings.buttonText,
+            privacyPolicyUrl:
+              apiSettings.privacyPolicyUrl || settings.privacyPolicyUrl,
+          });
 
-    // Show popup if enabled and not yet accepted
+          // Show popup if enabled and not yet accepted
+          if (!hasAccepted && (apiSettings.cookieConsentEnabled ?? true)) {
+            setIsVisible(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading SEO settings:", error);
+      }
+    };
+    fetchSettings();
+
+    // Initial check for visibility (if API fails or is slow, this might be redundant but safe)
     if (!hasAccepted && settings.enabled) {
-      setIsVisible(true);
+      // delayed check is handled in fetchSettings
     }
   }, []);
 

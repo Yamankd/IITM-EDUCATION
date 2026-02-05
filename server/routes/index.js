@@ -9,7 +9,8 @@ const uploadRoutes = require('./upload.routes');
 const studentRoutes = require('./student.routes');
 const examRoutes = require('./exam.routes');
 
-// Mount routes
+
+const settingsRoutes = require('./settings.routes');
 router.use('/', authRoutes); // Auth routes often at root or /auth. Original was mixed. Keeping some at root like /admin-login
 router.use('/courses', courseRoutes);
 router.use('/leads', leadRoutes);
@@ -20,5 +21,6 @@ router.use('/students', studentRoutes);
 router.use('/exams', examRoutes);
 router.use('/ai', require('./ai.routes'));
 router.use('/instructors', require('./instructor.routes'));
+router.use('/settings', settingsRoutes);
 
 module.exports = router;

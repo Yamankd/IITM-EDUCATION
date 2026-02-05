@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import api from "../api/api";
 
 const CustomScripts = () => {
   const [scripts, setScripts] = useState("");
   const [gtmId, setGtmId] = useState("");
+  const [seo, setSeo] = useState(null);
 
   useEffect(() => {
-    // Load custom scripts from localStorage
-    const savedSettings = localStorage.getItem("seoSettings");
-    if (savedSettings) {
+    // Load custom scripts from API
+    const fetchSettings = async () => {
       try {
-        const parsed = JSON.parse(savedSettings);
-        if (parsed.customHeadScripts) {
-          setScripts(parsed.customHeadScripts);
+        const { data } = await api.get("/settings");
+        if (data.success) {
+          const settings = data.data;
+          setSeo(settings);
+          if (settings.customHeadScripts) {
+            setScripts(settings.customHeadScripts);
+          }
+          if (settings.googleTagManagerId) {
+            setGtmId(settings.googleTagManagerId);
+          }
         }
-        if (parsed.googleTagManagerId) {
-          setGtmId(parsed.googleTagManagerId);
-        }
-      } catch (e) {
-        console.error("Error loading custom scripts:", e);
+      } catch (error) {
+        console.error("Error loading custom scripts:", error);
       }
-    }
+    };
+
+    fetchSettings();
   }, []);
 
   // Inject GTM noscript in body
@@ -45,6 +52,17 @@ const CustomScripts = () => {
 
   return (
     <Helmet>
+      {/* Global SEO Meta Tags */}
+      {seo && seo.metaTitle && <title>{seo.metaTitle}</title>}
+      {seo && seo.metaDescription && (
+        <meta name="description" content={seo.metaDescription} />
+      )}
+      {seo && seo.keywords && <meta name="keywords" content={seo.keywords} />}
+      {seo && seo.ogImage && <meta property="og:image" content={seo.ogImage} />}
+      {seo && seo.faviconUrl && (
+        <link rel="icon" type="image/png" href={seo.faviconUrl} />
+      )}
+
       {/* Google Tag Manager Head Script */}
       {gtmId && (
         <script>

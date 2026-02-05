@@ -62,23 +62,36 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
   });
 
   // Load saved SEO settings from localStorage
+  // Load saved SEO settings from API
   useEffect(() => {
-    const savedSettings = localStorage.getItem("seoSettings");
-    if (savedSettings) {
+    const fetchSettings = async () => {
       try {
-        setSeoSettings(JSON.parse(savedSettings));
-      } catch (e) {
-        console.error("Error loading SEO settings:", e);
+        const { data } = await api.get("/settings");
+        if (data.success) {
+          setSeoSettings((prev) => ({ ...prev, ...data.data }));
+        }
+      } catch (error) {
+        console.error("Error fetching SEO settings:", error);
       }
-    }
+    };
+    fetchSettings();
   }, []);
 
-  const handleSaveSimulated = (section) => {
+  const handleSave = async (section) => {
     setLoading(true);
 
-    // Save SEO settings to localStorage for cookie consent
     if (section === "seo") {
-      localStorage.setItem("seoSettings", JSON.stringify(seoSettings));
+      try {
+        await api.put("/settings", seoSettings);
+        setSuccess("seo");
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        console.error("Error saving SEO settings:", error);
+        // Temporary error handling, maybe add a toast later
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
 
     // Simulate API call for non-security settings
@@ -789,7 +802,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
 
               <div className="pt-4 flex justify-end">
                 <button
-                  onClick={() => handleSaveSimulated("seo")}
+                  onClick={() => handleSave("seo")}
                   className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
                 >
                   {loading && success !== "seo" ? (
