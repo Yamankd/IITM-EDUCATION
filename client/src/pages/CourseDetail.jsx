@@ -82,7 +82,7 @@ const CourseDetail = () => {
     try {
       await api.post("/leads", {
         ...leadFormData,
-        courseId: id,
+        courseId: course._id,
         courseTitle: course.title,
       });
 

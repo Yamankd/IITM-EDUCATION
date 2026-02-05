@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Sparkles,
   Award,
+  GraduationCap,
 } from "lucide-react";
 
 // Sub-view imports
@@ -130,7 +131,7 @@ const AdminDashboard = () => {
 const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-    { id: "students", label: "Students", icon: <Users size={20} /> },
+    { id: "students", label: "Students", icon: <GraduationCap size={20} /> },
     { id: "leads", label: "Leads", icon: <MessageSquare size={20} /> },
 
     { id: "instructors", label: "Instructors", icon: <Users size={20} /> },
