@@ -26,7 +26,13 @@ import { useConfirm } from "../../components/ConfirmDialog";
 import AIGeneratorModal from "./modals/AIGeneratorModal";
 import Papa from "papaparse";
 
-const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
+const ExamBuilder = ({
+  courseId,
+  examId,
+  onSave,
+  onCancel,
+  type = "course",
+}) => {
   const { showError, showSuccess } = useAlert();
   const { showConfirm } = useConfirm();
   const [examData, setExamData] = useState({
@@ -44,6 +50,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("general"); // 'general' | 'certificate'
   const fileInputRef = React.useRef(null);
   const csvInputRef = React.useRef(null);
 
@@ -61,6 +68,16 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
         randomizeQuestions: false,
         randomizeAnswers: false,
         questions: [],
+        certificateConfig: {
+          titleOverride: "",
+          descriptionOverride: "",
+          signatureName: "",
+          signatureTitle: "",
+          backgroundImageUrl: "",
+          showLogo: true,
+          showDate: true,
+          showId: true,
+        },
       }));
     }
   }, [examId]);
@@ -68,8 +85,18 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
   const fetchExam = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/exams/admin/${examId}`);
-      setExamData(data);
+      const endpoint =
+        type === "free-quiz"
+          ? `/free-quiz/public/quiz/${examId}`
+          : type === "certification"
+            ? `/certification-exams/admin/${examId}`
+            : `/exams/admin/${examId}`;
+
+      // For free quiz, the public endpoint structure is { success, data }.
+      // The exam endpoint might be returning data directly or { data }.
+      // Let's standardise based on what api returns.
+      const { data } = await api.get(endpoint);
+      setExamData(data.data || data); // Handle both wrapped and unwrapped responses
     } catch (error) {
       console.log("Failed to fetch exam:", error);
       showError("Failed to load exam data");
@@ -313,16 +340,49 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
 
     setSaving(true);
     try {
-      await api.post("/exams", {
-        courseId,
-        examId: examId === "new" ? null : examId,
-        ...examData,
-      });
+      const endpoint =
+        type === "free-quiz" ? "/free-quiz/admin/create" : "/exams";
+      const method =
+        examId && examId !== "new" && type === "free-quiz" ? "put" : "post"; // Free quiz might use PUT for update if supported, else POST
+
+      // For free quiz reuse create for now or handle update
+      // If endpoint is /exams, it handles both create/update via POST in backend? Or need check?
+      // existing code used api.post("/exams", ...).
+
+      const payload = {
+        title: examData.title,
+        description: examData.description,
+        questions: examData.questions,
+        passingScore: examData.passingScore,
+        durationMinutes: examData.durationMinutes,
+        randomizeQuestions: examData.randomizeQuestions,
+        randomizeAnswers: examData.randomizeAnswers,
+        certificateConfig: examData.certificateConfig,
+      };
+
+      if (type === "course") {
+        payload.courseId = courseId;
+        payload.examId = examId === "new" ? null : examId;
+      } else if (type === "certification") {
+        payload.examId = examId === "new" ? null : examId;
+        // No courseId needed
+        // Override endpoint for certification
+        // api.post("/certification-exams", payload)
+      } else {
+        // Free Quiz specific
+        if (examId && examId !== "new") payload.id = examId; // If update needed
+      }
+
+      const finalEndpoint =
+        type === "certification" ? "/certification-exams" : endpoint;
+      await api.post(finalEndpoint, payload);
+
       showSuccess("Exam saved successfully!");
       if (onSave) onSave();
     } catch (error) {
       console.error(error);
-      showError("Failed to save exam.");
+      const message = error.response?.data?.message || "Failed to save exam.";
+      showError(message);
     } finally {
       setSaving(false);
     }
@@ -330,13 +390,17 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
 
   const stats = getCompletionStats();
 
-  if (!courseId && !examId)
+  if (type === "course" && !courseId && !examId)
     // Fallback check
     return (
       <div className="text-center p-10 text-gray-500">
         Please select a course first.
       </div>
     );
+
+  if (type === "certification" && !examId && examId !== "new") {
+    // Just in case logic needs it, mostly it's fine
+  }
 
   return (
     // FULL SCREEN OVERLAY
@@ -459,9 +523,9 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
           className={`
           ${sidebarCollapsed ? "w-16" : "w-80"}
           bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
-          flex flex-col flex-shrink-0 z-40 transition-all duration-300 shadow-xl
-          fixed md:relative inset-y-0 left-0 top-16 md:top-0
-          ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          flex flex-col flex-shrink-0 transition-all duration-300 shadow-xl
+          fixed md:relative inset-y-0 left-0 
+          ${mobileSidebarOpen ? "translate-x-0 z-50" : "-translate-x-full md:translate-x-0 z-40"}
         `}
         >
           {/* Sidebar Toggle Button (Desktop) */}
@@ -499,88 +563,252 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
 
           {/* Settings Tab */}
           {!sidebarCollapsed && (
-            <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 space-y-4">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <Info size={14} /> Exam Configuration
-              </h3>
-
-              {/* Duration & Passing Score grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                    Time (Min)
-                  </label>
-                  <input
-                    type="number"
-                    name="durationMinutes"
-                    value={examData.durationMinutes}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                    Pass Sc %
-                  </label>
-                  <input
-                    type="number"
-                    name="passingScore"
-                    value={examData.passingScore}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
-                  />
-                </div>
+            <div className="flex flex-col border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 max-h-[55%] overflow-hidden shrink-0">
+              {/* Tab Switcher */}
+              <div className="flex border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab("general")}
+                  className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider ${
+                    activeTab === "general"
+                      ? "text-[#D6A419] border-b-2 border-[#D6A419] bg-white dark:bg-gray-800"
+                      : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
+                >
+                  General
+                </button>
               </div>
 
-              {/* Randomization Toggles */}
-              <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <label className="flex items-center justify-between cursor-pointer group">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Shuffle size={14} className="text-[#D6A419]" />
-                    Shuffle Questions
-                  </span>
-                  <div className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      name="randomizeQuestions"
-                      checked={examData.randomizeQuestions}
-                      onChange={handleInputChange}
-                      className="sr-only peer"
-                    />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
-                  </div>
-                </label>
+              <div className="p-4 space-y-4 overflow-y-auto flex-1">
+                {activeTab === "general" ? (
+                  <>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                      <Info size={14} /> Exam Configuration
+                    </h3>
 
-                <label className="flex items-center justify-between cursor-pointer group">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Shuffle size={14} className="text-[#D6A419]" />
-                    Shuffle Options
-                  </span>
-                  <div className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      name="randomizeAnswers"
-                      checked={examData.randomizeAnswers}
-                      onChange={handleInputChange}
-                      className="sr-only peer"
-                    />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
-                  </div>
-                </label>
-              </div>
+                    {/* Duration & Passing Score grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                          Time (Min)
+                        </label>
+                        <input
+                          type="number"
+                          name="durationMinutes"
+                          value={examData.durationMinutes}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                          Pass Sc %
+                        </label>
+                        <input
+                          type="number"
+                          name="passingScore"
+                          value={examData.passingScore}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-center focus:border-[#D6A419] outline-none"
+                        />
+                      </div>
+                    </div>
 
-              <div className="pt-2">
-                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
-                  Exam Description
-                </label>
-                <textarea
-                  name="description"
-                  value={examData.description}
-                  onChange={handleInputChange}
-                  rows={2}
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none resize-none"
-                  placeholder="Enter brief instructions..."
-                />
+                    {/* Randomization Toggles */}
+                    <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <label className="flex items-center justify-between cursor-pointer group">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <Shuffle size={14} className="text-[#D6A419]" />
+                          Shuffle Questions
+                        </span>
+                        <div className="relative inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            name="randomizeQuestions"
+                            checked={examData.randomizeQuestions}
+                            onChange={handleInputChange}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                        </div>
+                      </label>
+
+                      <label className="flex items-center justify-between cursor-pointer group">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <Shuffle size={14} className="text-[#D6A419]" />
+                          Shuffle Options
+                        </span>
+                        <div className="relative inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            name="randomizeAnswers"
+                            checked={examData.randomizeAnswers}
+                            onChange={handleInputChange}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="pt-2">
+                      <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                        Exam Description
+                      </label>
+                      <textarea
+                        name="description"
+                        value={examData.description}
+                        onChange={handleInputChange}
+                        rows={2}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none resize-none"
+                        placeholder="Enter brief instructions..."
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                      <Award size={14} /> Certificate Settings
+                    </h3>
+
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                        Certificate Title Override
+                      </label>
+                      <input
+                        type="text"
+                        name="titleOverride"
+                        value={examData.certificateConfig?.titleOverride || ""}
+                        onChange={handleCertificateConfigChange}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none"
+                        placeholder={examData.title || "Exam Title"}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                        Description Override
+                      </label>
+                      <textarea
+                        name="descriptionOverride"
+                        value={
+                          examData.certificateConfig?.descriptionOverride || ""
+                        }
+                        onChange={handleCertificateConfigChange}
+                        rows={3}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none resize-none"
+                        placeholder="Default description..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                          Signature Name
+                        </label>
+                        <input
+                          type="text"
+                          name="signatureName"
+                          value={
+                            examData.certificateConfig?.signatureName || ""
+                          }
+                          onChange={handleCertificateConfigChange}
+                          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none"
+                          placeholder="e.g. John Doe"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                          Signature Title
+                        </label>
+                        <input
+                          type="text"
+                          name="signatureTitle"
+                          value={
+                            examData.certificateConfig?.signatureTitle || ""
+                          }
+                          onChange={handleCertificateConfigChange}
+                          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none"
+                          placeholder="e.g. Director"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-400">
+                        Background Image URL
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          name="backgroundImageUrl"
+                          value={
+                            examData.certificateConfig?.backgroundImageUrl || ""
+                          }
+                          onChange={handleCertificateConfigChange}
+                          className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:border-[#D6A419] outline-none"
+                          placeholder="https://..."
+                        />
+                        <button
+                          onClick={() => bgImageInputRef.current.click()}
+                          className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                          title="Upload Image"
+                        >
+                          <Upload size={16} />
+                        </button>
+                        <input
+                          type="file"
+                          ref={bgImageInputRef}
+                          onChange={handleImageUpload}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <label className="flex items-center justify-between cursor-pointer group">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Show IITM Logo
+                        </span>
+                        <input
+                          type="checkbox"
+                          name="showLogo"
+                          checked={
+                            examData.certificateConfig?.showLogo !== false
+                          }
+                          onChange={handleCertificateConfigChange}
+                          className="accent-[#0B2A4A]"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer group">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Show Date
+                        </span>
+                        <input
+                          type="checkbox"
+                          name="showDate"
+                          checked={
+                            examData.certificateConfig?.showDate !== false
+                          }
+                          onChange={handleCertificateConfigChange}
+                          className="accent-[#0B2A4A]"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer group">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Show Cert ID
+                        </span>
+                        <input
+                          type="checkbox"
+                          name="showId"
+                          checked={examData.certificateConfig?.showId !== false}
+                          onChange={handleCertificateConfigChange}
+                          className="accent-[#0B2A4A]"
+                        />
+                      </label>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -704,8 +932,8 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
         </div>
 
         {/* 3. Main Editor Canvas */}
-        <div className="flex-1 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-4 md:p-8 relative">
-          <div className="max-w-4xl mx-auto pb-8">
+        <div className="flex-1 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2 md:p-4 lg:p-8 relative">
+          <div className="max-w-4xl mx-auto pb-8 w-full">
             {examData.questions.length > 0 ? (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Question Type & Actions Header */}
@@ -756,7 +984,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                 </div>
 
                 {/* Card Container */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 overflow-hidden w-full">
                   {/* Question Input */}
                   <div className="p-6 border-b border-gray-100 dark:border-gray-700">
                     <textarea
@@ -777,7 +1005,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                   </div>
 
                   {/* Answer Area */}
-                  <div className="p-5 bg-gray-50/50 dark:bg-gray-800/50">
+                  <div className="p-3 md:p-5 bg-gray-50/50 dark:bg-gray-800/50">
                     {(() => {
                       const q = examData.questions[currentQuestionIndex];
                       const type = q.questionType || "single-choice";
@@ -999,7 +1227,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
                   </div>
 
                   {/* Footer Actions */}
-                  <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 flex items-center justify-between">
+                  <div className="bg-gray-50 border-t border-gray-100 px-4 md:px-8 py-4 md:py-5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
                     <div className="flex items-center gap-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">
                         Marks:
@@ -1051,7 +1279,7 @@ const ExamBuilder = ({ courseId, examId, onSave, onCancel }) => {
               </div>
             ) : (
               // Empty State
-              <div className="flex flex-col items-center justify-center h-full pt-20 animate-in zoom-in-95 duration-500">
+              <div className="flex flex-col items-center justify-center h-full pt-10 md:pt-20 animate-in zoom-in-95 duration-500">
                 <div className="w-24 h-24 bg-gradient-to-br from-[#0B2A4A] to-[#1a4c7a] rounded-3xl flex items-center justify-center shadow-xl mb-8 transform rotate-3">
                   <FileText size={48} className="text-[#D6A419]" />
                 </div>

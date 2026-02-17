@@ -77,11 +77,7 @@ const updateCourse = async (req, res) => {
 const deleteCourse = async (req, res) => {
     try {
         // We can do soft delete by setting isActive: false
-        const course = await Course.findByIdAndUpdate(
-            req.params.id,
-            { isActive: false },
-            { new: true }
-        );
+        const course = await Course.findByIdAndDelete(req.params.id);
         if (!course) return res.status(404).json({ message: "Course not found" });
         res.status(200).json({ message: "Course deleted successfully" });
     } catch (error) {

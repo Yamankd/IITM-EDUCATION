@@ -10,6 +10,7 @@ import {
   Clock,
   BarChart,
 } from "lucide-react"; // Assuming you might have lucide-react, if not, I'll stick to SVGs in code
+import SEO from "../components/common/SEO";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -124,6 +125,11 @@ const Courses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 pb-20 font-sans">
+      <SEO
+        title="All Courses"
+        description="Browse our wide range of computer education courses. From basic computer skills to advanced programming and data science."
+        keywords="courses, computer education, programming, coding classes"
+      />
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         {/* Header Section */}
         <div className="text-center mb-12 space-y-4">
@@ -362,7 +368,8 @@ const Courses = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
                       <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-[#0B2A4A] text-sm font-bold px-3 py-1 rounded-full shadow-sm">
-                        ₹{course.price}
+                        ₹
+                        {course.salePrice > 0 ? course.salePrice : course.price}
                       </div>
                       <div className="absolute bottom-4 left-4">
                         <span className="px-3 py-1 bg-[#D6A419] text-white text-xs font-bold uppercase tracking-wide rounded-md shadow-sm">

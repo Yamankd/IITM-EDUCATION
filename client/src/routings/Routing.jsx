@@ -14,6 +14,12 @@ import StudentLogin from "../pages/student/StudentLogin";
 import StudentDashboard from "../pages/student/StudentDashboard";
 import ProtectStudentRoute from "../protectedRoutes/ProtectStudentRoute";
 import ExamPortal from "../pages/student/ExamPortal";
+import StudentRegister from "../pages/student/StudentRegister";
+import CertificationRegister from "../pages/certification/CertificationRegister";
+import CertificationLogin from "../pages/certification/CertificationLogin";
+import CertificationDashboard from "../pages/certification/CertificationDashboard";
+import NotFound from "../pages/error/NotFound";
+import ServerError from "../pages/error/ServerError";
 
 const Routing = () => {
   return (
@@ -24,6 +30,7 @@ const Routing = () => {
       <Route path="/about" element={<About />} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/contact" element={<ContactUs />} />
+
       <Route path="/admin" element={<Navigate to="/portal" replace />} />
       <Route path="/portal" element={<AdminLogin />} />
       <Route path="/admin-login" element={<AdminLogin />} />
@@ -38,6 +45,7 @@ const Routing = () => {
 
       {/* Student Routes */}
       <Route path="/student/login" element={<StudentLogin />} />
+      <Route path="/student/register" element={<StudentRegister />} />
       <Route
         path="/student/dashboard"
         element={
@@ -54,6 +62,29 @@ const Routing = () => {
           </ProtectStudentRoute>
         }
       />
+
+      {/* Certification Routes */}
+      <Route
+        path="/certification"
+        element={<Navigate to="/certification/login" replace />}
+      />
+      <Route
+        path="/certification/register"
+        element={<CertificationRegister />}
+      />
+      <Route path="/certification/login" element={<CertificationLogin />} />
+      <Route
+        path="/certification/dashboard"
+        element={<CertificationDashboard />}
+      />
+      <Route
+        path="/certification/exam/:examId"
+        element={<ExamPortal isExternal={true} />}
+      />
+
+      {/* Error Routes */}
+      <Route path="/server-error" element={<ServerError />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

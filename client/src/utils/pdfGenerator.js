@@ -111,3 +111,85 @@ export const generateExamPDF = (exam, result, studentProfile) => {
 
     doc.save(`${exam.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_result.pdf`);
 };
+
+export const generateCertificatePDF = (data, action = "download") => {
+    const doc = new jsPDF("l", "mm", "a4"); // Landscape
+    const width = doc.internal.pageSize.getWidth();
+    const height = doc.internal.pageSize.getHeight();
+
+    // --- Decorative Border ---
+    doc.setDrawColor(11, 42, 74); // #0B2A4A
+    doc.setLineWidth(3);
+    doc.rect(10, 10, width - 20, height - 20); // Outer
+
+    doc.setDrawColor(214, 164, 25); // #D6A419
+    doc.setLineWidth(1);
+    doc.rect(15, 15, width - 30, height - 30); // Inner
+
+    // --- Helper for Centered Text ---
+    const centerText = (text, y, size = 12, font = "helvetica", style = "normal", color = [0, 0, 0]) => {
+        doc.setFontSize(size);
+        doc.setFont(font, style);
+        doc.setTextColor(...color);
+        const textWidth = (doc.getStringUnitWidth(text) * size) / doc.internal.scaleFactor;
+        const x = (width - textWidth) / 2;
+        doc.text(text, x, y);
+    };
+
+    // --- Header ---
+    centerText("CERTIFICATE", 60, 50, "times", "bold", [11, 42, 74]); // Dark Blue
+    centerText("OF ACHIEVEMENT", 75, 20, "times", "normal", [214, 164, 25]); // Gold
+
+    // --- Body ---
+    centerText("This is to certify that", 100, 16, "helvetica", "italic", [100, 100, 100]);
+
+    // Name (Underlined)
+    const name = data.visitorName || "Student Name";
+    centerText(name, 125, 40, "times", "bold", [11, 42, 74]);
+    doc.setDrawColor(214, 164, 25);
+    doc.setLineWidth(0.5);
+    doc.line(width / 2 - 60, 128, width / 2 + 60, 128); // Underline
+
+    centerText("has successfully completed the quiz for", 145, 16, "helvetica", "italic", [100, 100, 100]);
+
+    // Quiz Title
+    centerText(data.quizId?.title || "Free Certification Quiz", 160, 24, "helvetica", "bold", [0, 0, 0]);
+
+    // --- Footer ---
+    const date = new Date(data.createdAt).toLocaleDateString();
+    doc.setFontSize(12);
+    doc.setFont("times", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    // Date
+    doc.text(date, 50, 180);
+    doc.line(40, 182, 90, 182); // Line
+    doc.setFontSize(10);
+    doc.setTextColor(150, 150, 150);
+    doc.text("Date", 60, 188);
+
+    // Signature
+    doc.setFontSize(16);
+    doc.setFont("times", "italic");
+    doc.setTextColor(11, 42, 74);
+    doc.text("Digital IITM", width - 80, 180);
+    doc.setDrawColor(0, 0, 0);
+    doc.line(width - 90, 182, width - 40, 182);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(150, 150, 150);
+    doc.text("Director Signature", width - 78, 188);
+
+    // ID
+    doc.setFontSize(8);
+    doc.setTextColor(200, 200, 200);
+    doc.text(`Certificate ID: ${data.certificateId}`, width - 60, height - 5);
+
+    // --- Output Action ---
+    if (action === "preview") {
+        const pdfUrl = doc.output("bloburl");
+        window.open(pdfUrl, "_blank");
+    } else {
+        doc.save(`Certificate-${data.certificateId}.pdf`);
+    }
+};

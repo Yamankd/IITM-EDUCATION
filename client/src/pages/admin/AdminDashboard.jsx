@@ -33,6 +33,7 @@ import InstructorsView from "../../components/admin/InstructorsView";
 import SettingsView from "./SettingsView";
 import StudentsView from "./StudentsView";
 import ExamsView from "./ExamsView";
+import CertificationManagement from "./CertificationManagement";
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -90,6 +91,8 @@ const AdminDashboard = () => {
         return <CoursesView />;
       case "exams":
         return <ExamsView />;
+      case "certifications":
+        return <CertificationManagement />;
       case "gallery":
         return <GalleryView />;
       case "faq":
@@ -136,7 +139,12 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout }) => {
 
     { id: "instructors", label: "Instructors", icon: <Users size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
-    { id: "exams", label: "Exams", icon: <Award size={20} /> }, // Added Award icon
+    { id: "exams", label: "Exams", icon: <Award size={20} /> },
+    {
+      id: "certifications",
+      label: "Certifications",
+      icon: <Award size={20} />,
+    }, // Added Certifications
     { id: "gallery", label: "Gallery", icon: <ImageIcon size={20} /> },
     { id: "faq", label: "FAQ", icon: <HelpCircle size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },

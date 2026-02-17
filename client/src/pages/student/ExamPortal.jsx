@@ -21,7 +21,7 @@ import { useAlert } from "../../context/AlertContext";
 import { useConfirm } from "../../components/ConfirmDialog";
 import { generateExamPDF } from "../../utils/pdfGenerator";
 
-const ExamPortal = () => {
+const ExamPortal = ({ isExternal = false }) => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { showError, showInfo } = useAlert();
@@ -46,159 +46,36 @@ const ExamPortal = () => {
     fetchStudentProfile();
   }, [examId]);
 
-  // Load Saved State or Initialize
-  useEffect(() => {
-    if (exam && !result) {
-      const savedState = localStorage.getItem(`exam_state_${examId}`);
-      if (savedState) {
-        const {
-          timeLeft: _savedTimeLeft,
-          answers: savedAnswers,
-          visitedQuestions: savedVisited,
-          markedForReview: savedMarked,
-          currentQuestionIndex: savedIndex,
-          startTime,
-          examStarted: savedExamStarted,
-        } = JSON.parse(savedState);
-
-        // Resume if already started
-        if (savedExamStarted) {
-          setExamStarted(true);
-          const elapsed = Math.floor((Date.now() - startTime) / 1000);
-          const actualTimeLeft = Math.max(
-            0,
-            exam.durationMinutes * 60 - elapsed,
-          );
-          setTimeLeft(actualTimeLeft);
-          setAnswers(savedAnswers || {});
-          setVisitedQuestions(new Set(savedVisited || [0]));
-          setMarkedForReview(new Set(savedMarked || []));
-          setCurrentQuestionIndex(savedIndex || 0);
-        }
-      }
-    }
-  }, [exam, examId, result]);
-
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (exam && examStarted && !result) {
-      const savedState = localStorage.getItem(`exam_state_${examId}`);
-      let startTime = Date.now();
-
-      if (savedState) {
-        const parsed = JSON.parse(savedState);
-        if (parsed.startTime) startTime = parsed.startTime;
-      } else {
-        // Initial start time when first started
-        localStorage.setItem(
-          `exam_state_${examId}`,
-          JSON.stringify({ startTime }),
-        );
-      }
-
-      const stateToSave = {
-        timeLeft,
-        answers,
-        visitedQuestions: Array.from(visitedQuestions),
-        markedForReview: Array.from(markedForReview),
-        currentQuestionIndex,
-        startTime,
-        examStarted: true,
-      };
-      localStorage.setItem(`exam_state_${examId}`, JSON.stringify(stateToSave));
-    }
-  }, [
-    examId,
-    timeLeft,
-    answers,
-    visitedQuestions,
-    markedForReview,
-    currentQuestionIndex,
-    exam,
-    examStarted,
-    result,
-  ]);
-
-  // Timer Logic
-  useEffect(() => {
-    if (!examStarted || result || timeLeft === null) return;
-
-    if (timeLeft === 0) {
-      handleAutoSubmit();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, result, examStarted]);
-
-  // Comprehensive exit prevention (Only when examStarted and not submitted)
-  useEffect(() => {
-    if (!examStarted || result) return;
-
-    // Prevent browser back button
-    const handlePopState = (e) => {
-      e.preventDefault();
-      window.history.pushState(null, "", window.location.href);
-      showError(
-        "You cannot go back during the exam. Please submit the exam to exit.",
-      );
-    };
-
-    // Prevent tab/window close
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue =
-        "Your exam is in progress. Are you sure you want to leave? Your progress will be saved but the timer will continue.";
-      return e.returnValue;
-    };
-
-    // Prevent keyboard shortcuts for navigation
-    const handleKeyDown = (e) => {
-      // Prevent Alt+Left (back), Alt+Right (forward)
-      if (e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
-        e.preventDefault();
-        showError("Navigation is disabled during the exam.");
-      }
-      // Prevent Backspace navigation (when not in input)
-      if (
-        e.key === "Backspace" &&
-        !["INPUT", "TEXTAREA"].includes(e.target.tagName)
-      ) {
-        e.preventDefault();
-      }
-    };
-
-    // Push initial state to prevent back navigation
-    window.history.pushState(null, "", window.location.href);
-
-    // Add event listeners
-    window.addEventListener("popstate", handlePopState);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [result, examStarted]);
+  // Timer effect added above
 
   const fetchExam = async () => {
     try {
       const token = localStorage.getItem("studentToken");
-      const { data } = await api.get(`/exams/${examId}`, {
+      const endpoint = isExternal
+        ? `/certification-exams/${examId}`
+        : `/exams/${examId}`;
+      const { data } = await api.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setExam(data);
     } catch (error) {
       console.error(error);
-      showError("Exam not found.");
-      navigate("/student/dashboard");
+
+      // Check if the error is due to already attempting the exam
+      if (error.response?.data?.alreadyAttempted) {
+        showError(
+          "You have already attempted this exam. Redirecting to dashboard...",
+        );
+      } else {
+        showError("Exam not found.");
+      }
+
+      // Redirect to appropriate dashboard after a short delay
+      setTimeout(() => {
+        navigate(
+          isExternal ? "/certification/dashboard" : "/student/dashboard",
+        );
+      }, 2000);
     } finally {
       setLoading(false);
     }
@@ -207,7 +84,8 @@ const ExamPortal = () => {
   const fetchStudentProfile = async () => {
     try {
       const token = localStorage.getItem("studentToken");
-      const { data } = await api.get("/students/profile", {
+      const endpoint = isExternal ? "/external/profile" : "/students/profile";
+      const { data } = await api.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStudentProfile(data);
@@ -216,96 +94,101 @@ const ExamPortal = () => {
     }
   };
 
+  // Timer Logic
+  useEffect(() => {
+    if (examStarted && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            submitExam();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [examStarted, timeLeft]);
+
+  // Event Handlers
   const handleStartExam = () => {
     setExamStarted(true);
-    if (timeLeft === null) {
+    if (exam && exam.durationMinutes) {
       setTimeLeft(exam.durationMinutes * 60);
+    }
+    // Enter Full Screen (Optional/Best Effort)
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.log("Full screen denied:", err);
+      });
     }
   };
 
-  const handleAnswerChange = (value, type) => {
-    const qId = currentQuestion._id;
+  const navigateQuestion = (index) => {
+    setCurrentQuestionIndex(index);
+    setVisitedQuestions((prev) => new Set(prev).add(index));
+  };
 
+  const handleAnswerChange = (val, type) => {
+    const qId = exam.questions[currentQuestionIndex]._id;
     setAnswers((prev) => {
+      const newAnswers = { ...prev };
       if (type === "multiple-choice") {
-        const currentSelected = Array.isArray(prev[qId]) ? prev[qId] : [];
-        if (currentSelected.includes(value)) {
-          return { ...prev, [qId]: currentSelected.filter((i) => i !== value) };
+        const current = newAnswers[qId] || [];
+        // val is index (number)
+        if (current.includes(val)) {
+          newAnswers[qId] = current.filter((i) => i !== val);
         } else {
-          return { ...prev, [qId]: [...currentSelected, value] };
+          newAnswers[qId] = [...current, val];
         }
+      } else {
+        newAnswers[qId] = val;
       }
+      return newAnswers;
+    });
+  };
 
-      // Single Choice / True-False -> Single index
-      // Fill-Blank / Code -> String value
-      return {
-        ...prev,
-        [qId]: value,
-      };
+  const toggleMarkForReview = () => {
+    const qId = exam.questions[currentQuestionIndex]._id;
+    setMarkedForReview((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(qId)) newSet.delete(qId);
+      else newSet.add(qId);
+      return newSet;
     });
   };
 
   const clearResponse = () => {
-    const questionId = exam.questions[currentQuestionIndex]._id;
-    const newAnswers = { ...answers };
-    delete newAnswers[questionId];
-    setAnswers(newAnswers);
+    const qId = exam.questions[currentQuestionIndex]._id;
+    setAnswers((prev) => {
+      const newAns = { ...prev };
+      delete newAns[qId];
+      return newAns;
+    });
   };
 
-  const toggleMarkForReview = () => {
-    const questionId = exam.questions[currentQuestionIndex]._id;
-    const newMarked = new Set(markedForReview);
-    if (newMarked.has(questionId)) {
-      newMarked.delete(questionId);
-    } else {
-      newMarked.add(questionId);
-    }
-    setMarkedForReview(newMarked);
-  };
-
-  const navigateQuestion = (index) => {
-    if (index >= 0 && index < exam.questions.length) {
-      setCurrentQuestionIndex(index);
-      setVisitedQuestions((prev) => new Set(prev).add(index));
-    }
-  };
-
-  const getQuestionStatus = (index, questionId) => {
-    if (answers[questionId] !== undefined) return "answered";
-    if (markedForReview.has(questionId)) return "marked";
+  const getQuestionStatus = (index, qId) => {
+    if (currentQuestionIndex === index) return "current";
+    if (markedForReview.has(qId)) return "marked";
+    if (
+      answers[qId] !== undefined &&
+      answers[qId] !== "" &&
+      (Array.isArray(answers[qId]) ? answers[qId].length > 0 : true)
+    )
+      return "answered";
     if (visitedQuestions.has(index)) return "not_answered";
     return "not_visited";
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "answered":
-        return "bg-green-500 text-white border-green-600";
-      case "marked":
-        return "bg-purple-500 text-white border-purple-600";
-      case "not_answered":
-        return "bg-red-500 text-white border-red-600";
-      default:
-        return "bg-gray-200 text-gray-700 border-gray-300"; // not visited
-    }
-  };
-
-  const handleAutoSubmit = () => {
-    showInfo("Time is up! Submitting your exam automatically.");
-    submitExam();
-  };
-
   const handleSubmit = async () => {
     const isConfirmed = await showConfirm({
-      title: "Submit Exam",
-      message: "Are you sure you want to finish the exam?",
-      type: "info",
+      title: "Submit Exam?",
+      message: "Are you sure you want to submit? You cannot undo this action.",
       confirmText: "Submit",
+      cancelText: "Cancel",
     });
-
-    if (isConfirmed) {
-      submitExam();
-    }
+    if (isConfirmed) submitExam();
   };
 
   const submitExam = async () => {
@@ -330,8 +213,12 @@ const ExamPortal = () => {
       });
 
       const token = localStorage.getItem("studentToken");
+      const endpoint = isExternal
+        ? "/certification-exams/submit"
+        : "/exams/submit";
+
       const { data } = await api.post(
-        "/exams/submit",
+        endpoint,
         {
           examId: exam._id,
           answers: formattedAnswers,
@@ -346,6 +233,13 @@ const ExamPortal = () => {
       localStorage.removeItem(`exam_state_${examId}`);
     } catch (error) {
       console.error(error);
+
+      // Check if the error is due to already attempting the exam
+      if (error.response?.data?.alreadyAttempted) {
+        showError("You have already attempted this exam.");
+      } else {
+        showError("Failed to submit exam. Please try again.");
+      }
     }
   };
 
@@ -360,9 +254,11 @@ const ExamPortal = () => {
 
     if (isConfirmed) {
       localStorage.removeItem("studentToken");
-      navigate("/");
+      navigate(isExternal ? "/certification/login" : "/");
     } else {
-      navigate("/student/dashboard", { replace: true });
+      navigate(isExternal ? "/certification/dashboard" : "/student/dashboard", {
+        replace: true,
+      });
     }
   };
 
@@ -584,12 +480,14 @@ const ExamPortal = () => {
             </div>
           </div>
           <div className="space-y-3">
-            <button
-              onClick={handleDownloadPDF}
-              className="w-full py-3 bg-[#0B2A4A] text-white font-bold rounded-xl hover:bg-blue-900 transition-colors flex items-center justify-center gap-2"
-            >
-              <Download size={20} /> Download Report
-            </button>
+            {!isExternal && (
+              <button
+                onClick={handleDownloadPDF}
+                className="w-full py-3 bg-[#0B2A4A] text-white font-bold rounded-xl hover:bg-blue-900 transition-colors flex items-center justify-center gap-2"
+              >
+                <Download size={20} /> Download Report
+              </button>
+            )}
             <button
               onClick={handleExit}
               className="w-full py-3 bg-[#D6A419] text-[#0B2A4A] font-bold rounded-xl hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2"

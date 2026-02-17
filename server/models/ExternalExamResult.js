@@ -1,28 +1,15 @@
 const mongoose = require("mongoose");
 
-const resultSchema = new mongoose.Schema(
+const externalExamResultSchema = new mongoose.Schema(
     {
         studentId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Student",
-            required: false, // Made optional to support external students
-        },
-        externalStudentId: {
-            type: mongoose.Schema.Types.ObjectId,
             ref: "ExternalStudent",
-        },
-        isExternal: {
-            type: Boolean,
-            default: false,
+            required: true,
         },
         examId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Exam",
-            required: true,
-        },
-        courseId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Course",
+            ref: "Exam", // References the shared Exam definition
             required: true,
         },
         totalQuestions: {
@@ -52,4 +39,4 @@ const resultSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Result", resultSchema);
+module.exports = mongoose.model("ExternalExamResult", externalExamResultSchema);

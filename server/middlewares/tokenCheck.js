@@ -1,7 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 const protect = (req, res, next) => {
-  const token = req.cookies.adminToken;
+  let token = req.cookies.adminToken;
+
+  // Check Authorization header (case-insensitive)
+  const authHeader = req.headers.authorization || req.headers.Authorization || req.get("Authorization");
+
+  if (!token && authHeader && authHeader.startsWith("Bearer")) {
+    token = authHeader.split(" ")[1];
+  }
 
   if (!token) {
     return res.status(401).json({

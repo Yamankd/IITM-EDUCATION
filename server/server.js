@@ -1,10 +1,11 @@
 require("dotenv").config();
-// Force restart to load env
+// Force restart to load env (updated 2)
 const express = require("express");
 const dbConnection = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const routes = require('./routes/index');
+const certificationExamRoutes = require("./routes/certificationExam.routes");
 
 const app = express();
 
@@ -47,6 +48,9 @@ app.use(
 );
 
 // ====== main routes ============
+const seoRoutes = require("./routes/seo.routes");
+app.use("/", seoRoutes);
+app.use("/certification-exams", certificationExamRoutes);
 app.use("/", routes);
 
 const PORT = process.env.PORT || 3000;

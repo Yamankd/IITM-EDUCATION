@@ -9,6 +9,7 @@ import "yet-another-react-lightbox/styles.css";
 
 import Masonry from "react-masonry-css";
 import "./Gallery.css";
+import SEO from "../components/common/SEO";
 
 const Gallery = () => {
   const [images, setImages] = useState([]);
@@ -74,6 +75,11 @@ const Gallery = () => {
 
   return (
     <div className="bg-[#0B2A4A] min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+      <SEO
+        title="Gallery"
+        description="View photos of campus life, events, and classroom sessions at IITM Computer Education."
+        keywords="iitm gallery, campus photos, student life, mathura education events"
+      />
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">Our Gallery</h1>

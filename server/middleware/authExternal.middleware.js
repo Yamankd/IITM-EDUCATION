@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const Student = require("../models/student.model");
+const ExternalStudent = require("../models/ExternalStudent");
 
-const protectStudent = async (req, res, next) => {
+const protectExternal = async (req, res, next) => {
     let token;
 
     if (
@@ -15,17 +15,17 @@ const protectStudent = async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Get student from the token
-            req.student = await Student.findById(decoded.id).select("-password");
+            // Get user from the token
+            req.externalStudent = await ExternalStudent.findById(decoded.id).select("-password");
 
-            if (!req.student) {
-                return res.status(401).json({ message: "Not authorized, student not found" });
+            if (!req.externalStudent) {
+                return res.status(401).json({ message: "Not authorized, user not found" });
             }
 
             next();
         } catch (error) {
             console.error(error);
-            res.status(401).json({ message: "Not authorized" });
+            res.status(401).json({ message: "Not authorized, token failed" });
         }
     }
 
@@ -34,4 +34,4 @@ const protectStudent = async (req, res, next) => {
     }
 };
 
-module.exports = { protectStudent };
+module.exports = { protectExternal };

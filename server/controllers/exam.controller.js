@@ -90,9 +90,42 @@ const shuffleArray = (array) => {
 // @access  Private
 const getExamById = async (req, res) => {
     try {
+        console.log('🔍 Fetching exam:', req.params.examId);
         const exam = await Exam.findById(req.params.examId).select("-questions.correctOptionIndex -questions.correctOptionIndexes -questions.correctAnswer");
         if (!exam) {
             return res.status(404).json({ message: "Exam not found" });
+        }
+
+        // Check if student has already attempted this exam
+        if (req.student) {
+            console.log('👤 Student ID:', req.student.id);
+            const existingResult = await Result.findOne({
+                studentId: req.student.id,
+                examId: req.params.examId
+            });
+
+            if (existingResult) {
+                console.log('⚠️ Blocking access - exam already attempted');
+                return res.status(400).json({
+                    message: "You have already attempted this exam",
+                    alreadyAttempted: true
+                });
+            }
+        } else if (req.externalStudent) {
+            console.log('👤 External student ID:', req.externalStudent.id);
+            const existingResult = await Result.findOne({
+                externalStudentId: req.externalStudent.id,
+                examId: req.params.examId,
+                isExternal: true
+            });
+
+            if (existingResult) {
+                console.log('⚠️ Blocking access - exam already attempted');
+                return res.status(400).json({
+                    message: "You have already attempted this exam",
+                    alreadyAttempted: true
+                });
+            }
         }
 
         // Apply randomization if enabled
@@ -155,13 +188,52 @@ const getExamForAdmin = async (req, res) => {
 // @access  Private (Student)
 const submitExam = async (req, res) => {
     try {
+        console.log('📝 Exam submission started');
         const { examId, answers } = req.body;
-        const studentId = req.student.id;
+        console.log('Exam ID:', examId, 'Answers count:', answers?.length);
+
+        let studentId = null;
+        let externalStudentId = null;
+        let isExternal = false;
+
+        if (req.student) {
+            studentId = req.student.id;
+        } else if (req.externalStudent) {
+            externalStudentId = req.externalStudent.id;
+            isExternal = true;
+        } else {
+            return res.status(401).json({ message: "Not authorized" });
+        }
 
         const exam = await Exam.findById(examId);
         if (!exam) {
             return res.status(404).json({ message: "Exam not found" });
         }
+
+        // Check if student has already attempted this exam
+        console.log('🔍 Checking for existing result...');
+        let existingResult;
+        if (isExternal) {
+            existingResult = await Result.findOne({
+                externalStudentId,
+                examId,
+                isExternal: true
+            });
+        } else {
+            existingResult = await Result.findOne({
+                studentId,
+                examId
+            });
+        }
+
+        if (existingResult) {
+            console.log('⚠️ Exam already attempted');
+            return res.status(400).json({
+                message: "You have already attempted this exam",
+                alreadyAttempted: true
+            });
+        }
+        console.log('✅ No existing result found, proceeding with submission');
 
         let correctCount = 0;
         const processedAnswers = [];
@@ -243,16 +315,25 @@ const submitExam = async (req, res) => {
         const isPassed = scorePercentage >= exam.passingScore;
 
         // Save Result
-        const result = await Result.create({
-            studentId,
+        const resultPayload = {
             examId,
             courseId: exam.courseId,
             totalQuestions,
             correctAnswers: correctCount,
             scorePercentage,
             isPassed,
-            answers: processedAnswers
-        });
+            answers: processedAnswers,
+            isExternal
+        };
+
+        if (isExternal) {
+            resultPayload.externalStudentId = externalStudentId;
+        } else {
+            resultPayload.studentId = studentId;
+        }
+
+        const result = await Result.create(resultPayload);
+        console.log('✅ Exam submitted successfully. Score:', scorePercentage.toFixed(2) + '%');
 
         res.json(result);
 
@@ -264,10 +345,20 @@ const submitExam = async (req, res) => {
 
 // @desc    Get Student Results
 // @route   GET /api/exams/my-results
-// @access  Private (Student)
+// @access  Private (Student/External)
 const getStudentResults = async (req, res) => {
     try {
-        const results = await Result.find({ studentId: req.student.id })
+        let query = {};
+
+        if (req.student) {
+            query = { studentId: req.student.id };
+        } else if (req.externalStudent) {
+            query = { externalStudentId: req.externalStudent.id, isExternal: true };
+        } else {
+            return res.status(401).json({ message: "Not authorized" });
+        }
+
+        const results = await Result.find(query)
             .populate("courseId", "title")
             .populate("examId", "title")
             .sort("-createdAt");
@@ -299,6 +390,39 @@ const deleteExam = async (req, res) => {
     }
 };
 
+// @desc    Get All Active Exams for External Students
+// @route   GET /api/exams/external/all
+// @access  Private (External Student)
+const getAllExamsForExternal = async (req, res) => {
+    try {
+        // Fetch all active exams
+        const exams = await Exam.find({ isActive: true })
+            .select("-questions.correctOptionIndex -questions.correctOptionIndexes -questions.correctAnswer -questions.options.originalIndex")
+            .populate("courseId", "title");
+
+        res.json(exams);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+// @desc    Get All Certification Exams (No Course Linked)
+// @route   GET /api/exams/admin/certifications
+// @access  Private (Admin)
+const getCertificationExams = async (req, res) => {
+    try {
+        // Fetch exams where courseId is null or doesn't exist
+        const exams = await Exam.find({
+            $or: [{ courseId: null }, { courseId: { $exists: false } }]
+        }).sort("-createdAt");
+        res.json(exams);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
 module.exports = {
     createExam,
     getExamsByCourse,
@@ -307,5 +431,7 @@ module.exports = {
     submitExam,
     getStudentResults,
     deleteExam,
-    getExamsInCourseForAdmin
+    getExamsInCourseForAdmin,
+    getAllExamsForExternal,
+    getCertificationExams
 };

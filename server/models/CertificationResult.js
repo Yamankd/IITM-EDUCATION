@@ -1,30 +1,20 @@
 const mongoose = require("mongoose");
 
-const resultSchema = new mongoose.Schema(
+const certificationResultSchema = new mongoose.Schema(
     {
-        studentId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Student",
-            required: false, // Made optional to support external students
-        },
+        // Link to External Student
         externalStudentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "ExternalStudent",
+            required: true,
         },
-        isExternal: {
-            type: Boolean,
-            default: false,
-        },
+        // Link to Certification Exam
         examId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Exam",
+            ref: "CertificationExam",
             required: true,
         },
-        courseId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Course",
-            required: true,
-        },
+        // No courseId
         totalQuestions: {
             type: Number,
             required: true,
@@ -45,6 +35,8 @@ const resultSchema = new mongoose.Schema(
             {
                 questionId: mongoose.Schema.Types.ObjectId,
                 selectedOptionIndex: Number,
+                selectedOptionIndexes: [Number],
+                textAnswer: String,
                 isCorrect: Boolean,
             },
         ],
@@ -52,4 +44,4 @@ const resultSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Result", resultSchema);
+module.exports = mongoose.model("CertificationResult", certificationResultSchema);

@@ -1,34 +1,35 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const studentSchema = new mongoose.Schema(
+const externalStudentSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
         },
         email: {
             type: String,
             required: true,
             unique: true,
         },
-        password: {
-            type: String,
-            required: true,
-        },
         mobile: {
             type: String,
-            required: true,
         },
-        enrolledCourses: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Course",
-            },
-        ],
-        isActive: {
-            type: Boolean,
-            default: true,
+        dob: {
+            type: Date,
+        },
+        gender: {
+            type: String,
+            enum: ["Male", "Female", "Other"],
+        },
+        profileImage: {
+            type: String, // URL to image
+        },
+        password: {
+            type: String,
+        },
+        role: {
+            type: String,
+            default: "external_student",
         },
         otp: {
             type: String,
@@ -42,22 +43,20 @@ const studentSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        certificationDetails: {
-            college: String,
-            address: String,
-            city: String,
-            state: String,
-            qualification: String,
-            passingYear: String,
-            dob: Date,
-            gender: String,
+        academicDetails: {
+            college: { type: String },
+            address: { type: String },
+            city: { type: String },
+            state: { type: String },
+            qualification: { type: String },
+            passingYear: { type: String },
         },
     },
     { timestamps: true }
 );
 
 // Encrypt password before saving
-studentSchema.pre("save", async function () {
+externalStudentSchema.pre("save", async function () {
     if (!this.isModified("password")) {
         return;
     }
@@ -66,8 +65,8 @@ studentSchema.pre("save", async function () {
 });
 
 // Compare user password
-studentSchema.methods.matchPassword = async function (enteredPassword) {
+externalStudentSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model("Student", studentSchema);
+module.exports = mongoose.model("ExternalStudent", externalStudentSchema);

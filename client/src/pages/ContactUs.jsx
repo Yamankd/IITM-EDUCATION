@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../api/api";
+import SEO from "../components/common/SEO";
 
 const branches = [
   {
@@ -104,6 +105,11 @@ const ContactUs = () => {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] font-sans text-[#0B2A4A] relative overflow-x-hidden selection:bg-[#D6A419] selection:text-white">
+      <SEO
+        title="Contact Us"
+        description="Get in touch with IITM Computer Education. Visit our campuses in Mathura or contact us via phone or email."
+        keywords="contact iitm, iitm mathura address, computer institute contact"
+      />
       {/* Dynamic Background */}
       <div className="fixed inset-0 pointer-events-none -z-10">
         <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#0B2A4A] to-transparent" />

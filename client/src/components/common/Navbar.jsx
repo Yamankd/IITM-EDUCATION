@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Menu, X, Home, BookOpen, Image, LogIn, Monitor } from "lucide-react";
+import { Menu, X, Home, BookOpen, Image, LogIn } from "lucide-react";
 import logo from "../../assets/logo.png";
+
+import api from "../../api/api"; // Ensure api is imported
 
 const Navbar = () => {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [hasShadow, setHasShadow] = useState(false);
+  const [featureFlags, setFeatureFlags] = useState({});
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await api.get("/settings");
+        if (data.success && data.data.featureFlags) {
+          setFeatureFlags(data.data.featureFlags);
+        }
+      } catch (error) {
+        console.error("Failed to load settings", error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -85,6 +102,19 @@ const Navbar = () => {
               >
                 Courses
               </NavLink>
+
+              {featureFlags.freeCertification && (
+                <NavLink
+                  to="/certification"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-[#D6A419]"
+                      : "hover:text-[#D6A419] transition-colors"
+                  }
+                >
+                  Certification
+                </NavLink>
+              )}
 
               <NavLink
                 to="/gallery"

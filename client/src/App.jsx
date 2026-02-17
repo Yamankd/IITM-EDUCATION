@@ -18,6 +18,8 @@ const App = () => {
     location.pathname.startsWith("/AdminDashboard") ||
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/student/exam") ||
+    location.pathname.startsWith("/student/exam") ||
+    location.pathname.startsWith("/certification") ||
     location.pathname === "/portal" ||
     location.pathname === "/admin-login" ||
     location.pathname === "/student/login";

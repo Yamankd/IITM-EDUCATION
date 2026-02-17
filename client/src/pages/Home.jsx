@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
 import InstructorCarousel from "../components/common/InstructorCarousel";
 import EventsShowcase from "../components/common/EventsShowcase";
+import SEO from "../components/common/SEO";
 
 const Home = () => {
   const [particles, setParticles] = useState([]);
@@ -206,6 +207,11 @@ const Home = () => {
 
   return (
     <>
+      <SEO
+        title="Home"
+        description="Welcome to IITM Computer Education. Discover world-class education and cutting-edge research in computer science and technology."
+        keywords="IITM, Computer Education, Web Development, Data Science, Coding, Mathura"
+      />
       {/* Hero Section */}
       <div
         ref={containerRef}

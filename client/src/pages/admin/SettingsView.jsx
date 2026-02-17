@@ -15,7 +15,37 @@ import {
   Contact,
   Search,
   Cookie,
+  Trash2,
+  Plus,
+  Palette,
+  Palette as ColorPicker, // Mocking ColorPicker with Palette for now, in real app assumes a component
+  FileText,
+  Wrench,
 } from "lucide-react";
+
+// Mock ColorPicker component since it was implied but not defined in imports
+const ColorPickerComponent = ({ label, value, onChange, description }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      {label}
+    </label>
+    <div className="flex items-center gap-2">
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-10 w-20 cursor-pointer"
+      />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="flex-1 px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+      />
+    </div>
+    {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
+  </div>
+);
 
 const SettingsView = ({ darkMode, toggleDarkMode }) => {
   const [activeSection, setActiveSection] = useState("general");
@@ -59,6 +89,47 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
       "We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.",
     cookieButtonText: "Accept",
     privacyPolicyUrl: "/privacy-policy",
+    featureFlags: {
+      freeCertification: false,
+    },
+  });
+
+  const [branding, setBranding] = useState({
+    logoUrl: "",
+    footerLogoUrl: "",
+    footerText: "",
+    primaryColor: "#0B2A4A",
+    secondaryColor: "#D6A419",
+    socialLinks: [],
+    customCSS: "",
+  });
+
+  const [maintenanceMode, setMaintenanceMode] = useState({
+    enabled: false,
+    message: "",
+    allowedIPs: "",
+    estimatedCompletion: "",
+    showCountdown: false,
+  });
+
+  const [content, setContent] = useState({
+    aboutUs: "",
+    privacyPolicy: "",
+    termsAndConditions: "",
+    refundPolicy: "",
+    contactInfo: {
+      address: "",
+      phone: "",
+      email: "",
+      mapUrl: "",
+    },
+  });
+
+  const [footer, setFooter] = useState({
+    description:
+      "Providing quality computer education and shaping the next generation of tech experts since 2010.",
+    quickLinks: [],
+    courses: [],
   });
 
   // Load saved SEO settings from localStorage
@@ -68,7 +139,26 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
       try {
         const { data } = await api.get("/settings");
         if (data.success) {
-          setSeoSettings((prev) => ({ ...prev, ...data.data }));
+          const settings = data.data;
+          setSeoSettings((prev) => ({ ...prev, ...settings }));
+
+          // Load Phase 2 settings
+          if (settings.branding) {
+            setBranding((prev) => ({ ...prev, ...settings.branding }));
+          }
+          if (settings.footer) {
+            setFooter((prev) => ({ ...prev, ...settings.footer }));
+          }
+          if (settings.maintenanceMode) {
+            setMaintenanceMode((prev) => ({
+              ...prev,
+              ...settings.maintenanceMode,
+              allowedIPs: settings.maintenanceMode.allowedIPs?.join("\n") || "",
+            }));
+          }
+          if (settings.content) {
+            setContent((prev) => ({ ...prev, ...settings.content }));
+          }
         }
       } catch (error) {
         console.error("Error fetching SEO settings:", error);
@@ -88,6 +178,68 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
       } catch (error) {
         console.error("Error saving SEO settings:", error);
         // Temporary error handling, maybe add a toast later
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Phase 2: Branding
+    if (section === "branding") {
+      try {
+        await api.put("/settings", { branding });
+        setSuccess("branding");
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        console.error("Error saving branding settings:", error);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Phase 2: Footer (Merged with Branding)
+    if (section === "footer") {
+      try {
+        await api.put("/settings", { footer, branding, content });
+        setSuccess("footer");
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        console.error("Error saving footer settings:", error);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Phase 2: Maintenance Mode
+    if (section === "maintenance") {
+      try {
+        const maintenanceData = {
+          ...maintenanceMode,
+          allowedIPs: maintenanceMode.allowedIPs
+            .split("\n")
+            .filter((ip) => ip.trim()),
+        };
+        await api.put("/settings", { maintenanceMode: maintenanceData });
+        setSuccess("maintenance");
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        console.error("Error saving maintenance settings:", error);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Phase 2: Content Management
+    if (section === "content") {
+      try {
+        await api.put("/settings", { content });
+        setSuccess("content");
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        console.error("Error saving content settings:", error);
       } finally {
         setLoading(false);
       }
@@ -166,6 +318,9 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
     { id: "profile", label: "Admin Profile", icon: <User size={18} /> },
     { id: "seo", label: "SEO & Analytics", icon: <Search size={18} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
+    // Branding merged into Footer
+    { id: "footer", label: "Footer & Branding", icon: <Palette size={18} /> },
+    { id: "features", label: "Feature Flags", icon: <Shield size={18} /> },
     { id: "appearance", label: "Appearance", icon: <Sun size={18} /> },
   ];
 
@@ -256,7 +411,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
               </div>
               <div className="pt-4 flex justify-end">
                 <button
-                  onClick={() => handleSaveSimulated("general")}
+                  onClick={() => handleSave("general")}
                   className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
                 >
                   {loading && success !== "general" ? (
@@ -474,6 +629,8 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
             </div>
           )}
 
+          {/* Branding & Customization Section */}
+
           {activeSection === "notifications" && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
               <h3 className="text-lg font-semibold dark:text-white mb-4">
@@ -525,6 +682,894 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                     </label>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Maintenance Mode Section */}
+          {activeSection === "maintenance" && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+              <h3 className="text-lg font-semibold dark:text-white mb-4 flex items-center gap-2">
+                <Wrench size={20} className="text-[#D6A419]" />
+                Maintenance Mode
+              </h3>
+
+              {/* Enable/Disable */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white">
+                    Enable Maintenance Mode
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Display maintenance page to all visitors except allowed IPs
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={maintenanceMode.enabled}
+                    onChange={(e) =>
+                      setMaintenanceMode({
+                        ...maintenanceMode,
+                        enabled: e.target.checked,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#D6A419]/30 dark:peer-focus:ring-[#D6A419]/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                </label>
+              </div>
+
+              {/* Maintenance Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Maintenance Message
+                </label>
+                <textarea
+                  value={maintenanceMode.message}
+                  onChange={(e) =>
+                    setMaintenanceMode({
+                      ...maintenanceMode,
+                      message: e.target.value,
+                    })
+                  }
+                  placeholder="We are currently performing scheduled maintenance..."
+                  rows={4}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  This message will be displayed to visitors during maintenance
+                </p>
+              </div>
+
+              {/* Allowed IPs */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Allowed IP Addresses
+                </label>
+                <textarea
+                  value={maintenanceMode.allowedIPs}
+                  onChange={(e) =>
+                    setMaintenanceMode({
+                      ...maintenanceMode,
+                      allowedIPs: e.target.value,
+                    })
+                  }
+                  placeholder="192.168.1.1&#10;10.0.0.1&#10;203.0.113.0"
+                  rows={3}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none font-mono text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter one IP address per line. These IPs can access the site
+                  during maintenance.
+                </p>
+              </div>
+
+              {/* Estimated Completion */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Estimated Completion Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={maintenanceMode.estimatedCompletion}
+                  onChange={(e) =>
+                    setMaintenanceMode({
+                      ...maintenanceMode,
+                      estimatedCompletion: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Optional: Display when maintenance is expected to complete
+                </p>
+              </div>
+
+              {/* Show Countdown */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white">
+                    Show Countdown Timer
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Display countdown to estimated completion time
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={maintenanceMode.showCountdown}
+                    onChange={(e) =>
+                      setMaintenanceMode({
+                        ...maintenanceMode,
+                        showCountdown: e.target.checked,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#D6A419]/30 dark:peer-focus:ring-[#D6A419]/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                </label>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={() => handleSave("maintenance")}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
+                >
+                  {loading && success !== "maintenance" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : success === "maintenance" ? (
+                    <Check size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  Save Maintenance Settings
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeSection === "footer" && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+              <h3 className="text-lg font-semibold dark:text-white mb-4 flex items-center gap-2">
+                <FileText size={20} className="text-[#D6A419]" />
+                Footer Content
+              </h3>
+
+              {/* --- BRANDING SECTION MERGED HERE --- */}
+
+              {/* Colors */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Brand Colors
+                </h4>
+                <ColorPickerComponent
+                  label="Primary Color"
+                  value={branding.primaryColor}
+                  onChange={(value) =>
+                    setBranding({ ...branding, primaryColor: value })
+                  }
+                  description="Main brand color (buttons, links, accents)"
+                />
+                <ColorPickerComponent
+                  label="Secondary Color"
+                  value={branding.secondaryColor}
+                  onChange={(value) =>
+                    setBranding({ ...branding, secondaryColor: value })
+                  }
+                  description="Secondary brand color (headers, backgrounds)"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Logos */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Logos & Images
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Main Logo URL
+                  </label>
+                  <input
+                    type="url"
+                    value={branding.logoUrl}
+                    onChange={(e) =>
+                      setBranding({ ...branding, logoUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/logo.png"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Logo displayed in the navbar
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Footer Logo URL
+                  </label>
+                  <input
+                    type="url"
+                    value={branding.footerLogoUrl}
+                    onChange={(e) =>
+                      setBranding({
+                        ...branding,
+                        footerLogoUrl: e.target.value,
+                      })
+                    }
+                    placeholder="https://example.com/footer-logo.png"
+                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Logo displayed in the footer (optional)
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Footer Text */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Footer Copyright Text
+                </label>
+                <input
+                  type="text"
+                  value={branding.footerText}
+                  onChange={(e) =>
+                    setBranding({ ...branding, footerText: e.target.value })
+                  }
+                  placeholder="© 2026 Your Company. All rights reserved."
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Social Links */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Social Media Links
+                </h4>
+                <div className="space-y-4">
+                  {branding.socialLinks && branding.socialLinks.length > 0 ? (
+                    branding.socialLinks.map((link, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 items-start border p-4 rounded-lg dark:border-gray-700 relative"
+                      >
+                        <button
+                          onClick={() => {
+                            const newLinks = branding.socialLinks.filter(
+                              (_, i) => i !== index,
+                            );
+                            setBranding({ ...branding, socialLinks: newLinks });
+                          }}
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+
+                        <div className="flex-1 space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Platform Name
+                            </label>
+                            <input
+                              type="text"
+                              value={link.platform}
+                              onChange={(e) => {
+                                const newLinks = [...branding.socialLinks];
+                                newLinks[index].platform = e.target.value;
+                                setBranding({
+                                  ...branding,
+                                  socialLinks: newLinks,
+                                });
+                              }}
+                              placeholder="e.g. Facebook"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              URL
+                            </label>
+                            <input
+                              type="url"
+                              value={link.url}
+                              onChange={(e) => {
+                                const newLinks = [...branding.socialLinks];
+                                newLinks[index].url = e.target.value;
+                                setBranding({
+                                  ...branding,
+                                  socialLinks: newLinks,
+                                });
+                              }}
+                              placeholder="https://"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Icon Name (Lucide)
+                            </label>
+                            <input
+                              type="text"
+                              value={link.icon}
+                              onChange={(e) => {
+                                const newLinks = [...branding.socialLinks];
+                                newLinks[index].icon = e.target.value;
+                                setBranding({
+                                  ...branding,
+                                  socialLinks: newLinks,
+                                });
+                              }}
+                              placeholder="e.g. Facebook"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Case-sensitive name from Lucide React
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">
+                      No social links added yet.
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      const newLinks = [
+                        ...(branding.socialLinks || []),
+                        { platform: "", url: "", icon: "" },
+                      ];
+                      setBranding({ ...branding, socialLinks: newLinks });
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <Plus size={16} /> Add Social Link
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Custom CSS */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Custom CSS (Advanced)
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Add custom CSS to override default styles. Use with caution.
+                </p>
+                <textarea
+                  value={branding.customCSS}
+                  onChange={(e) =>
+                    setBranding({ ...branding, customCSS: e.target.value })
+                  }
+                  placeholder=".custom-class { color: red; }"
+                  rows={6}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none font-mono text-sm"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* --- END BRANDING SECTION --- */}
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Description
+                </label>
+                <textarea
+                  value={footer.description}
+                  onChange={(e) =>
+                    setFooter({ ...footer, description: e.target.value })
+                  }
+                  placeholder="Providing quality computer education..."
+                  rows={3}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Text displayed below the logo in the footer
+                </p>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Quick Links */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Quick Links
+                </h4>
+                <div className="space-y-4">
+                  {footer.quickLinks && footer.quickLinks.length > 0 ? (
+                    footer.quickLinks.map((link, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 items-start border p-4 rounded-lg dark:border-gray-700 relative"
+                      >
+                        <button
+                          onClick={() => {
+                            const newLinks = footer.quickLinks.filter(
+                              (_, i) => i !== index,
+                            );
+                            setFooter({ ...footer, quickLinks: newLinks });
+                          }}
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <div className="flex-1 space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Display Name
+                            </label>
+                            <input
+                              type="text"
+                              value={link.name}
+                              onChange={(e) => {
+                                const newLinks = [...footer.quickLinks];
+                                newLinks[index].name = e.target.value;
+                                setFooter({ ...footer, quickLinks: newLinks });
+                              }}
+                              placeholder="e.g. About Us"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Link Path / URL
+                            </label>
+                            <input
+                              type="text"
+                              value={link.path}
+                              onChange={(e) => {
+                                const newLinks = [...footer.quickLinks];
+                                newLinks[index].path = e.target.value;
+                                setFooter({ ...footer, quickLinks: newLinks });
+                              }}
+                              placeholder="/about"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">
+                      No quick links added.
+                    </p>
+                  )}
+                  <button
+                    onClick={() => {
+                      const newLinks = [
+                        ...(footer.quickLinks || []),
+                        { name: "", path: "" },
+                      ];
+                      setFooter({ ...footer, quickLinks: newLinks });
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <Plus size={16} /> Add Quick Link
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Courses */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Courses
+                </h4>
+                <div className="space-y-4">
+                  {footer.courses && footer.courses.length > 0 ? (
+                    footer.courses.map((link, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 items-start border p-4 rounded-lg dark:border-gray-700 relative"
+                      >
+                        <button
+                          onClick={() => {
+                            const newLinks = footer.courses.filter(
+                              (_, i) => i !== index,
+                            );
+                            setFooter({ ...footer, courses: newLinks });
+                          }}
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <div className="flex-1 space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Course Name
+                            </label>
+                            <input
+                              type="text"
+                              value={link.name}
+                              onChange={(e) => {
+                                const newLinks = [...footer.courses];
+                                newLinks[index].name = e.target.value;
+                                setFooter({ ...footer, courses: newLinks });
+                              }}
+                              placeholder="e.g. Web Development"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Link Path / URL
+                            </label>
+                            <input
+                              type="text"
+                              value={link.path}
+                              onChange={(e) => {
+                                const newLinks = [...footer.courses];
+                                newLinks[index].path = e.target.value;
+                                setFooter({ ...footer, courses: newLinks });
+                              }}
+                              placeholder="/course/web-dev"
+                              className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg outline-none dark:bg-gray-700 dark:text-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">No courses added.</p>
+                  )}
+                  <button
+                    onClick={() => {
+                      const newLinks = [
+                        ...(footer.courses || []),
+                        { name: "", path: "" },
+                      ];
+                      setFooter({ ...footer, courses: newLinks });
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <Plus size={16} /> Add Course
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Contact Information (Shared with Content Section) */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Footer Contact Info
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={content.contactInfo.address}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            address: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="123 Main St, City, Country"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={content.contactInfo.phone}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            phone: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="+1 234 567 8900"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={content.contactInfo.email}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            email: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="contact@example.com"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={() => handleSave("footer")}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
+                >
+                  {loading && success !== "footer" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : success === "footer" ? (
+                    <Check size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  Save Footer Settings
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Content Management Section */}
+          {activeSection === "content" && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+              <h3 className="text-lg font-semibold dark:text-white mb-4 flex items-center gap-2">
+                <FileText size={20} className="text-[#D6A419]" />
+                Content Management
+              </h3>
+
+              {/* About Us */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  About Us Page
+                </label>
+                <textarea
+                  value={content.aboutUs}
+                  onChange={(e) =>
+                    setContent({ ...content, aboutUs: e.target.value })
+                  }
+                  placeholder="Tell visitors about your organization..."
+                  rows={6}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Privacy Policy */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Privacy Policy
+                </label>
+                <textarea
+                  value={content.privacyPolicy}
+                  onChange={(e) =>
+                    setContent({ ...content, privacyPolicy: e.target.value })
+                  }
+                  placeholder="Your privacy policy content..."
+                  rows={6}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Terms & Conditions */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Terms & Conditions
+                </label>
+                <textarea
+                  value={content.termsAndConditions}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      termsAndConditions: e.target.value,
+                    })
+                  }
+                  placeholder="Your terms and conditions..."
+                  rows={6}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Refund Policy */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Refund Policy
+                </label>
+                <textarea
+                  value={content.refundPolicy}
+                  onChange={(e) =>
+                    setContent({ ...content, refundPolicy: e.target.value })
+                  }
+                  placeholder="Your refund policy..."
+                  rows={6}
+                  className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="border-t dark:border-gray-700 my-4"></div>
+
+              {/* Contact Information */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Contact Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={content.contactInfo.address}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            address: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="123 Main St, City, Country"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={content.contactInfo.phone}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            phone: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="+1 234 567 8900"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={content.contactInfo.email}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            email: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="contact@example.com"
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Google Maps URL
+                    </label>
+                    <input
+                      type="url"
+                      value={content.contactInfo.mapUrl}
+                      onChange={(e) =>
+                        setContent({
+                          ...content,
+                          contactInfo: {
+                            ...content.contactInfo,
+                            mapUrl: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="https://maps.google.com/..."
+                      className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={() => handleSave("content")}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
+                >
+                  {loading && success !== "content" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : success === "content" ? (
+                    <Check size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  Save Content
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeSection === "features" && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+              <h3 className="text-lg font-semibold dark:text-white mb-4">
+                Feature Flags
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white">
+                      Free Certification
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Enable "Certification" menu in Navbar
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={
+                        seoSettings.featureFlags?.freeCertification || false
+                      }
+                      onChange={(e) =>
+                        setSeoSettings({
+                          ...seoSettings,
+                          featureFlags: {
+                            ...seoSettings.featureFlags,
+                            freeCertification: e.target.checked,
+                          },
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#D6A419]/30 dark:peer-focus:ring-[#D6A419]/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0B2A4A]"></div>
+                  </label>
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={() => handleSave("seo")} // Reusing SEO save logic as it saves seoSettings state
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0B2A4A] text-white rounded-lg hover:bg-[#0B2A4A]/90 transition-colors"
+                >
+                  {loading && success !== "seo" ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : success === "seo" ? (
+                    <Check size={18} />
+                  ) : (
+                    <Save size={18} />
+                  )}
+                  Save Changes
+                </button>
               </div>
             </div>
           )}

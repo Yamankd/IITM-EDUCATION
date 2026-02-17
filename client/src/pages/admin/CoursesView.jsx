@@ -204,11 +204,12 @@ const CoursesView = () => {
                 <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
                   <span className="font-bold text-[#D6A419] text-lg">
                     ₹{course.salePrice > 0 ? course.salePrice : course.price}
-                    {course.salePrice > 0 && (
-                      <span className="text-gray-400 text-sm line-through ml-2 font-normal">
-                        ₹{course.price}
-                      </span>
-                    )}
+                    {course.salePrice > 0 &&
+                      course.salePrice < course.price && (
+                        <span className="text-gray-400 text-sm line-through ml-2 font-normal">
+                          ₹{course.price}
+                        </span>
+                      )}
                   </span>
                   <div className="flex gap-2">
                     <button

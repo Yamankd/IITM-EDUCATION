@@ -12,7 +12,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { useAlert } from "../context/AlertContext";
-import { Helmet } from "react-helmet-async";
+import SEO from "../components/common/SEO";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -132,44 +132,31 @@ const CourseDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans relative">
-      <Helmet>
-        <title>{course.metaTitle || course.title} | Digital IITM</title>
-        <meta
-          name="description"
-          content={course.metaDescription || course.description}
-        />
-        <meta
-          name="keywords"
-          content={
-            course.category
-              ? `${course.category}, course, learning`
-              : "course, learning"
-          }
-        />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:title" content={course.metaTitle || course.title} />
-        <meta
-          property="og:description"
-          content={course.metaDescription || course.description}
-        />
-        <meta property="og:image" content={course.image} />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={window.location.href} />
-        <meta
-          property="twitter:title"
-          content={course.metaTitle || course.title}
-        />
-        <meta
-          property="twitter:description"
-          content={course.metaDescription || course.description}
-        />
-        <meta property="twitter:image" content={course.image} />
-      </Helmet>
+      <SEO
+        title={course.metaTitle || course.title}
+        description={course.metaDescription || course.description}
+        keywords={course.category ? `${course.category}, course` : "course"}
+        image={course.image}
+        type="article"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Course",
+          name: course.title,
+          description: course.metaDescription || course.description,
+          provider: {
+            "@type": "Organization",
+            name: "IITM Computer Education",
+            sameAs: "https://digitaliitm.com",
+          },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            price: course.salePrice || course.price || 0,
+            availability: "https://schema.org/InStock",
+            url: window.location.href,
+          },
+        }}
+      />
       {/* --- LEAD CAPTURE MODAL --- */}
       {showLeadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
@@ -600,7 +587,9 @@ const CourseDetail = () => {
                   Total Course Fee
                 </p>
                 <div className="flex flex-col">
-                  {course.salePrice && course.salePrice > 0 ? (
+                  {course.salePrice &&
+                  course.salePrice > 0 &&
+                  course.salePrice < course.price ? (
                     <>
                       <span className="text-5xl font-extrabold text-[#0B2A4A]">
                         ₹{course.salePrice?.toLocaleString()}

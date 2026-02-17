@@ -21,6 +21,15 @@ router.use('/students', studentRoutes);
 router.use('/exams', examRoutes);
 router.use('/ai', require('./ai.routes'));
 router.use('/instructors', require('./instructor.routes'));
-router.use('/settings', settingsRoutes);
+router.use('/certification', require('./certification.routes'));
+router.use('/external', require('./external.routes'));
+console.log("Loading Settings Routes...");
+try {
+    router.use('/settings', require('./settings.routes'));
+} catch (error) {
+    console.error("Error loading settings routes:", error);
+}
+
+
 
 module.exports = router;
