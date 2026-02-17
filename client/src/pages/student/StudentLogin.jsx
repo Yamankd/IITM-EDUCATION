@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import SEO from "../../components/common/SEO";
 
 const StudentLogin = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,11 @@ const StudentLogin = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#0B2A4A] font-sans relative overflow-hidden">
+      <SEO
+        title="Student Login"
+        description="Login to the Student Portal to access your courses, view exam results, and manage your profile."
+        keywords="student login, iitm student portal, student dashboard, education portal"
+      />
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#fff] blur-[100px]" />

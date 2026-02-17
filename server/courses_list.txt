@@ -1,0 +1,7 @@
+--- COURSES FOUND ---
+ID: 697051755c181133e19cb127 | Title: "MERN STACK DEVELOPMENT" | Slug: "mern stack course in mathura"
+ID: 697b26f07d983dffc07624ba | Title: "POWER BI" | Slug: "POWER BI IITM COMPUTER EDUCATION MATHURA"
+ID: 697b29da7d983dffc0762552 | Title: "Data Science" | Slug: "Advance Data Science in mathura"
+ID: 697b3207b50d29bee5aba145 | Title: "Data Analytics" | Slug: "data Analytics in mathura"
+ID: 6992ff09854fab30293c7688 | Title: "Artificail Intelligence & Machine Learning" | Slug: "ai and ml in mathura"
+---------------------

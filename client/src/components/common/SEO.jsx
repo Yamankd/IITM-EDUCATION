@@ -10,10 +10,37 @@ const SEO = ({
   url,
   type = "website",
   schema,
+  noindex = false,
 }) => {
   const siteTitle = "Digital IITM";
   const fullTitle = title ? `${title} | ${siteTitle}` : siteTitle;
-  const currentUrl = url || window.location.href;
+
+  // --- CANONICAL URL LOGIC ---
+  const PREFERRED_DOMAIN = "https://www.digitaliitm.com";
+
+  // 1. Get current path without query string and remove trailing slash
+  let pathname = window.location.pathname;
+  if (pathname.endsWith("/") && pathname !== "/") {
+    pathname = pathname.slice(0, -1);
+  }
+
+  // 2. Handle Query Params: Only allow 'page' for pagination
+  const searchParams = new URLSearchParams(window.location.search);
+  const allowedParams = ["page"];
+  const newSearchParams = new URLSearchParams();
+  allowedParams.forEach((param) => {
+    if (searchParams.has(param)) {
+      newSearchParams.set(param, searchParams.get(param));
+    }
+  });
+  const queryString = newSearchParams.toString()
+    ? `?${newSearchParams.toString()}`
+    : "";
+
+  // 3. Construct Final Canonical URL
+  const generatedCanonical = `${PREFERRED_DOMAIN}${pathname}${queryString}`;
+  const currentUrl = url || generatedCanonical;
+
   const defaultImage = "https://digitaliitm.com/assets/logo.png"; // Fallback image
 
   return (
@@ -22,6 +49,14 @@ const SEO = ({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
+
+      {/* Robots Tag: Control Indexing */}
+      {noindex ? (
+        <meta name="robots" content="noindex, nofollow" />
+      ) : (
+        <meta name="robots" content="index, follow" />
+      )}
+
       <link rel="canonical" href={currentUrl} />
 
       {/* Open Graph / Facebook */}
@@ -54,6 +89,7 @@ SEO.propTypes = {
   url: PropTypes.string,
   type: PropTypes.string,
   schema: PropTypes.object,
+  noindex: PropTypes.bool,
 };
 
 export default SEO;

@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Monitor } from "lucide-react";
+import SEO from "../components/common/SEO";
 
 const Portal = () => {
   return (
     <div className="min-h-screen bg-[#0B2A4A] flex flex-col items-center justify-center px-4">
+      <SEO title="Portal" description="Authorized Access Only" noindex={true} />
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-white mb-2">
           Welcome to IITM Portal

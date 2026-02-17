@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import SEO from "../../components/common/SEO";
 
 const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +71,11 @@ const AdminLogin = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#0B2A4A] font-sans relative overflow-hidden">
+      <SEO
+        title="Admin Login"
+        description="Restricted access for institute administrators."
+        noindex={true}
+      />
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#D6A419] blur-[100px]" />

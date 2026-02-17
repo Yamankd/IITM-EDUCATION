@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin
+Disallow: /AdminDashboard
+Disallow: /admin-login
+Disallow: /portal
+Allow: /
+
+# IMPORTANT: Replace the URL below with your deployed BACKEND URL
+Sitemap: https://YOUR-DEPLOYED-BACKEND-URL.com/sitemap.xml
