@@ -26,7 +26,7 @@ const ProtectRoute = ({ children }) => {
 
   // If authorized, show the protected page (children).
   // If NOT authorized, redirect to the login page.
-  return authorized ? children : <Navigate to="/admin/loginpage" replace />;
+  return authorized ? children : <Navigate to="/portal" replace />;
 };
 
 export default ProtectRoute;

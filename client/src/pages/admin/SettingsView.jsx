@@ -76,14 +76,6 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
   });
 
   const [seoSettings, setSeoSettings] = useState({
-    metaTitle: "Digital IITM - Professional IT Training",
-    metaDescription: "Learn cutting-edge technologies with expert instructors",
-    keywords: "IT training, MERN stack, web development, programming courses",
-    googleAnalyticsId: "",
-    googleTagManagerId: "", // GTM-XXXXXXX
-    faviconUrl: "",
-    ogImage: "",
-    customHeadScripts: "", // For Google Analytics and other custom scripts
     cookieConsentEnabled: true,
     cookieMessage:
       "We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.",
@@ -316,7 +308,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
   const sections = [
     { id: "general", label: "General", icon: <Globe size={18} /> },
     { id: "profile", label: "Admin Profile", icon: <User size={18} /> },
-    { id: "seo", label: "SEO & Analytics", icon: <Search size={18} /> },
+    { id: "seo", label: "Cookies", icon: <Shield size={18} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
     // Branding merged into Footer
     { id: "footer", label: "Footer & Branding", icon: <Palette size={18} /> },
@@ -1577,197 +1569,18 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
           {activeSection === "seo" && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
               <h3 className="text-lg font-semibold dark:text-white mb-4">
-                SEO & Analytics Settings
+                Cookie Settings
               </h3>
-
-              {/* Meta Tags Section */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 dark:text-white">
-                  Default Meta Tags
-                </h4>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Default Meta Title
-                  </label>
-                  <input
-                    type="text"
-                    value={seoSettings.metaTitle}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        metaTitle: e.target.value,
-                      })
-                    }
-                    placeholder="Your Site Name - Tagline"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Default Meta Description
-                  </label>
-                  <textarea
-                    value={seoSettings.metaDescription}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        metaDescription: e.target.value,
-                      })
-                    }
-                    placeholder="Brief description of your site (150-160 characters)"
-                    rows={3}
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {seoSettings.metaDescription.length} / 160 characters
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Keywords (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={seoSettings.keywords}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        keywords: e.target.value,
-                      })
-                    }
-                    placeholder="keyword1, keyword2, keyword3"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="border-t dark:border-gray-700 my-4"></div>
-
-              {/* Analytics Section */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 dark:text-white">
-                  Analytics & Tracking
-                </h4>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Google Analytics ID
-                  </label>
-                  <input
-                    type="text"
-                    value={seoSettings.googleAnalyticsId}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        googleAnalyticsId: e.target.value,
-                      })
-                    }
-                    placeholder="G-XXXXXXXXXX or UA-XXXXXXXXX-X"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Google Tag Manager ID
-                  </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    Enter your GTM container ID (e.g., GTM-XXXXXXX). The GTM
-                    scripts will be automatically injected.
-                  </p>
-                  <input
-                    type="text"
-                    value={seoSettings.googleTagManagerId}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        googleTagManagerId: e.target.value,
-                      })
-                    }
-                    placeholder="GTM-XXXXXXX"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Favicon URL
-                  </label>
-                  <input
-                    type="url"
-                    value={seoSettings.faviconUrl}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        faviconUrl: e.target.value,
-                      })
-                    }
-                    placeholder="https://example.com/favicon.ico"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Default OG Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={seoSettings.ogImage}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        ogImage: e.target.value,
-                      })
-                    }
-                    placeholder="https://example.com/og-image.jpg"
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Custom Head Scripts (Google Analytics, etc.)
-                  </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    Paste your Google Analytics or any custom scripts here. They
-                    will be injected into the &lt;head&gt; section of every
-                    page.
-                  </p>
-                  <textarea
-                    value={seoSettings.customHeadScripts}
-                    onChange={(e) =>
-                      setSeoSettings({
-                        ...seoSettings,
-                        customHeadScripts: e.target.value,
-                      })
-                    }
-                    placeholder={`<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n  gtag('config', 'G-XXXXXXXXXX');\n</script>`}
-                    rows={8}
-                    className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none font-mono text-sm"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    ⚠️ Only paste trusted scripts. Malicious scripts can
-                    compromise your site security.
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-t dark:border-gray-700 my-4"></div>
 
               {/* Cookie Consent Section */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                      <Cookie size={18} />
-                      Cookie Consent Popup
+                    <h4 className="font-medium text-gray-900 dark:text-white">
+                      Enable Cookie Banner
                     </h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Enable GDPR-compliant cookie notice
+                      Show cookie consent banner to visitors
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -1787,10 +1600,10 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                 </div>
 
                 {seoSettings.cookieConsentEnabled && (
-                  <>
+                  <div className="grid gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Cookie Message
+                        Banner Message
                       </label>
                       <textarea
                         value={seoSettings.cookieMessage}
@@ -1800,15 +1613,14 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                             cookieMessage: e.target.value,
                           })
                         }
-                        rows={2}
+                        rows={3}
                         className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white resize-none"
                       />
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Accept Button Text
+                          Button Text
                         </label>
                         <input
                           type="text"
@@ -1822,7 +1634,6 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                           className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                         />
                       </div>
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Privacy Policy URL
@@ -1836,12 +1647,11 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                               privacyPolicyUrl: e.target.value,
                             })
                           }
-                          placeholder="/privacy-policy"
                           className="w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#D6A419] outline-none dark:bg-gray-700 dark:text-white"
                         />
                       </div>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
 
@@ -1857,7 +1667,7 @@ const SettingsView = ({ darkMode, toggleDarkMode }) => {
                   ) : (
                     <Save size={18} />
                   )}
-                  Save SEO Settings
+                  Save Changes
                 </button>
               </div>
             </div>

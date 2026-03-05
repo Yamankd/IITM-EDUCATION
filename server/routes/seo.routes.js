@@ -15,14 +15,12 @@ router.get('/sitemap.xml', async (req, res) => {
     try {
         const baseUrl = process.env.CLIENT_URL || 'https://www.digitaliitm.com';
 
-        // Static Routes
+        // Static Routes (only indexable public pages — no noindex pages here)
         const staticRoutes = [
-            '/',
-            '/about',
-            '/contact',
-            '/gallery',
-            '/portal',
-            '/course'
+            { path: '/', priority: '1.0', changefreq: 'daily' },
+            { path: '/course', priority: '0.9', changefreq: 'daily' },
+            { path: '/contact', priority: '0.8', changefreq: 'monthly' },
+            { path: '/gallery', priority: '0.7', changefreq: 'weekly' },
         ];
 
         let xmlContent = '';
@@ -31,9 +29,9 @@ router.get('/sitemap.xml', async (req, res) => {
         staticRoutes.forEach(route => {
             xmlContent += `
     <url>
-        <loc>${baseUrl}${route}</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
+        <loc>${baseUrl}${route.path}</loc>
+        <changefreq>${route.changefreq}</changefreq>
+        <priority>${route.priority}</priority>
     </url>`;
         });
 
@@ -41,33 +39,13 @@ router.get('/sitemap.xml', async (req, res) => {
         const courses = await Course.find({ isActive: true }).select('slug updatedAt');
 
         courses.forEach(course => {
-            // Use slug if available, otherwise fallback to ID (though frontend should support slug)
-            // Assuming frontend uses /course/:id or /course/:slug
-            // Based on CourseDetail.jsx using useParams().id, it likely expects ID currently.
-            // If you have slug support, use course.slug. 
-            // For now, I'll use ID to be safe based on previous code reading, 
-            // BUT Course model has 'slug', let's try to use slug if widely supported, 
-            // or just ID if that's what the app uses.
-            // Re-reading CourseDetail.jsx: `const { id } = useParams(); ... api.get(/courses/${id})`
-            // So it currently depends on ID.
-            // However, to make it SEO friendly, we SHOULD use slugs.
-            // For the sitemap, I'll put the URL that actually works. 
-            // If the app only supports ID, use ID.
-
-            // TODO: Ideally refactor to use Slugs for better SEO, but for now map to what works.
-            // checking CourseDetail.jsx again... it uses `id`.
-            // checking App.jsx... `<Route path="/course/:id" element={<CourseDetail />} />` (inferred)
-            // Let's assume ID for now to ensure links don't 404.
-
-            // Wait, Course model HAS a slug field.
-            // If the router supports slug, we should use it.
-            // Let's stick to ID to maintain current functionality guarantee, 
-            // or maybe the ID param CAN handle slugs if the backend lookup handles it?
-            // Safe bet: ID.
+            // Use slug for SEO-friendly URLs (matches Courses.jsx link behaviour)
+            // Backend getCourseById supports both slug and ObjectId lookup
+            const courseIdentifier = course.slug || course._id;
 
             xmlContent += `
     <url>
-        <loc>${baseUrl}/course/${course._id}</loc>
+        <loc>${baseUrl}/course/${courseIdentifier}</loc>
         <lastmod>${new Date(course.updatedAt).toISOString()}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>

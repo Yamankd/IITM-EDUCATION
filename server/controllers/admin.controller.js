@@ -32,14 +32,15 @@ const admin_Login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // Simplified Environment Check
-    // If we are explicitly in 'production', use secure cookies. Otherwise (development/undefined), be permissive.
-    const isProduction = process.env.NODE_ENV === "production";
+    // Use request origin to determine if this is a localhost request.
+    // NODE_ENV alone is unreliable since .env may have NODE_ENV=production even for local dev.
+    const requestOrigin = req.headers.origin || req.headers.referer || '';
+    const isLocalhost = requestOrigin.includes('localhost') || requestOrigin.includes('127.0.0.1');
 
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: isProduction,             // Only true in explicit production
-      sameSite: isProduction ? "none" : "lax", // Lax for local dev
+      secure: !isLocalhost,             // Only secure on HTTPS (non-localhost)
+      sameSite: isLocalhost ? "lax" : "none", // lax for local dev, none for cross-origin production
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -71,12 +72,13 @@ const AdminDashboard = (req, res) => {
 
 
 const admin_Logout = (req, res) => {
-  const isProduction = process.env.NODE_ENV === "production";
+  const requestOrigin = req.headers.origin || req.headers.referer || '';
+  const isLocalhost = requestOrigin.includes('localhost') || requestOrigin.includes('127.0.0.1');
 
   res.clearCookie("adminToken", {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: !isLocalhost,
+    sameSite: isLocalhost ? "lax" : "none",
   });
   res.status(200).json({ message: "Logout successful" });
 };

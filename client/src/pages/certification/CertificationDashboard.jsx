@@ -4,6 +4,7 @@ import api from "../../api/api";
 import { useConfirm } from "../../components/ConfirmDialog";
 import { Download, LogOut, FileText, CheckCircle, Clock } from "lucide-react";
 import logo from "../../assets/logo.png";
+import SEO from "../../components/common/SEO";
 
 const CertificationDashboard = () => {
   const navigate = useNavigate();
@@ -102,6 +103,11 @@ const CertificationDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <SEO
+        title="Certification Dashboard"
+        description="Your IITM certification dashboard."
+        noindex={true}
+      />
       {/* Navbar */}
       <nav className="bg-[#0B2A4A] text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

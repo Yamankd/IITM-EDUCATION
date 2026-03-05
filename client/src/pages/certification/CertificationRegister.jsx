@@ -4,6 +4,7 @@ import api from "../../api/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../assets/logo.png";
+import SEO from "../../components/common/SEO";
 import {
   CheckCircle,
   Mail,
@@ -194,6 +195,11 @@ const CertificationRegister = () => {
 
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col md:flex-row font-sans text-gray-800">
+      <SEO
+        title="Certification Register"
+        description="Register for IITM Certification exams."
+        noindex={true}
+      />
       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* Left Panel */}

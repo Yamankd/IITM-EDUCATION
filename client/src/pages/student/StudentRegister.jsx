@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/api";
+import SEO from "../../components/common/SEO";
 
 const StudentRegister = () => {
   const [formData, setFormData] = useState({
@@ -30,6 +31,11 @@ const StudentRegister = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0B2A4A] px-4 py-12">
+      <SEO
+        title="Student Registration"
+        description="Register as a student at IITM Computer Education."
+        noindex={true}
+      />
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-[#0B2A4A] mb-6">
           Student Registration

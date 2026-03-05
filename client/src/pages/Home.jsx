@@ -208,9 +208,10 @@ const Home = () => {
   return (
     <>
       <SEO
-        title="Home"
-        description="Welcome to IITM Computer Education. Discover world-class education and cutting-edge research in computer science and technology."
-        keywords="IITM, Computer Education, Web Development, Data Science, Coding, Mathura"
+        title="Best Computer Institute in Mathura — Courses, Certification & More"
+        description="IITM Computer Education — Mathura's leading computer institute. Expert-led courses in Web Development, Data Science, O-Level, and more. 14+ years, 25K+ alumni."
+        keywords="IITM, Computer Education, Web Development, Data Science, Coding, Mathura, Best Computer Institute, O Level"
+        image="https://www.digitaliitm.com/logo.png"
       />
       {/* Hero Section */}
       <div

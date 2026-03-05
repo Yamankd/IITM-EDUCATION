@@ -38,7 +38,7 @@ const StudentLogin = () => {
       <SEO
         title="Student Login"
         description="Login to the Student Portal to access your courses, view exam results, and manage your profile."
-        keywords="student login, iitm student portal, student dashboard, education portal"
+        noindex={true}
       />
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
