@@ -13,7 +13,9 @@ ${content}
 // GET /sitemap.xml
 router.get('/sitemap.xml', async (req, res) => {
     try {
-        const baseUrl = process.env.CLIENT_URL || 'https://www.digitaliitm.com';
+        // Always use the canonical production domain for sitemap URLs.
+        // CLIENT_URL env var may point to a staging/subdomain — sitemap must use the real domain.
+        const baseUrl = 'https://www.digitaliitm.com';
 
         // Static Routes (only indexable public pages — no noindex pages here)
         const staticRoutes = [
@@ -63,7 +65,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
 // GET /robots.txt
 router.get('/robots.txt', (req, res) => {
-    const baseUrl = process.env.CLIENT_URL || 'https://www.digitaliitm.com';
+    const baseUrl = 'https://www.digitaliitm.com';
     const content = `User-agent: *
 Allow: /
 
