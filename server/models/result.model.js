@@ -45,6 +45,8 @@ const resultSchema = new mongoose.Schema(
             {
                 questionId: mongoose.Schema.Types.ObjectId,
                 selectedOptionIndex: Number,
+                selectedOptionIndexes: [Number], // Added to support multiple-choice
+                textAnswer: String, // Added to support fill-blank and code
                 isCorrect: Boolean,
             },
         ],

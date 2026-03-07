@@ -10,8 +10,8 @@ const certificationExamRoutes = require("./routes/certificationExam.routes");
 const app = express();
 
 // Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 // Define allowed origins

@@ -40,11 +40,64 @@ const ExamPortal = ({ isExternal = false }) => {
   const [timeLeft, setTimeLeft] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar toggle
   const [studentProfile, setStudentProfile] = useState(null); // Student info
+  const [isSubmitting, setIsSubmitting] = useState(false); // Submission loading state
 
   useEffect(() => {
     fetchExam();
     fetchStudentProfile();
+
+    // Load saved state from localStorage
+    const savedState = localStorage.getItem(`exam_state_${examId}`);
+    if (savedState) {
+      try {
+        const parsedState = JSON.parse(savedState);
+        setAnswers(parsedState.answers || {});
+        setVisitedQuestions(new Set(parsedState.visitedQuestions || [0]));
+        setMarkedForReview(new Set(parsedState.markedForReview || []));
+        setTimeLeft(parsedState.timeLeft);
+        setCurrentQuestionIndex(parsedState.currentQuestionIndex || 0);
+        setExamStarted(parsedState.examStarted || false);
+      } catch (e) {
+        console.error("Failed to parse saved exam state:", e);
+      }
+    }
   }, [examId]);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (examStarted && exam) {
+      const stateToSave = {
+        answers,
+        visitedQuestions: Array.from(visitedQuestions),
+        markedForReview: Array.from(markedForReview),
+        currentQuestionIndex,
+        examStarted,
+      };
+      // Note: timeLeft is intentionally omitted here to avoid writing to localStorage every second.
+      // It will be saved periodically or during critical actions if needed.
+      localStorage.setItem(`exam_state_${examId}`, JSON.stringify(stateToSave));
+    }
+  }, [
+    answers,
+    visitedQuestions,
+    markedForReview,
+    currentQuestionIndex,
+    examStarted,
+    exam,
+    examId,
+  ]);
+
+  // Periodically save timeLeft (every 10 seconds)
+  useEffect(() => {
+    if (examStarted && timeLeft !== null) {
+      const savedState = localStorage.getItem(`exam_state_${examId}`);
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        parsed.timeLeft = timeLeft;
+        localStorage.setItem(`exam_state_${examId}`, JSON.stringify(parsed));
+      }
+    }
+  }, [timeLeft % 10 === 0]); // Save every 10 seconds
 
   // Timer effect added above
 
@@ -192,6 +245,8 @@ const ExamPortal = ({ isExternal = false }) => {
   };
 
   const submitExam = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true);
     try {
       const formattedAnswers = Object.keys(answers).map((qId) => {
         const answer = answers[qId];
@@ -232,14 +287,27 @@ const ExamPortal = ({ isExternal = false }) => {
       // Clear saved exam state after successful submission
       localStorage.removeItem(`exam_state_${examId}`);
     } catch (error) {
-      console.error(error);
+      console.error("Exam submission error:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.status,
+      });
 
       // Check if the error is due to already attempting the exam
       if (error.response?.data?.alreadyAttempted) {
         showError("You have already attempted this exam.");
+      } else if (error.response?.status === 413 || error.status === 413) {
+        showError(
+          "The exam data is too large to submit. Please contact support.",
+        );
       } else {
-        showError("Failed to submit exam. Please try again.");
+        const errorMsg =
+          error.response?.data?.message ||
+          "Failed to submit exam. Please try again.";
+        showError(errorMsg);
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -832,9 +900,21 @@ const ExamPortal = ({ isExternal = false }) => {
           <div className="p-6 border-t border-white/10 bg-[#0B2A4A]/50 backdrop-blur-sm">
             <button
               onClick={handleSubmit}
-              className="w-full py-4 bg-[#D6A419] text-[#0B2A4A] font-bold rounded-xl shadow-lg hover:bg-[#eebb30] hover:shadow-xl hover:shadow-[#D6A419]/20 transition-all transform active:scale-95 text-lg"
+              disabled={isSubmitting}
+              className={`w-full py-4 font-bold rounded-xl shadow-lg transition-all transform text-lg flex items-center justify-center gap-3 ${
+                isSubmitting
+                  ? "bg-gray-500 cursor-not-allowed text-white/50"
+                  : "bg-[#D6A419] text-[#0B2A4A] hover:bg-[#eebb30] hover:shadow-xl hover:shadow-[#D6A419]/20 active:scale-95"
+              }`}
             >
-              Submit Exam
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Submitting...
+                </>
+              ) : (
+                "Submit Exam"
+              )}
             </button>
           </div>
         </div>

@@ -249,7 +249,7 @@ const submitExam = async (req, res) => {
                     case 'single-choice':
                     case 'true-false':
                         // Single answer comparison
-                        isCorrect = question.correctOptionIndex === ans.selectedOptionIndex;
+                        isCorrect = Number(question.correctOptionIndex) === Number(ans.selectedOptionIndex);
                         break;
 
                     case 'multiple-choice':
@@ -332,14 +332,15 @@ const submitExam = async (req, res) => {
             resultPayload.studentId = studentId;
         }
 
+        console.log('💾 Saving result for student:', studentId || externalStudentId, 'Payload size:', JSON.stringify(resultPayload).length, 'bytes');
         const result = await Result.create(resultPayload);
-        console.log('✅ Exam submitted successfully. Score:', scorePercentage.toFixed(2) + '%');
+        console.log('✅ Exam submitted successfully. Result ID:', result._id, 'Score:', scorePercentage.toFixed(2) + '%');
 
         res.json(result);
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('❌ Exam submission error:', error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
 

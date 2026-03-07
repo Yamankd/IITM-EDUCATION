@@ -171,27 +171,57 @@ const submitCertificationExam = async (req, res) => {
             if (question) {
                 let isCorrect = false;
 
+                const normalize = (str) => str.replace(/[.,;!?]/g, "").trim();
+
                 switch (question.questionType) {
-                    case 'single-choice':
-                    case 'true-false':
-                        isCorrect = question.correctOptionIndex === ans.selectedOptionIndex;
+                    case "single-choice":
+                    case "true-false":
+                        isCorrect =
+                            Number(question.correctOptionIndex) ===
+                            Number(ans.selectedOptionIndex);
                         break;
-                    case 'multiple-choice':
-                        if (Array.isArray(ans.selectedOptionIndexes) && Array.isArray(question.correctOptionIndexes)) {
-                            const sorted1 = [...ans.selectedOptionIndexes].map(v => Number(v)).sort((a, b) => a - b);
-                            const sorted2 = [...question.correctOptionIndexes].map(v => Number(v)).sort((a, b) => a - b);
-                            isCorrect = JSON.stringify(sorted1) === JSON.stringify(sorted2);
+                    case "multiple-choice":
+                        if (
+                            Array.isArray(ans.selectedOptionIndexes) &&
+                            Array.isArray(question.correctOptionIndexes)
+                        ) {
+                            const sorted1 = [...ans.selectedOptionIndexes]
+                                .map((v) => Number(v))
+                                .filter((val) => !isNaN(val))
+                                .sort((a, b) => a - b);
+                            const sorted2 = [...question.correctOptionIndexes]
+                                .map((v) => Number(v))
+                                .sort((a, b) => a - b);
+                            isCorrect =
+                                JSON.stringify(sorted1) ===
+                                JSON.stringify(sorted2);
                         }
                         break;
-                    case 'fill-blank':
-                    case 'code':
+                    case "fill-blank":
                         if (ans.textAnswer && question.correctAnswer) {
-                            // Simplified check
-                            isCorrect = ans.textAnswer.trim().toLowerCase() === question.correctAnswer.trim().toLowerCase();
+                            const studentAnswer = question.caseSensitive
+                                ? normalize(ans.textAnswer)
+                                : normalize(ans.textAnswer).toLowerCase();
+                            const correctAnswer = question.caseSensitive
+                                ? normalize(question.correctAnswer)
+                                : normalize(question.correctAnswer).toLowerCase();
+
+                            isCorrect = studentAnswer === correctAnswer;
+                        }
+                        break;
+                    case "code":
+                        if (ans.textAnswer && question.correctAnswer) {
+                            const normalizeCode = (str) =>
+                                str.replace(/\s+/g, "");
+                            isCorrect =
+                                normalizeCode(ans.textAnswer) ===
+                                normalizeCode(question.correctAnswer);
                         }
                         break;
                     default:
-                        isCorrect = Number(ans.selectedOptionIndex) === Number(question.correctOptionIndex);
+                        isCorrect =
+                            Number(ans.selectedOptionIndex) ===
+                            Number(question.correctOptionIndex);
                 }
 
                 if (isCorrect) correctCount++;
@@ -210,7 +240,7 @@ const submitCertificationExam = async (req, res) => {
         const scorePercentage = (correctCount / totalQuestions) * 100;
         const isPassed = scorePercentage >= exam.passingScore;
 
-        const result = await CertificationResult.create({
+        const resultData = {
             externalStudentId,
             examId,
             totalQuestions,
@@ -218,14 +248,17 @@ const submitCertificationExam = async (req, res) => {
             scorePercentage,
             isPassed,
             answers: processedAnswers
-        });
-        console.log('✅ Certification exam submitted successfully. Score:', scorePercentage.toFixed(2) + '%');
+        };
+
+        console.log('💾 Saving certification result for external student:', externalStudentId, 'Payload size:', JSON.stringify(resultData).length, 'bytes');
+        const result = await CertificationResult.create(resultData);
+        console.log('✅ Certification exam submitted successfully. Result ID:', result._id, 'Score:', scorePercentage.toFixed(2) + '%');
 
         res.json(result);
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('❌ Certification exam submission error:', error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
 

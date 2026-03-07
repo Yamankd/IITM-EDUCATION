@@ -67,6 +67,10 @@ router.get('/sitemap.xml', async (req, res) => {
 router.get('/robots.txt', (req, res) => {
     const baseUrl = 'https://www.digitaliitm.com';
     const content = `User-agent: *
+Disallow: /admin
+Disallow: /AdminDashboard
+Disallow: /admin-login
+Disallow: /portal
 Allow: /
 
 Sitemap: ${baseUrl}/sitemap.xml`;
