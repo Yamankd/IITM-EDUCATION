@@ -38,16 +38,13 @@ router.get('/sitemap.xml', async (req, res) => {
         });
 
         // Add Dynamic Course Routes
-        const courses = await Course.find({ isActive: true }).select('slug updatedAt');
+        // Only include courses with a slug for SEO quality
+        const courses = await Course.find({ isActive: true, slug: { $exists: true, $ne: "" } }).select('slug updatedAt');
 
         courses.forEach(course => {
-            // Use slug for SEO-friendly URLs (matches Courses.jsx link behaviour)
-            // Backend getCourseById supports both slug and ObjectId lookup
-            const courseIdentifier = course.slug || course._id;
-
             xmlContent += `
     <url>
-        <loc>${baseUrl}/course/${courseIdentifier}</loc>
+        <loc>${baseUrl}/course/${course.slug}</loc>
         <lastmod>${new Date(course.updatedAt).toISOString()}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>

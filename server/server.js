@@ -14,6 +14,34 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// SEO Redirect Middleware: Redirect to WWW and remove trailing slashes
+app.use((req, res, next) => {
+  const host = req.get("host");
+  const url = req.originalUrl;
+
+  // 1. Redirect non-www to www (canonical domain)
+  // Only apply in production if possible, but identifying production by digitaliitm.com
+  if (host === "digitaliitm.com") {
+    return res.redirect(301, `https://www.digitaliitm.com${url}`);
+  }
+
+  // 2. Remove trailing slash (except for the root path)
+  if (url.length > 1 && url.endsWith("/")) {
+    const cleanUrl = url.slice(0, -1);
+    return res.redirect(301, cleanUrl);
+  }
+
+  // 3. Lowercase URL Redirect (except for the query string)
+  const path = req.path;
+  if (path !== path.toLowerCase()) {
+    const newPath = path.toLowerCase();
+    const query = req.url.slice(path.length);
+    return res.redirect(301, `${newPath}${query}`);
+  }
+
+  next();
+});
+
 // Define allowed origins
 const allowedOrigins = [
   "http://localhost:5173",                // Local development

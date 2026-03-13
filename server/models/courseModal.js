@@ -61,4 +61,19 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Pre-save hook for slug sanitization
+courseSchema.pre("save", function (next) {
+  if (this.isModified("slug") || (this.isNew && !this.slug)) {
+    const source = this.slug || this.title;
+    if (source) {
+      this.slug = source
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with -
+        .replace(/(^-|-$)+/g, ""); // Remove leading/trailing -
+    }
+  }
+  next();
+});
+
 module.exports = mongoose.model("Course", courseSchema);
